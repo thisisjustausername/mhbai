@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="de" xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://ogp.me/ns#" prefix="og: http://ogp.me/ns#">
+<head>
+
+<meta charset="utf-8">
+<!-- 
+	This website is powered by TYPO3 - inspiring people to share!
+	TYPO3 is a free open source Content Management Framework initially created by Kasper Skaarhoj and licensed under GNU/GPL.
+	TYPO3 is copyright 1998-2019 of Kasper Skaarhoj. Extensions are copyright of their respective owners.
+	Information and contribution at https://typo3.org/
+-->
+
+
+<link rel="shortcut icon" href="https://studieren.de/favicon.ico" type="image/vnd.microsoft.icon">
+
+<meta name="generator" content="TYPO3 CMS">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="xStudy SE">
+<meta name="copyright" content="xStudy SE">
+<meta name="publisher" content="xStudy SE">
+<meta name="referrer" content="no-referrer-when-downgrade">
+<meta name="robots" content="index,follow">
+<meta name="revisit-after" content="1 day">
+<meta http-equiv="expires" content="0">
+<meta http-equiv="cache-control" content="no-cache,no-store,max-age=0">
+<meta http-equiv="pragma" content="no-cache">
+<meta name="language" content="de">
+<meta http-equiv="content-language" content="de">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+
+<link rel="stylesheet" type="text/css" href="https://studieren.de/typo3temp/assets/compressed/merged-bd748c9798d2d00ccfd7451f4eba557e-2c23dc7d07ce10e8262df00bc78185a6.css?1734699360" media="all">
+
+
+
+<script src="https://studieren.de/typo3temp/assets/compressed/merged-bf5c55510df41de199077fb49a53a4ff-3fd6fae766a618fc4981bc1ddbd249c5.js?1741767812" type="text/javascript"></script>
+
+
+
+
+<link rel="preload" as="font" href="https://studieren.de/typo3conf/ext/search_core/Resources/Public/Fonts/5560332/70509f43-bcee-44d2-b61b-f6c2a10982b7.woff2" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" as="font" href="https://studieren.de/typo3conf/ext/search_core/Resources/Public/Fonts/5560332/e8b8f4ed-a81a-4dfb-ad0b-e842c8b2834f.woff" type="font/woff" crossorigin="anonymous">
+<link rel="preload" as="font" href="https://studieren.de/typo3conf/ext/search_core/Resources/Public/Fonts/5559111/9a9e7c17-4d4a-43f9-bf79-36404cb158f4.woff2" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" as="font" href="https://studieren.de/typo3conf/ext/search_core/Resources/Public/Fonts/5559111/4dbb9d29-6d18-4da9-a0fa-e92972dfdb24.woff" type="font/woff" crossorigin="anonymous">
+<link rel="preload" as="font" href="https://studieren.de/typo3conf/ext/search_core/Resources/Public/Fonts/5561753/189496f8-4502-4032-8651-cc1b39a8e01d.woff2" type="font/woff2" crossorigin="anonymous">
+<script>(function(factory){'use strict';window.xStudy=window.xStudy||{};factory(jQuery,window.xStudy,window.xStudy);}(function($,_,__){'use strict';_.GoogleMaps.Loader.libraryUrl='https://maps.googleapis.com/maps/api/js?key=AIzaSyD1l-wFr3KXMj2d0-EcqzbiJpxAkuxvgEw';$(document).ready(function(){_.sliders=new _.Sliders('section.content-tile-box-container','div.content-tile-box-glider-container','button.content-tile-box-nav-prev-arrow','button.content-tile-box-nav-next-arrow','div.content-tile-box.with-preview-video',[{breakpoint:940,top:90},{breakpoint:620,top:90},{breakpoint:300,top:117}]);});}));</script>
+<script>(function(factory){'use strict';window.xStudy=window.xStudy||{};window.xStudy.Favorites=window.xStudy.Favorites||{};factory(jQuery,window.xStudy,window.xStudy.Favorites);}(function($,_,__){'use strict';$(window).on('load',function(){_.Locale.set({"dialog.button.ok":"OK","dialog.button.cancel":"Abbrechen","dialog.button.delete":"L\u00f6schen","dialog.button.close":"Schlie\u00dfen","dialog.button.send":"E-Mail senden","dialog.notepad.save":"Favoriten speichern","dialog.type.email":"Bitte gib Deine E-Mail Adresse ein um die Favoriten zu speichern.","dialog.gdpr.acknowledgment.text":"<strong>Datenschutzrechtliche Einwilligungserkl\u00e4rung<\/strong><br\/><span>Ich willige ein, dass mich die xStudy SE per E-Mail kontaktieren darf, um mir den Zugriff auf meine Favoriten zu erm\u00f6glichen. Dar\u00fcberhinaus gebe ich der xStudy SE die Erlaubnis die Studienangebote, die ich mir gemerkt habe, zu speichern und in anonymisierter Form, zur Ermittlung von statistischer Kennwerte zu verwenden. Meine Daten werden ausschlie\u00dflich zu diesem Zweck genutzt. Eine Weitergabe von personenbezogenen Daten an Dritte erfolgt nicht. Ich kann die Einwilligung jederzeit per E-Mail an <a href=\"mailto:support@studieren.de\">support@studieren.de<\/a> oder per Brief an xStudy SE, Alter Hof 5, 80331 M\u00fcnchen widerrufen.<\/span>","dialog.gdpr.acknowledgment.error":"Wir ben\u00f6tigen Deine datenschutzrechtliche Einwilligung.","dialog.subscribe.newsletter":"F\u00fcr Newsletter anmelden","dialog.type.captcha.code":"Bitte gib den Code zur Best\u00e4tigung ein:","dialog.notepad.save.success":"Favoriten wurden gespeichert","dialog.notepad.save.success.info":"<p>Deine Favoriten wurde erfolgreich gespeichert und an folgende E-Mail Adresse verschickt: <strong><a href=\"mailto:{#email}\">{#email}<\/a><\/strong><\/p>\n<p>Du kannst Deine Favoriten \u00fcber den in der E-Mail angegebenen Link wieder abrufen und weiter bearbeiten.<\/p>\n<p><strong>Achtung:<\/strong> Deine E-Mail Adresse wird 3 Monate nach Deinem letzten Abruf oder Deiner letzten Bearbeitung automatisch gel\u00f6scht. Danach k\u00f6nnen Deine Favoriten nicht mehr aufgerufen werden.<\/p>","dialog.notepad.ticketExists":"Favoriten existiert bereits","dialog.notepad.ticketExists.info":"<p>F\u00fcr die angegebene E-Mail Adresse existiert bereits Favoriten. Soll Dir ein Link per E-Mail gesendet werden, um diesen zu \u00f6ffnen und weiter zu bearbeiten?<\/p>\n<p><strong>Achtung:<\/strong> Wenn Du die gespeicherten Favoriten \u00f6ffnest, geht Deine aktuelle Auswahl verloren.<\/p>","dialog.notepad.ticketExists.success":"E-Mail wurde versendet","dialog.notepad.ticketExists.success.info":"<p>Die E-Mail mit dem Link auf Deine Favoriten wurde erfolgreich versendet.<\/p>\n<p>Bitte schlie\u00dfe dieses Browserfenster und \u00f6ffne den Link aus der E-Mail um Deine Favoriten zu laden.<\/p>","dialog.notepad.save.fail":"Favoriten wurde nicht gespeichert","dialog.notepad.save.fail.info":"<p>Deine Favoriten konnte auf Grund eines Fehlers nicht gespeichert werden.<\/p>","dialog.notepad.delete.title":"Favoriten l\u00f6schen","dialog.notepad.delete.info":"<p>Sollen die Favoriten wirklich komplett gel\u00f6scht werden?<\/p>","dialog.notepad.delete.done.title":"Favoriten gel\u00f6scht","dialog.notepad.delete.done.info":"<p>Deine Favoriten wurde erfolgreich gel\u00f6scht.<\/p>","dialog.notepad.delete.fail.title":"Favoriten konnte nicht gel\u00f6scht werden","dialog.notepad.delete.fail.info":"<p>Deine Favoriten konnte aus unbekanntn Gr\u00fcnden nicht gel\u00f6scht werden.<\/p>\n<p>Bitte kontaktiere uns, damit wir Dir helfen und den Fehler beheben k\u00f6nnen.<\/p>","dialog.error.title":"Fehler","dialog.error.email.empty":"Bitte im Feld f\u00fcr die E-Mail eine korrekte Adresse angeben.","map.control.reset":"Ansicht zur\u00fccksetzen"});_.favoritesWidget=new __.Widget({profileDetails:3307,programDetails:3306,reference:3317,configuration:3291,address:227,ticket:817});_.favoritesDetails=new __.Details({display:false,listDetailsUrl:'https://studieren.de/studienprofil.560.html'});});}));</script>
+<script>(function(factory){'use strict';window.xStudy=window.xStudy||{};factory(jQuery,window.xStudy,window.xStudy.xStudy);}(function($,_,__){'use strict';$(document).ready(function(){$('div.page > div.page-default-header').topBar();_.widgetSearch=new _.Search.Widget($('form[name="search"]'));_.autoSuggest=new _.AutoSuggest($('#searchString'),{className:'autoSuggest fixed',minChars:2,timeout:0,delay:0,offsety:-5,positionTo:$('#searchStringContainer'),positionFixed:true,width:'match'});_.embedPlayer=new _.EmbedPlayer('a[rel="embed-player"]',{jwPlayerApiKey:'8YcDPIH3E5Js3zj20h5T5tgKv74xdGaBAy684JN9PnQ=',googleApiKey:'AIzaSyD1l-wFr3KXMj2d0-EcqzbiJpxAkuxvgEw'});_.imageDisplay=new _.ImageDisplay('a[rel="image-display"]');_.tabAnchor=new _.TabAnchor('article.page-body-section-content-details.profile-details','a');_.secureImgUrl=$('footer div.course-profile-source-id img').attr('src');$('input[type="radio"][name="tabs"]').change(function(event){var secureImg=$('footer div.course-profile-source-id img');if(secureImg){$('<img/>').attr('src',_.secureImgUrl+'#'+new Date().getTime()).insertBefore(secureImg);secureImg.remove();}});});if(!(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(navigator.userAgent||navigator.vendor||window.opera)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test((navigator.userAgent||navigator.vendor||window.opera).substr(0,4)))){$(window).on('load resize',function(){$('section.profile-details-media-container').slimScroll({destroy:true}).slimScroll({axis:'x',size:'10px',height:'266px',color:'rgba(255, 255, 255, .75)',opacity:1,disableFadeOut:true,railVisible:false,applyVerticalWheelToHorizontal:true,wheelStep:500});});}}));</script>
+
+
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Course","url":"https://studieren.de/musiktheaterregie-hfm-hanns-eisler-berlin.studienprofil.t-0.a-266.c-46818.p-286820.html","name":"(Musiktheater-)Regie B.Mus.","description":"Der Studiengang Bachelor Regie für Musiktheater ist ein künstlerischer, praxisorientierter Bachelorstudiengang, in dem Studierende innerhalb von acht Semestern dem vielfältigen Tätigkeitsspektrum der Regie begegnen.","offers":{"@type":"Offer","category":"Free"},"hasCourseInstance":[{"@type":"CourseInstance","name":"Bachelor of Music","courseMode":"Onsite","location":"Hochschule für Musik Hanns Eisler Berlin","courseWorkload":"P3Y","startDate":"2025-10-01"}],"image":"https://studieren.de/profilestorage/_processed_/7/2/csm_Studienprofil-266-46818-286820-2_6227d644f4.jpg","provider":{"@type":"Organization","name":"Hochschule für Musik Hanns Eisler Berlin","sameAs":"https://www.hfm-berlin.de/"}}</script>
+</head>
+<body>
+
+<div class="page">
+
+	<div class="page-default-header">
+		<div class="page-default-header-inner">
+			<div class="page-default-header-grid">
+				<div class="page-default-header-logo"><a href="https://studieren.de/" target="_top" title="studieren.de"><img src="https://studieren.de/typo3conf/ext/search_core/Resources/Public/Images/Logos/studieren-de-studium.svg" width="300" height="66" alt="studieren.de Logo: Finde Dein Studium!" /></a></div>
+
+				<div class="page-default-header-search">
+					<form id="searchStringContainer" class="page-default-header-search-input-container" name="search" action="https://studieren.de/suche.0.html" method="get">
+						<div class="page-default-header-search-fieldset">
+							<input id="searchString" name="search" type="text" value="" placeholder="Finde Dein Studium" />
+							<button name="search-start" type="submit" value="go" title="Suchen">
+								<span class="xsi xsi-s32 xsi-orange xsi-magnifier"></span>
+							</button>
+						</div>
+					</form>
+				</div>
+
+				<div class="page-default-header-counters page-header-counters">
+					<a class="page-header-counters-entry courses" href="https://studieren.de/suche.0.html"><span class="numbers">23.436</span> <span class="label">Studiengänge</span></a>
+					<a class="page-header-counters-entry universities" href="https://studieren.de/suche.0.html?lt=university"><span class="numbers">733</span> <span class="label">Hochschulen</span></a>
+					<a class="page-header-counters-entry courseprofiles" href="https://studieren.de/suche.0.html?sw=studienprofile"><span class="numbers">3.925</span> <span class="label">Studienprofile</span></a>
+				</div>
+
+				<div class="page-default-header-favorites">
+					<button type="button" class="favorites-button" name="favorites" type="button" value="false" title="Deine Favoriten">
+	<div class="grid">
+		<span class="icon">
+			<span class="counter" style="display:none;"><em>0</em></span>
+		</span>
+		<span class="label">Favoriten</span>
+	</div>
+</button>
+
+				</div>
+
+				<div class="page-default-header-navigation">
+					<button id="page-header-navigation-button" class="xsi xsi-s32 xsi-grey-light xsi-menue" type="button">Menü</button>
+
+	<nav id="page-header-navigation-layer" style="display: none; visibility: hidden;">
+		<div class="page-header-navigation-layer-content">
+			<div class="page-header-navigation-layer-content-links">
+				<div class="page-header-navigation-layer-content-link"><ul><li><a href="https://studieren.de/suche.0.html" title="Suchmaschine">Suchmaschine</a></li><li><a href="https://studieren.de/fachbereiche.0.html" title="Fachbereiche">Fachbereiche</a></li><li><a href="https://studieren.de/studiengangsliste.0.html" title="Studiengänge">Studiengänge</a></li><li><a href="https://studieren.de/hochschulliste.0.html" title="Universitäten und Hochschulen">Universitäten und Hochschulen</a></li><li><a href="https://studieren.de/thessaai.0.html" title="Test für Ausbildung und Studium">Test für Ausbildung und Studium</a></li><li><a href="https://studieren.de/studienberatung.0.html" title="Studienberatung">Studienberatung</a></li><li><a href="https://studieren.de/berufsberatung.0.html" title="Beruf und Karriere">Beruf und Karriere</a></li><li><a href="https://studieren.de/studium-veranstaltungen.0.html" title="Terminkalender">Terminkalender</a></li><li><a href="https://studieren.de/hochschule-service.0.html" title="Service für Hochschulen">Service für Hochschulen</a></li></ul></div>
+			</div>
+			<div id="page-header-navigation-layer-content-close" class="page-header-navigation-layer-content-close xsi xsi-grey-light xsi-close-button"></div>
+		</div>
+	</nav>
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="page-header-clearer">&nbsp;</div>
+
+
+
+
+
+<div class="page-path" itemscope itemtype="http://schema.org/BreadcrumbList"><span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><a itemprop="item" href="https://studieren.de/" title="Studium"><span itemprop="name">Studium</span></a><meta itemprop="url" content="https://studieren.de/"/><meta itemprop="position" content="1"/></span><span> › </span><span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><a itemprop="item" href="https://studieren.de/fachbereiche.0.html" title="Fachbereiche"><span itemprop="name">Fachbereiche</span></a><meta itemprop="url" content="https://studieren.de/fachbereiche.0.html"/><meta itemprop="position" content="2"/></span><span> › </span><span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><a itemprop="item" href="https://studieren.de/kunst-gestaltung-und-musik.fachbereiche.t-0.f-570.html" title="Kunst, Gestaltung und Musik"><span itemprop="name">Kunst, Gestaltung und Musik</span></a><meta itemprop="url" content="https://studieren.de/kunst-gestaltung-und-musik.fachbereiche.t-0.f-570.html"/><meta itemprop="position" content="3"/></span><span> › </span><span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><a itemprop="item" href="https://studieren.de/musik-und-musikwissenschaft.fachbereiche.t-0.f-76.html" title="Musik und Musikwissenschaft"><span itemprop="name">Musik und Musikwissenschaft</span></a><meta itemprop="url" content="https://studieren.de/musik-und-musikwissenschaft.fachbereiche.t-0.f-76.html"/><meta itemprop="position" content="4"/></span><span> › </span><span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><a itemprop="item" href="https://studieren.de/musiktheaterregie.hochschulliste.t-0.c-46818.html" title="(Musiktheater-)Regie"><span itemprop="name">(Musiktheater-)Regie</span></a><meta itemprop="url" content="https://studieren.de/musiktheaterregie.hochschulliste.t-0.c-46818.html"/><meta itemprop="position" content="5"/></span><span> › </span><span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><a itemprop="item" href="https://studieren.de/hfm-hanns-eisler-berlin.hochschule.t-0.a-266.html" title="HFM Hanns Eisler Berlin"><span itemprop="name">HFM Hanns Eisler Berlin</span></a><meta itemprop="url" content="https://studieren.de/hfm-hanns-eisler-berlin.hochschule.t-0.a-266.html"/><meta itemprop="position" content="6"/></span><span> › </span><span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><a itemprop="item" href="https://studieren.de/musiktheaterregie-hfm-hanns-eisler-berlin.studienprofil.t-0.a-266.c-46818.p-286820.html" title="Profil"><span itemprop="name">Profil</span></a><meta itemprop="url" content="https://studieren.de/musiktheaterregie-hfm-hanns-eisler-berlin.studienprofil.t-0.a-266.c-46818.p-286820.html"/><meta itemprop="position" content="7"/></span></div>
+
+
+
+
+
+	<div class="page-body">
+
+
+<div id="c14286" class="page-body-section">
+
+
+
+		<header>
+
+					<span class="slim">Studienprofil</span>
+
+		</header>
+
+
+
+<div class="page-body-section-content">
+
+
+
+	<article class="page-body-section-content-details profile-details xs-faculty-76">
+		<header>
+			<div class="headlines">
+				<!-- Studienprofiltitel -->
+				<h1 title="(Musiktheater-) Regie">(Musiktheater-) Regie</h1>
+				<div class="headlines-additional-info">
+					<!-- Name der Universität/Hochschule -->
+					<div class="headlines-additional-info-line text-switch">
+						<span class="text-switch-long">Hochschule für Musik Hanns Eisler Berlin</span>
+						<span class="text-switch-spacer"> / </span>
+						<span class="text-switch-short">HFM Hanns Eisler Berlin</span>
+					</div>
+					<!-- Art des/Infos zum Abschluss -->
+					<div class="headlines-additional-info-line text-switch">
+						<span class="text-switch-long">Bachelor of Music</span>
+						<span class="text-switch-spacer"> / </span>
+						<span class="text-switch-short">Bachelor of Music</span>
+					</div>
+				</div>
+			</div>
+			<aside class="functions">
+				<button class="favorites-trigger white" name="favorites:action" value="false" data-favorites-values="u:266,c:46818" data-color="white" title="Diesen Studiengang zu den Favoriten hinzufügen"></button>
+
+				<a class="function download-button" href="https://studieren.de/studienprofil.a-266.c-46818.p-286820.pdf" title=""></a>
+				<a class="function course-guidance" href="https://studieren.de/studienberatung-persoenlich.0.html?tx_ascourseguidance_pi1%5Bacademy%5D=266&amp;tx_ascourseguidance_pi1%5Bcourse%5D=46818" title="Studienberatung"></a>
+				<a class="function close-button" href="https://studieren.de/hfm-hanns-eisler-berlin.hochschule.t-0.a-266.html" title="Schließen"></a>
+			</aside>
+		</header>
+
+		<section class="profile-details-media-container xs-faculty-76-brighter-bg">
+			<div class="media-track">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		<div class="media-track-slide">
+			<a href="https://studieren.de/profilestorage/_processed_/1/c/csm_Studienprofil-266-46818-286820-2_f71fb4cd3d.jpg" rel="image-display">
+
+				<img data-title="" data-description="© Foto: Jonathan Gäsler (www.jonathangaessler.de), Regie: Leonie Haupt" title="© Foto: Jonathan Gäsler (www.jonathangaessler.de), Regie: Leonie Haupt" alt="study profile image" src="https://studieren.de/profilestorage/_processed_/1/c/csm_Studienprofil-266-46818-286820-2_6f10e22a00.jpg" width="399" height="266" />
+			</a>
+		</div>
+
+		<div class="media-track-slide">
+			<a href="https://studieren.de/profilestorage/_processed_/f/a/csm_Studienprofil-266-46818-286820-0_873416133d.jpg" rel="image-display">
+
+				<img data-title="" data-description="© Foto: David Scholl, Regie: Moritz Warnecke" title="© Foto: David Scholl, Regie: Moritz Warnecke" alt="study profile image" src="https://studieren.de/profilestorage/_processed_/f/a/csm_Studienprofil-266-46818-286820-0_8df4d436ae.jpg" width="201" height="266" />
+			</a>
+		</div>
+
+		<div class="media-track-slide">
+			<a href="https://studieren.de/profilestorage/photos/self-service/user-4645/Studienprofil-266-46818-286820-1.jpeg" rel="image-display">
+
+				<img data-title="" data-description="© Foto: Muriel Weinmann, Regie: Nada Zimmermann" title="© Foto: Muriel Weinmann, Regie: Nada Zimmermann" alt="study profile image" src="https://studieren.de/profilestorage/_processed_/3/1/csm_Studienprofil-266-46818-286820-1_e9bea01a74.jpeg" width="399" height="266" />
+			</a>
+		</div>
+
+
+
+
+			</div>
+		</section>
+
+
+
+
+
+				<input id="tabpage-tab-no1" name="tabs" type="radio" value="tabpage-tab-no1" checked /><input id="tabpage-tab-no2" name="tabs" type="radio" value="tabpage-tab-no2" /><input id="tabpage-tab-no3" name="tabs" type="radio" value="tabpage-tab-no3" />
+
+
+				<div class="tabpage-tabs"><label for="tabpage-tab-no1">Kurzprofil</label><label for="tabpage-tab-no2">Studieninhalte</label><label for="tabpage-tab-no3">Berufsperspektiven</label></div>
+
+
+
+
+
+
+
+
+
+
+				<div class="tabpage-contents">
+
+						<div class="tabpage-content tabpage-content-no1">
+
+
+
+
+
+
+<div class="tabpage-content-grid">
+	<div class="tabpage-content-grid-main">
+
+		<h2>(Musiktheater-) Regie ist ein k&uuml;nstlerischer, praxisorientierter Bachelorstudiengang</h2>
+<p>Studierende begegnen innerhalb von acht Semestern dem vielf&auml;ltigen T&auml;tigkeitsspektrum der Regie im Musiktheater.</p>
+<h3>Daten zum Studiengang</h3><ul><li><strong>Abschluss</strong>: Bachelor of Music (B. A.)</li><li><strong>Regelstudienzeit</strong>: 8 Semester</li><li><strong>Studienbeginn</strong>: Wintersemester</li><li><strong>Unterrichtssprache</strong>: Deutsch</li><li><strong>Studienort:</strong> Berlin</li><li><strong>Zulassungsfrei</strong>: nein, mit Aufnahmepr&uuml;fung</li></ul><p>Infos zur Aufnahmepr&uuml;fung <strong><a href="https://secure.studieren.de/goto/4165/21/Studienprofil-266-46818-286820/f9ac4f233a3a0492a2df8abd183792afe4e4f6a5afc28c81e6356fd0f80cb756/?dest=https%3A%2F%2Fwww.hfm-berlin.de%2Fbewerbung%2Fstudienangebot%2Fmusiktheater-regie%2F" target="_blank">hier &gt;</a></strong></p>
+<p><strong>Bewerbungsschluss Wintersemester 2025/26: 08. April 2025</strong></p>
+<p>&nbsp;</p>
+	</div>
+	<div class="tabpage-content-grid-sidebar">
+		<div class="university-logo"><img alt="university logo" src="https://studieren.de/profilestorage/logos/Hochschule-fuer-Musik_Hanns_Eisler_Berlin_Logo.png" width="77" height="113" /></div>
+
+
+
+
+
+
+			<h3>Kontakt</h3>
+<p><strong>Hochschule f&uuml;r Musik Hanns Eisler Berlin</strong><br />Charlottenstr. 55<br />10117 Berlin</p>
+<p>Tel. <a href="tel:+4930688305700">+49 (0)30 688305-700 </a></p>
+<h3>Immatrikulation, Pr&uuml;fung und Beratung</h3>
+<p>Charlottenstra&szlig;e 55<br />10117 Berlin<br />Raum 637<br /><a href="mailto:studium1@adm.hfm-berlin.de">studium1@adm.hfm-berlin.de</a></p>
+<h3>Studienfachberatung</h3>
+<p>Prof. Claus Unzen<br /><a href="mailto:claus.unzen@stud.hfm-berlin.de">claus.unzen@stud.hfm-berlin.de</a></p>
+<h3>Beratungsgespr&auml;ch</h3>
+<p>Leonie Haupt<br /><a href="mailto:tutor.regie@adm.hfm-berlin.de">tutor.regie@adm.hfm-berlin.de</a></p>
+<p><strong><a href="https://secure.studieren.de/goto/4165/21/Studienprofil-266-46818-286820/b2a56c50743a6d6a00cc4bf3fee70766176ddbddc9305c94ddbe3fbc8491914e/?dest=https%3A%2F%2Fwww.hfm-berlin.de%2F" target="_blank">Zur Webseite der Hochschule &gt;</a></strong></p>
+<p><strong><a href="https://secure.studieren.de/goto/4165/21/Studienprofil-266-46818-286820/a4a1f782c43ad5c4f2e96b2a19f4c863b44346ed98f3fde245004a59ed6ecaf2/?dest=https%3A%2F%2Fwww.hfm-berlin.de%2Fbewerbung%2Fstudienangebot%2Fproduktionsdramaturgie-fuer-musiktheater%2F" target="_blank">Zur Webseite des Studiengangs &gt;</a></strong></p>
+
+
+
+			<p><strong><a href="https://secure.studieren.de/goto/4165/21/Studienprofil-266-46818-286820/b2a56c50743a6d6a00cc4bf3fee70766176ddbddc9305c94ddbe3fbc8491914e/?dest=https%3A%2F%2Fwww.hfm-berlin.de%2F" target="_blank">Zur Webseite &gt;</a></strong></p>
+
+
+
+				<h3>Studienabschlüsse</h3>
+
+				<ul class="profile-navigation">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+								<li class=" degree-type-bachelor xs-faculty-76-fg">Bachelor of Music</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+								<li class=" degree-type-master">
+									<a href="https://studieren.de/musiktheaterregie-hfm-hanns-eisler-berlin.studienprofil.t-0.a-266.c-46818.p-286821.html">Master of Music</a>
+								</li>
+
+
+				</ul>
+
+
+		<p>&nbsp;</p>
+	</div>
+</div>
+
+
+						</div>
+
+						<div class="tabpage-content tabpage-content-no2">
+
+
+
+
+
+
+<div class="tabpage-content-grid">
+	<div class="tabpage-content-grid-main">
+
+		<h3>Studieninhalte und -verlauf</h3>
+<p>Regie im Musiktheater bedeutet in der Praxis im weitesten Sinne immer Auseinandersetzung mit Theatermenschen, mit Musikern, mit Texten und Kompositionen.</p>
+<p>Das Regiestudium an der Hochschule f&uuml;r Musik Hanns Eisler Berlin regt diese k&uuml;nstlerischen Auseinandersetzungen an und wirkt unterst&uuml;tzend dabei, sie wissend und auf professioneller Ebene f&uuml;hren zu k&ouml;nnen. Eine umfassende musikalisch-theoretisch-praxisnahe Ausbildung bietet den Studierenden durch vielschichtige Lehrangebote die M&ouml;glichkeit, die Rolle der:s eigenverantwortlich und selbstst&auml;ndig agierenden Regisseurin bzw. Regisseurs zu <span>&bdquo;lernen&ldquo;</span>.</p>
+<p><br /><strong><a href="file:///C:/Users/leoni/Downloads/Moduluebersicht_BA_Regie-3.pdf" target="_blank">Modulhandbuch (PDF) &gt;</a></strong></p>
+	</div>
+	<div class="tabpage-content-grid-sidebar">
+		<div class="university-logo"><img alt="university logo" src="https://studieren.de/profilestorage/logos/Hochschule-fuer-Musik_Hanns_Eisler_Berlin_Logo.png" width="77" height="113" /></div>
+
+
+
+
+
+
+			<h3>Kontakt</h3>
+<p><strong>Hochschule f&uuml;r Musik Hanns Eisler Berlin</strong><br />Charlottenstr. 55<br />10117 Berlin</p>
+<p>Tel. <a href="tel:+4930688305700">+49 (0)30 688305-700 </a></p>
+<h3>Immatrikulation, Pr&uuml;fung und Beratung</h3>
+<p>Charlottenstra&szlig;e 55<br />10117 Berlin<br />Raum 637<br /><a href="mailto:studium1@adm.hfm-berlin.de">studium1@adm.hfm-berlin.de</a></p>
+<h3>Studienfachberatung</h3>
+<p>Prof. Claus Unzen<br /><a href="mailto:claus.unzen@stud.hfm-berlin.de">claus.unzen@stud.hfm-berlin.de</a></p>
+<h3>Beratungsgespr&auml;ch</h3>
+<p>Leonie Haupt<br /><a href="mailto:tutor.regie@adm.hfm-berlin.de">tutor.regie@adm.hfm-berlin.de</a></p>
+<p><strong><a href="https://secure.studieren.de/goto/4165/21/Studienprofil-266-46818-286820/b2a56c50743a6d6a00cc4bf3fee70766176ddbddc9305c94ddbe3fbc8491914e/?dest=https%3A%2F%2Fwww.hfm-berlin.de%2F" target="_blank">Zur Webseite der Hochschule &gt;</a></strong></p>
+<p><strong><a href="https://secure.studieren.de/goto/4165/21/Studienprofil-266-46818-286820/a4a1f782c43ad5c4f2e96b2a19f4c863b44346ed98f3fde245004a59ed6ecaf2/?dest=https%3A%2F%2Fwww.hfm-berlin.de%2Fbewerbung%2Fstudienangebot%2Fproduktionsdramaturgie-fuer-musiktheater%2F" target="_blank">Zur Webseite des Studiengangs &gt;</a></strong></p>
+
+
+
+			<p><strong><a href="https://secure.studieren.de/goto/4165/21/Studienprofil-266-46818-286820/b2a56c50743a6d6a00cc4bf3fee70766176ddbddc9305c94ddbe3fbc8491914e/?dest=https%3A%2F%2Fwww.hfm-berlin.de%2F" target="_blank">Zur Webseite &gt;</a></strong></p>
+
+
+
+				<h3>Studienabschlüsse</h3>
+
+				<ul class="profile-navigation">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+								<li class=" degree-type-bachelor xs-faculty-76-fg">Bachelor of Music</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+								<li class=" degree-type-master">
+									<a href="https://studieren.de/musiktheaterregie-hfm-hanns-eisler-berlin.studienprofil.t-0.a-266.c-46818.p-286821.html">Master of Music</a>
+								</li>
+
+
+				</ul>
+
+
+		<p>&nbsp;</p>
+	</div>
+</div>
+
+
+						</div>
+
+						<div class="tabpage-content tabpage-content-no3">
+
+
+
+
+
+
+<div class="tabpage-content-grid">
+	<div class="tabpage-content-grid-main">
+
+		<h3>Berufsperspektiven</h3>
+<p><span>Au&szlig;erdem profitieren die Studierenden von langj&auml;hrigen Kooperationen der Hochschule mit den Bayreuther Festspielen, der Komischen Oper Berlin und der Deutschen Oper Berlin. In gemeinsamen Projekten mit den Berliner Kunsthochschulen &ndash; bspw. der Hochschule f&uuml;r Schauspielkunst Ernst Busch, der Universit&auml;t der K&uuml;nste Berlin und der Kunsthochschule Wei&szlig;ensee &ndash; bilden sie Netzwerke mit k&uuml;nstlerischen Partner*innen aus verschiedenen Disziplinen wie Gesang, B&uuml;hne/Kost&uuml;m, Schauspiel, Film, Puppenspiel, usw. Durch den starken Praxisbezug und die individuelle Betreuung ergibt sich f&uuml;r die Studierenden schon vor dem Abschluss ein flie&szlig;ender &Uuml;bergang ins Berufsleben.</span></p><ul></ul>
+	</div>
+	<div class="tabpage-content-grid-sidebar">
+		<div class="university-logo"><img alt="university logo" src="https://studieren.de/profilestorage/logos/Hochschule-fuer-Musik_Hanns_Eisler_Berlin_Logo.png" width="77" height="113" /></div>
+
+
+
+
+
+
+			<h3>Kontakt</h3>
+<p><strong>Hochschule f&uuml;r Musik Hanns Eisler Berlin</strong><br />Charlottenstr. 55<br />10117 Berlin</p>
+<p>Tel. <a href="tel:+4930688305700">+49 (0)30 688305-700 </a></p>
+<h3>Immatrikulation, Pr&uuml;fung und Beratung</h3>
+<p>Charlottenstra&szlig;e 55<br />10117 Berlin<br />Raum 637<br /><a href="mailto:studium1@adm.hfm-berlin.de">studium1@adm.hfm-berlin.de</a></p>
+<h3>Studienfachberatung</h3>
+<p>Prof. Claus Unzen<br /><a href="mailto:claus.unzen@stud.hfm-berlin.de">claus.unzen@stud.hfm-berlin.de</a></p>
+<h3>Beratungsgespr&auml;ch</h3>
+<p>Leonie Haupt<br /><a href="mailto:tutor.regie@adm.hfm-berlin.de">tutor.regie@adm.hfm-berlin.de</a></p>
+<p><strong><a href="https://secure.studieren.de/goto/4165/21/Studienprofil-266-46818-286820/b2a56c50743a6d6a00cc4bf3fee70766176ddbddc9305c94ddbe3fbc8491914e/?dest=https%3A%2F%2Fwww.hfm-berlin.de%2F" target="_blank">Zur Webseite der Hochschule &gt;</a></strong></p>
+<p><strong><a href="https://secure.studieren.de/goto/4165/21/Studienprofil-266-46818-286820/a4a1f782c43ad5c4f2e96b2a19f4c863b44346ed98f3fde245004a59ed6ecaf2/?dest=https%3A%2F%2Fwww.hfm-berlin.de%2Fbewerbung%2Fstudienangebot%2Fproduktionsdramaturgie-fuer-musiktheater%2F" target="_blank">Zur Webseite des Studiengangs &gt;</a></strong></p>
+
+
+
+			<p><strong><a href="https://secure.studieren.de/goto/4165/21/Studienprofil-266-46818-286820/b2a56c50743a6d6a00cc4bf3fee70766176ddbddc9305c94ddbe3fbc8491914e/?dest=https%3A%2F%2Fwww.hfm-berlin.de%2F" target="_blank">Zur Webseite &gt;</a></strong></p>
+
+
+
+				<h3>Studienabschlüsse</h3>
+
+				<ul class="profile-navigation">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+								<li class=" degree-type-bachelor xs-faculty-76-fg">Bachelor of Music</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+								<li class=" degree-type-master">
+									<a href="https://studieren.de/musiktheaterregie-hfm-hanns-eisler-berlin.studienprofil.t-0.a-266.c-46818.p-286821.html">Master of Music</a>
+								</li>
+
+
+				</ul>
+
+
+		<p>&nbsp;</p>
+	</div>
+</div>
+
+
+						</div>
+
+
+				</div>
+
+
+		<footer>
+			<div class="course-profile-source-id"><img src="https://secure.studieren.de/view/890f6b93/21/Studienprofil-266-46818-286820.gif" border="0" alt="" />Studienprofil-266-46818-286820</div>
+
+
+						<div class="xs-faculty-76-bg">
+							<a href="https://studieren.de/musik-und-musikwissenschaft.fachbereiche.t-0.f-76.html">Musik und Musikwissenschaft</a>
+						</div>
+
+
+		</footer>
+	</article>
+
+</div>
+
+</div>
+
+
+<div id="c14287" class="page-body-section"><header><span>Übersicht Universität</span></header><div class="page-body-section-content"><section class="content-tile-box-container"><button aria-label="Vorheriger Eintrag" class="content-tile-box-nav-prev-arrow"><span class="xsi xsi-s100p xsi-grey-light xsi-navigation-left"></span></button><button aria-label="Nächster Eintrag" class="content-tile-box-nav-next-arrow"><span class="xsi xsi-s100p xsi-grey-light xsi-navigation-right"></span></button><div class="content-tile-box-glider-container"><div class="slide-item"><div class="content-tile-box staticmap faculty0"><a class="item-main-link" href="https://studieren.de/hfm-hanns-eisler-berlin.hochschule.t-0.a-266.html"><div class="header xs-faculty-0-bg"><div class="primary-headline">Hochschule für Musik Hanns Eisler Berlin</div></div><div class="picture"><img class="marker" alt="marker_normal" src="https://studieren.de/typo3conf/ext/search_core/Resources/Public/Images/Markers/marker_normal.png" width="32" height="37" /><img class="map" alt="staticmap" src="https://studieren.de/profilestorage/maps/static-map-266.png" width="1280" height="1280" /></div></a></div></div><div class="slide-item"><div class="content-tile-box faculty76"><a class="item-main-link" href="https://studieren.de/musiktheaterregie-hfm-hanns-eisler-berlin.studienprofil.t-0.a-266.c-46818.p-286821.html"><div class="header xs-faculty-76-bg"><div class="primary-headline">(Musiktheater-)Regie</div><div class="secondary-headline">Master of Music</div></div><div class="picture"><img alt="profiles teaser" src="https://studieren.de/profilestorage/_processed_/b/4/csm_Studienprofil-266-46818-286821-0_2cab52ded4.jpg" width="600" height="532" /></div><div class="icons"><div class="icons-left"></div><div class="icons-right"></div></div></a><div class="footer"><div class="favorite-icon"><button class="favorites-trigger white" name="favorites:action" value="false" data-favorites-values="u:266,c:46818" data-color="white" title="Diesen Studiengang zu den Favoriten hinzufügen"></button></div></div></div></div><div class="slide-item"><div class="content-tile-box faculty13"><a class="item-main-link" href="https://studieren.de/produktionsdramaturgie-fuer-musiktheater-hfm-hanns-eisler-berlin.studienprofil.t-0.a-266.c-46824.html"><div class="header xs-faculty-13-bg"><div class="primary-headline">Produktionsdramaturgie für Musiktheater</div><div class="secondary-headline">Master of Music</div></div><div class="picture"><img alt="profiles teaser" src="https://studieren.de/profilestorage/_processed_/8/8/csm_studieren.de_01_a33095af55.jpg" width="600" height="532" /></div><div class="icons"><div class="icons-left"></div><div class="icons-right"></div></div></a><div class="footer"><div class="favorite-icon"><button class="favorites-trigger white" name="favorites:action" value="false" data-favorites-values="u:266,c:46824" data-color="white" title="Diesen Studiengang zu den Favoriten hinzufügen"></button></div></div></div></div><div class="slide-item"><div class="content-tile-box poster pos-lb"><a class="item-main-link" href="https://secure.studieren.de/goto/4423/ServiceChannels/" target="_blank"><div class="picture"><img class="poster" src="https://secure.studieren.de/view/4423/ServiceChannels.jpg?1749229682" alt="poster" title="Wintersemester 2025/2026 #jetztbewerben TH OWL"></div></a></div></div></div></section></div></div>
+
+
+<div id="c14288" class="page-body-section">
+
+<header><h2>HFM Hanns Eisler Berlin &rsaquo; Studienangebot</h2></header><div class="page-course-listing-filter"><div class="page-course-listing-filter-link"><a href="https://studieren.de/musiktheaterregie-hfm-hanns-eisler-berlin.studienprofil.t-0.a-266.c-46818.filter-10.html" title="Bachelor"><span class="xsi-degree-bachelor">Bachelor</span></a></div><div class="page-course-listing-filter-link"><a href="https://studieren.de/musiktheaterregie-hfm-hanns-eisler-berlin.studienprofil.t-0.a-266.c-46818.filter-8.html" title="Master"><span class="xsi-degree-master">Master</span></a></div></div><div class="page-course-listing"><div id="Studienprofil-266-46818" class="page-course-listing-entry university-related profile"><a class="item-main-link" href="https://studieren.de/musiktheaterregie-hfm-hanns-eisler-berlin.studienprofil.t-0.a-266.c-46818.html"><div class="symbol xs-faculty-76-brighter-bg"><div class="symbol-header xs-faculty-76-bg">Info</div><div class="picture"><img alt="profiles teaser" src="https://studieren.de/profilestorage/_processed_/7/2/csm_Studienprofil-266-46818-286820-2_777db0601a.jpg" width="300" height="266" /></div></div><div class="captions upper"><div class="secondary-headline"><span class="text-switch"><span class="text-switch-long">Bachelor of Music, Master of Music</span><span class="text-switch-spacer"> / </span><span class="text-switch-short">B.Mus., M.Mus</span></span></div></div><div class="captions lower"><div class="primary-headline">(Musiktheater-)Regie</div></div><div class="infos"><div class="abstract" lang="de" title="Der Studiengang Bachelor Regie für Musiktheater ist ein künstlerischer, praxisorientierter Bachelorstudiengang, in dem Studierende innerhalb von acht Semestern dem vielfältigen Tätigkeitsspektrum der Regie begegnen.">Der Studiengang Bachelor Regie für Musiktheater ist ein künstlerischer, praxisorientierter Bachelorstudiengang, in dem Studierende innerhalb von acht Semestern dem vielfältigen Tätigkeitsspektrum der Regie begegnen.</div></div><div class="icons"><span class="xsi xsi-s14 xsi-grey-light xsi-university-type-university" title="Universität"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-bachelor" title="Bachelor"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-master" title="Master"></span></div></a><div class="favorite-icon"><button class="favorites-trigger grey-light" name="favorites:action" value="false" data-favorites-values="u:266,c:46818" data-color="grey-light" title="Diesen Studiengang zu den Favoriten hinzufügen"></button></div></div><div id="Studienprofil-266-34690" class="page-course-listing-entry university-related"><a class="item-main-link" href="https://studieren.de/querfloete-hfm-hanns-eisler-berlin.studiengang.t-0.a-266.c-34690.html"><div class="symbol xs-faculty-76-brighter-bg"><div class="symbol-header xs-faculty-76-bg"></div></div><div class="captions upper"><div class="secondary-headline"><span class="text-switch"><span class="text-switch-long">Bachelor, Master</span><span class="text-switch-spacer"> / </span><span class="text-switch-short">Bachelor, Master</span></span></div></div><div class="captions lower"><div class="primary-headline">(Quer-)Flöte</div></div><div class="icons"><span class="xsi xsi-s14 xsi-grey-light xsi-university-type-university" title="Universität"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-bachelor" title="Bachelor"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-master" title="Master"></span></div></a><div class="favorite-icon"><button class="favorites-trigger grey-light" name="favorites:action" value="false" data-favorites-values="u:266,c:34690" data-color="grey-light" title="Diesen Studiengang zu den Favoriten hinzufügen"></button></div></div><div id="Studienprofil-266-34692" class="page-course-listing-entry university-related"><a class="item-main-link" href="https://studieren.de/chordirigieren-hfm-hanns-eisler-berlin.studiengang.t-0.a-266.c-34692.html"><div class="symbol xs-faculty-76-brighter-bg"><div class="symbol-header xs-faculty-76-bg"></div></div><div class="captions upper"><div class="secondary-headline"><span class="text-switch"><span class="text-switch-long">Bachelor, Master</span><span class="text-switch-spacer"> / </span><span class="text-switch-short">Bachelor, Master</span></span></div></div><div class="captions lower"><div class="primary-headline">Chordirigieren</div></div><div class="icons"><span class="xsi xsi-s14 xsi-grey-light xsi-university-type-university" title="Universität"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-bachelor" title="Bachelor"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-master" title="Master"></span><span class="xsi xsi-s14 xsi-grey-light xsi-module-handbook" title="Studienmodule"></span></div></a><div class="favorite-icon"><button class="favorites-trigger grey-light" name="favorites:action" value="false" data-favorites-values="u:266,c:34692" data-color="grey-light" title="Diesen Studiengang zu den Favoriten hinzufügen"></button></div></div><div id="Studienprofil-266-34689" class="page-course-listing-entry university-related"><a class="item-main-link" href="https://studieren.de/fagott-hfm-hanns-eisler-berlin.studiengang.t-0.a-266.c-34689.html"><div class="symbol xs-faculty-76-brighter-bg"><div class="symbol-header xs-faculty-76-bg"></div></div><div class="captions upper"><div class="secondary-headline"><span class="text-switch"><span class="text-switch-long">Bachelor, Master</span><span class="text-switch-spacer"> / </span><span class="text-switch-short">Bachelor, Master</span></span></div></div><div class="captions lower"><div class="primary-headline">Fagott</div></div><div class="icons"><span class="xsi xsi-s14 xsi-grey-light xsi-university-type-university" title="Universität"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-bachelor" title="Bachelor"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-master" title="Master"></span></div></a><div class="favorite-icon"><button class="favorites-trigger grey-light" name="favorites:action" value="false" data-favorites-values="u:266,c:34689" data-color="grey-light" title="Diesen Studiengang zu den Favoriten hinzufügen"></button></div></div><div id="Studienprofil-266-34691" class="page-course-listing-entry university-related"><a class="item-main-link" href="https://studieren.de/historischer-und-zeitgenoessischer-tonsatz-hfm-hanns-eisler-berlin.studiengang.t-0.a-266.c-34691.html"><div class="symbol xs-faculty-76-brighter-bg"><div class="symbol-header xs-faculty-76-bg"></div></div><div class="captions upper"><div class="secondary-headline"><span class="text-switch"><span class="text-switch-long">Bachelor, Master</span><span class="text-switch-spacer"> / </span><span class="text-switch-short">Bachelor, Master</span></span></div></div><div class="captions lower"><div class="primary-headline">Historischer und Zeitgenössischer Tonsatz</div></div><div class="icons"><span class="xsi xsi-s14 xsi-grey-light xsi-university-type-university" title="Universität"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-bachelor" title="Bachelor"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-master" title="Master"></span></div></a><div class="favorite-icon"><button class="favorites-trigger grey-light" name="favorites:action" value="false" data-favorites-values="u:266,c:34691" data-color="grey-light" title="Diesen Studiengang zu den Favoriten hinzufügen"></button></div></div><div id="Studienprofil-266-34682" class="page-course-listing-entry university-related"><a class="item-main-link" href="https://studieren.de/horn-hfm-hanns-eisler-berlin.studiengang.t-0.a-266.c-34682.html"><div class="symbol xs-faculty-76-brighter-bg"><div class="symbol-header xs-faculty-76-bg"></div></div><div class="captions upper"><div class="secondary-headline"><span class="text-switch"><span class="text-switch-long">Bachelor, Master</span><span class="text-switch-spacer"> / </span><span class="text-switch-short">Bachelor, Master</span></span></div></div><div class="captions lower"><div class="primary-headline">Horn</div></div><div class="icons"><span class="xsi xsi-s14 xsi-grey-light xsi-university-type-university" title="Universität"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-bachelor" title="Bachelor"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-master" title="Master"></span></div></a><div class="favorite-icon"><button class="favorites-trigger grey-light" name="favorites:action" value="false" data-favorites-values="u:266,c:34682" data-color="grey-light" title="Diesen Studiengang zu den Favoriten hinzufügen"></button></div></div><div id="Studienprofil-266-34688" class="page-course-listing-entry university-related"><a class="item-main-link" href="https://studieren.de/klarinette-hfm-hanns-eisler-berlin.studiengang.t-0.a-266.c-34688.html"><div class="symbol xs-faculty-76-brighter-bg"><div class="symbol-header xs-faculty-76-bg"></div></div><div class="captions upper"><div class="secondary-headline"><span class="text-switch"><span class="text-switch-long">Bachelor, Master</span><span class="text-switch-spacer"> / </span><span class="text-switch-short">Bachelor, Master</span></span></div></div><div class="captions lower"><div class="primary-headline">Klarinette</div></div><div class="icons"><span class="xsi xsi-s14 xsi-grey-light xsi-university-type-university" title="Universität"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-bachelor" title="Bachelor"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-master" title="Master"></span></div></a><div class="favorite-icon"><button class="favorites-trigger grey-light" name="favorites:action" value="false" data-favorites-values="u:266,c:34688" data-color="grey-light" title="Diesen Studiengang zu den Favoriten hinzufügen"></button></div></div><div id="Studienprofil-266-970" class="page-course-listing-entry university-related"><a class="item-main-link" href="https://studieren.de/klavier-hfm-hanns-eisler-berlin.studiengang.t-0.a-266.c-970.html"><div class="symbol xs-faculty-76-brighter-bg"><div class="symbol-header xs-faculty-76-bg"></div></div><div class="captions upper"><div class="secondary-headline"><span class="text-switch"><span class="text-switch-long">Bachelor, Examen, Master</span><span class="text-switch-spacer"> / </span><span class="text-switch-short">Bachelor, Examen, Master</span></span></div></div><div class="captions lower"><div class="primary-headline">Klavier</div></div><div class="icons"><span class="xsi xsi-s14 xsi-grey-light xsi-university-type-university" title="Universität"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-bachelor" title="Bachelor"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-master" title="Master"></span><span class="xsi xsi-s14 xsi-grey-light xsi-module-handbook" title="Studienmodule"></span></div></a><div class="favorite-icon"><button class="favorites-trigger grey-light" name="favorites:action" value="false" data-favorites-values="u:266,c:970" data-color="grey-light" title="Diesen Studiengang zu den Favoriten hinzufügen"></button></div></div><div id="Studienprofil-266-34681" class="page-course-listing-entry university-related"><a class="item-main-link" href="https://studieren.de/kontrabass-hfm-hanns-eisler-berlin.studiengang.t-0.a-266.c-34681.html"><div class="symbol xs-faculty-76-brighter-bg"><div class="symbol-header xs-faculty-76-bg"></div></div><div class="captions upper"><div class="secondary-headline"><span class="text-switch"><span class="text-switch-long">Bachelor, Master</span><span class="text-switch-spacer"> / </span><span class="text-switch-short">Bachelor, Master</span></span></div></div><div class="captions lower"><div class="primary-headline">Kontrabass</div></div><div class="icons"><span class="xsi xsi-s14 xsi-grey-light xsi-university-type-university" title="Universität"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-bachelor" title="Bachelor"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-master" title="Master"></span></div></a><div class="favorite-icon"><button class="favorites-trigger grey-light" name="favorites:action" value="false" data-favorites-values="u:266,c:34681" data-color="grey-light" title="Diesen Studiengang zu den Favoriten hinzufügen"></button></div></div><div id="Studienprofil-266-130" class="page-course-listing-entry university-related"><a class="item-main-link" href="https://studieren.de/korrepetition-hfm-hanns-eisler-berlin.studiengang.t-0.a-266.c-130.html"><div class="symbol xs-faculty-76-brighter-bg"><div class="symbol-header xs-faculty-76-bg"></div></div><div class="captions upper"><div class="secondary-headline"><span class="text-switch"><span class="text-switch-long">Bachelor</span><span class="text-switch-spacer"> / </span><span class="text-switch-short">Bachelor</span></span></div></div><div class="captions lower"><div class="primary-headline">Korrepetition</div></div><div class="icons"><span class="xsi xsi-s14 xsi-grey-light xsi-university-type-university" title="Universität"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-bachelor" title="Bachelor"></span></div></a><div class="favorite-icon"><button class="favorites-trigger grey-light" name="favorites:action" value="false" data-favorites-values="u:266,c:130" data-color="grey-light" title="Diesen Studiengang zu den Favoriten hinzufügen"></button></div></div><div id="Studienprofil-266-34687" class="page-course-listing-entry university-related"><a class="item-main-link" href="https://studieren.de/oboe-hfm-hanns-eisler-berlin.studiengang.t-0.a-266.c-34687.html"><div class="symbol xs-faculty-76-brighter-bg"><div class="symbol-header xs-faculty-76-bg"></div></div><div class="captions upper"><div class="secondary-headline"><span class="text-switch"><span class="text-switch-long">Bachelor, Master</span><span class="text-switch-spacer"> / </span><span class="text-switch-short">Bachelor, Master</span></span></div></div><div class="captions lower"><div class="primary-headline">Oboe</div></div><div class="icons"><span class="xsi xsi-s14 xsi-grey-light xsi-university-type-university" title="Universität"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-bachelor" title="Bachelor"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-master" title="Master"></span></div></a><div class="favorite-icon"><button class="favorites-trigger grey-light" name="favorites:action" value="false" data-favorites-values="u:266,c:34687" data-color="grey-light" title="Diesen Studiengang zu den Favoriten hinzufügen"></button></div></div><div id="Studienprofil-266-12598" class="page-course-listing-entry university-related"><a class="item-main-link" href="https://studieren.de/orchesterdirigieren-hfm-hanns-eisler-berlin.studiengang.t-0.a-266.c-12598.html"><div class="symbol xs-faculty-76-brighter-bg"><div class="symbol-header xs-faculty-76-bg"></div></div><div class="captions upper"><div class="secondary-headline"><span class="text-switch"><span class="text-switch-long">Bachelor, Master</span><span class="text-switch-spacer"> / </span><span class="text-switch-short">Bachelor, Master</span></span></div></div><div class="captions lower"><div class="primary-headline">Orchesterdirigieren</div></div><div class="icons"><span class="xsi xsi-s14 xsi-grey-light xsi-university-type-university" title="Universität"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-bachelor" title="Bachelor"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-master" title="Master"></span></div></a><div class="favorite-icon"><button class="favorites-trigger grey-light" name="favorites:action" value="false" data-favorites-values="u:266,c:12598" data-color="grey-light" title="Diesen Studiengang zu den Favoriten hinzufügen"></button></div></div><div id="Studienprofil-266-34684" class="page-course-listing-entry university-related"><a class="item-main-link" href="https://studieren.de/posaune-hfm-hanns-eisler-berlin.studiengang.t-0.a-266.c-34684.html"><div class="symbol xs-faculty-76-brighter-bg"><div class="symbol-header xs-faculty-76-bg"></div></div><div class="captions upper"><div class="secondary-headline"><span class="text-switch"><span class="text-switch-long">Bachelor, Master</span><span class="text-switch-spacer"> / </span><span class="text-switch-short">Bachelor, Master</span></span></div></div><div class="captions lower"><div class="primary-headline">Posaune</div></div><div class="icons"><span class="xsi xsi-s14 xsi-grey-light xsi-university-type-university" title="Universität"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-bachelor" title="Bachelor"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-master" title="Master"></span></div></a><div class="favorite-icon"><button class="favorites-trigger grey-light" name="favorites:action" value="false" data-favorites-values="u:266,c:34684" data-color="grey-light" title="Diesen Studiengang zu den Favoriten hinzufügen"></button></div></div><div id="Studienprofil-266-46824" class="page-course-listing-entry university-related profile"><a class="item-main-link" href="https://studieren.de/produktionsdramaturgie-fuer-musiktheater-hfm-hanns-eisler-berlin.studienprofil.t-0.a-266.c-46824.html"><div class="symbol xs-faculty-13-brighter-bg"><div class="symbol-header xs-faculty-13-bg">Info</div><div class="picture"><img alt="profiles teaser" src="https://studieren.de/profilestorage/_processed_/8/8/csm_studieren.de_01_0530ee5b38.jpg" width="300" height="266" /></div></div><div class="captions upper"><div class="secondary-headline"><span class="text-switch"><span class="text-switch-long">Master of Music</span><span class="text-switch-spacer"> / </span><span class="text-switch-short">M.Mus</span></span></div></div><div class="captions lower"><div class="primary-headline">Produktionsdramaturgie für Musiktheater</div></div><div class="infos"><div class="abstract" lang="de" title="Produktionsdramaturgie für Musiktheater ist ein künstlerischer, praxisorientierter Masterstudiengang, in dem Studierende innerhalb von vier Semestern dem vielfältigen Tätigkeitsspektrum der Dramaturgie begegnen.">Produktionsdramaturgie für Musiktheater ist ein künstlerischer, praxisorientierter Masterstudiengang, in dem Studierende innerhalb von vier Semestern dem vielfältigen Tätigkeitsspektrum der Dramaturgie begegnen.</div></div><div class="icons"><span class="xsi xsi-s14 xsi-grey-light xsi-university-type-university" title="Universität"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-master" title="Master"></span></div></a><div class="favorite-icon"><button class="favorites-trigger grey-light" name="favorites:action" value="false" data-favorites-values="u:266,c:46824" data-color="grey-light" title="Diesen Studiengang zu den Favoriten hinzufügen"></button></div></div><div id="Studienprofil-266-34686" class="page-course-listing-entry university-related"><a class="item-main-link" href="https://studieren.de/saxophon-hfm-hanns-eisler-berlin.studiengang.t-0.a-266.c-34686.html"><div class="symbol xs-faculty-76-brighter-bg"><div class="symbol-header xs-faculty-76-bg"></div></div><div class="captions upper"><div class="secondary-headline"><span class="text-switch"><span class="text-switch-long">Bachelor, Master</span><span class="text-switch-spacer"> / </span><span class="text-switch-short">Bachelor, Master</span></span></div></div><div class="captions lower"><div class="primary-headline">Saxophon</div></div><div class="icons"><span class="xsi xsi-s14 xsi-grey-light xsi-university-type-university" title="Universität"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-bachelor" title="Bachelor"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-master" title="Master"></span></div></a><div class="favorite-icon"><button class="favorites-trigger grey-light" name="favorites:action" value="false" data-favorites-values="u:266,c:34686" data-color="grey-light" title="Diesen Studiengang zu den Favoriten hinzufügen"></button></div></div><div id="Studienprofil-266-34683" class="page-course-listing-entry university-related"><a class="item-main-link" href="https://studieren.de/trompete-hfm-hanns-eisler-berlin.studiengang.t-0.a-266.c-34683.html"><div class="symbol xs-faculty-76-brighter-bg"><div class="symbol-header xs-faculty-76-bg"></div></div><div class="captions upper"><div class="secondary-headline"><span class="text-switch"><span class="text-switch-long">Bachelor, Master</span><span class="text-switch-spacer"> / </span><span class="text-switch-short">Bachelor, Master</span></span></div></div><div class="captions lower"><div class="primary-headline">Trompete</div></div><div class="icons"><span class="xsi xsi-s14 xsi-grey-light xsi-university-type-university" title="Universität"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-bachelor" title="Bachelor"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-master" title="Master"></span></div></a><div class="favorite-icon"><button class="favorites-trigger grey-light" name="favorites:action" value="false" data-favorites-values="u:266,c:34683" data-color="grey-light" title="Diesen Studiengang zu den Favoriten hinzufügen"></button></div></div><div id="Studienprofil-266-34685" class="page-course-listing-entry university-related"><a class="item-main-link" href="https://studieren.de/tuba-hfm-hanns-eisler-berlin.studiengang.t-0.a-266.c-34685.html"><div class="symbol xs-faculty-76-brighter-bg"><div class="symbol-header xs-faculty-76-bg"></div></div><div class="captions upper"><div class="secondary-headline"><span class="text-switch"><span class="text-switch-long">Bachelor, Master</span><span class="text-switch-spacer"> / </span><span class="text-switch-short">Bachelor, Master</span></span></div></div><div class="captions lower"><div class="primary-headline">Tuba</div></div><div class="icons"><span class="xsi xsi-s14 xsi-grey-light xsi-university-type-university" title="Universität"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-bachelor" title="Bachelor"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-master" title="Master"></span></div></a><div class="favorite-icon"><button class="favorites-trigger grey-light" name="favorites:action" value="false" data-favorites-values="u:266,c:34685" data-color="grey-light" title="Diesen Studiengang zu den Favoriten hinzufügen"></button></div></div><div id="Studienprofil-266-34679" class="page-course-listing-entry university-related"><a class="item-main-link" href="https://studieren.de/viola-hfm-hanns-eisler-berlin.studiengang.t-0.a-266.c-34679.html"><div class="symbol xs-faculty-76-brighter-bg"><div class="symbol-header xs-faculty-76-bg"></div></div><div class="captions upper"><div class="secondary-headline"><span class="text-switch"><span class="text-switch-long">Bachelor, Master</span><span class="text-switch-spacer"> / </span><span class="text-switch-short">Bachelor, Master</span></span></div></div><div class="captions lower"><div class="primary-headline">Viola</div></div><div class="icons"><span class="xsi xsi-s14 xsi-grey-light xsi-university-type-university" title="Universität"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-bachelor" title="Bachelor"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-master" title="Master"></span></div></a><div class="favorite-icon"><button class="favorites-trigger grey-light" name="favorites:action" value="false" data-favorites-values="u:266,c:34679" data-color="grey-light" title="Diesen Studiengang zu den Favoriten hinzufügen"></button></div></div><div id="Studienprofil-266-34678" class="page-course-listing-entry university-related"><a class="item-main-link" href="https://studieren.de/violine-hfm-hanns-eisler-berlin.studiengang.t-0.a-266.c-34678.html"><div class="symbol xs-faculty-76-brighter-bg"><div class="symbol-header xs-faculty-76-bg"></div></div><div class="captions upper"><div class="secondary-headline"><span class="text-switch"><span class="text-switch-long">Bachelor, Master</span><span class="text-switch-spacer"> / </span><span class="text-switch-short">Bachelor, Master</span></span></div></div><div class="captions lower"><div class="primary-headline">Violine</div></div><div class="icons"><span class="xsi xsi-s14 xsi-grey-light xsi-university-type-university" title="Universität"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-bachelor" title="Bachelor"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-master" title="Master"></span></div></a><div class="favorite-icon"><button class="favorites-trigger grey-light" name="favorites:action" value="false" data-favorites-values="u:266,c:34678" data-color="grey-light" title="Diesen Studiengang zu den Favoriten hinzufügen"></button></div></div><div id="Studienprofil-266-34680" class="page-course-listing-entry university-related"><a class="item-main-link" href="https://studieren.de/violoncello-hfm-hanns-eisler-berlin.studiengang.t-0.a-266.c-34680.html"><div class="symbol xs-faculty-76-brighter-bg"><div class="symbol-header xs-faculty-76-bg"></div></div><div class="captions upper"><div class="secondary-headline"><span class="text-switch"><span class="text-switch-long">Bachelor, Master</span><span class="text-switch-spacer"> / </span><span class="text-switch-short">Bachelor, Master</span></span></div></div><div class="captions lower"><div class="primary-headline">Violoncello</div></div><div class="icons"><span class="xsi xsi-s14 xsi-grey-light xsi-university-type-university" title="Universität"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-bachelor" title="Bachelor"></span><span class="xsi xsi-s14 xsi-grey-light xsi-degree-master" title="Master"></span></div></a><div class="favorite-icon"><button class="favorites-trigger grey-light" name="favorites:action" value="false" data-favorites-values="u:266,c:34680" data-color="grey-light" title="Diesen Studiengang zu den Favoriten hinzufügen"></button></div></div></div>
+
+
+</div>
+
+
+<div id="c18096" class="page-body-section">
+
+<header>
+	<h3><a href="https://studieren.de/terminkalender-vorschlag.0.html?tx_aseventsfeinput_pi1%5Baddress%5D=266">Neuen Veranstaltungshinweis eintragen &gt;</a></h3>
+</header>
+
+</div>
+
+
+
+	</div>
+
+	<div class="page-footer">
+	<div class="page-footer-lower">
+		<div class="page-footer-shortcuts"><span class="page-footer-shortcuts-item"><a href="https://studieren.de/kurzportraet.0.html">Unternehmen</a></span><span class="page-footer-shortcuts-item"><a href="https://studieren.de/hochschule-service.0.html">Mediadaten</a></span><span class="page-footer-shortcuts-item"><a href="https://studieren.de/xstudy-de.0.html">Impressum</a></span><span class="page-footer-shortcuts-item"><a href="https://studieren.de/datenschutzerklaerung.0.html">Datenschutz</a></span></div><div class="page-footer-darkmode"><span class="xsi-inline xsi-s16 xsi-grey-light xsi-dark-mode"><a href="https://studieren.de/musiktheaterregie-hfm-hanns-eisler-berlin.studienprofil.t-0.a-266.c-46818.p-286820.html?darkmode=on">&nbsp;Dark Mode</a></span></div><div class="page-footer-copyright"><span class="page-footer-copyright-date">
+					1997-2025
+				</span><span class="page-footer-copyright-name">
+					studieren.de © xStudy SE
+				</span></div>
+	</div>
+</div>
+
+
+	<section class="favorites-details-box" id="favoritesDetailsBox" style="display:none;">
+	<div class="loading" id="favoritesDetailsLoading" style="display:none;"></div>
+
+	<div class="content">
+		<article>
+			<header class="xs-faculty-0-bg display-button-save">
+				<div class="caption">Deine Favoriten</div>
+				<div class="button-save"><button class="button-save" name="favorites:box:action" type="button" value="favorites:save" title="Favoriten speichern">Favoriten speichern</button></div>
+				<div class="button-close"><button class="button-close" name="favorites:box:action" type="button" value="favorites:close" title="Schließen">Schließen</button></div>
+			</header>
+
+			<div class="map-canvas" id="favoritesMapCanvas"></div>
+		</article>
+
+		<div class="selector-buttons" id="favoritesDetailsSelector">
+			<button type="button" class="selector active" name="favorites:box:action" value="tab:course">
+				<span class="numbers">0</span>
+				<span class="label">Favoriten</span>
+			</button>
+			<button type="button" class="selector" name="favorites:box:action" value="tab:university">
+				<span class="numbers">0</span>
+				<span class="label">Studienorte</span>
+			</button>
+			<button type="button" class="selector favourDisplay" name="favorites:box:action" value="tab:favorite">
+				<span class="numbers">0</span>
+				<span class="label">Prioritäten</span>
+				<div id="favoritesDetailsBoxFavoriteFavourDisplay" class="favourDisplay v0">
+					<span class="stars"></span>
+				</div>
+			</button>
+		</div>
+
+		<div class="courses" id="favoritesRecordListing">
+		</div>
+
+		<div class="welcome-message" id="favoritesWelcomeMessage">
+
+			<h1>Speichere Deine Lieblingsstudiengänge in der Favoritenliste</h1>
+<p>Bei über 650 Hochschulstandorten und mehr als 20.000 Studienangeboten allein in Deutschland verliert man leicht den Überblick. Mit den studieren.de-Favoriten ist es vorbei mit dem Notizenchaos. Du kannst Deine Studienwahl bequem organisieren und behältst genau die Studienangebote und Hochschulen im Blick, die Dich interessieren.</p>
+<h2>Und so geht’s:</h2>
+<p>Sammle einfach Deine Favoriten, indem Du das Stern-Symbol (<img src="https://studieren.de/typo3conf/ext/search_core/Resources/Public/Icons/Pages/orange/xs_web_icon_star_01.svg" style="width:18px;height:18px;vertical-align:text-bottom;" alt="" />) anklickst; Du findest es bei jedem Studiengang. Deine Auswahl siehst Du, wenn Du am oberen Seitenrand auf „Favoriten“ klickst.</p>
+<p>Sichere Deine Auswahl ab, indem Du in der Übersicht Deiner gemerkten Studiengänge auf das Download-Symbol (<img src="https://studieren.de/typo3conf/ext/search_core/Resources/Public/Icons/Pages/orange/xs_web_icon_file-download_01.svg" style="width:18px;height:18px;vertical-align:text-bottom;" alt="" />) klickst. Dann bekommst Du per Mail einen Link, über den Du Deine Favoriten wieder abrufen und weiter bearbeiten kannst. Sobald Du Deine Favoriten einmal gespeichert hast, werden alle Änderungen, die Du vornimmst, automatisch übernommen. Deine Favoriten bleiben weiterhin über den Link in der Mail abrufbar.</p>
+<p><strong>Wichtig:</strong> Deine Favoriten werden 3 Monate nach Deinem letzten Abruf oder Deiner letzten Bearbeitung automatisch gelöscht.</p>
+
+		</div>
+
+		<footer class="">
+			<div class="email-address" id="favoritesEmailAddress"></div>
+			<div class="button-clear"><button class="button-clear" name="favorites:box:action" type="button" value="favorites:clear">Favoriten und E-Mail Adresse löschen</button></div>
+		</footer>
+	</div>
+</section>
+
+
+</div>
+
+
+
+
+
+</body>
+</html>
