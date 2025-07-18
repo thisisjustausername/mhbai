@@ -44,7 +44,7 @@ def extract_text_from_stream(stream):
 # Usage:
 # pdf_bytes = ... (read from file, download, etc.)
 
-with open("../uni_a_all_mhbs.json", "r") as file:
+with open("../../../WebScraping/scrape_uni_augsburg/uni_a_all_mhbs.json", "r") as file:
     data = json.load(file)
 
 pdf = requests.get(data[0]).content

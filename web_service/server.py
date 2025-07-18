@@ -1,6 +1,5 @@
 from flask import Flask, session, g, flash, render_template, request, redirect, url_for, make_response, jsonify
-import requests
-import backend.download_files as df
+import WebScraping.scrape_uni_augsburg.download_files as df
 app = Flask(__name__)
 
 @app.route("/")
