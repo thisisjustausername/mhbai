@@ -3,6 +3,11 @@ import re
 import zlib
 
 class Pdf:
+    """
+    class Pdf \n
+    reads pdfs and extracts information
+    """
+
     def __init__(self, pdf_path: str):
         self.path = pdf_path
         self.content = self.read_content()
@@ -102,7 +107,7 @@ class Pdf:
                         'object_data': stream_decoded,
                         'information': "success"})
 
-                    # print("new page--------------------------------new page--------------------------------new page")
+                    #print("new page--------------------------------new page--------------------------------new page")
                 except Exception as e:
                     xref_entries.append({
                         'obj_num': start_obj + i,
