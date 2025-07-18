@@ -28,7 +28,7 @@ mhbai <br>
 ├──📁 pdfs/                                contains all mhb pdfs
 ├──📁 web_service/                         webservice, that allows users to interact with the program through a webpage
     ├──📁 backend/                         contains the web_service specific backend
-        └──📄 pdf_reader_toc.py                extracts the module codes from the toc of the mhb
+        └──📄 pdf_reader_toc.py            extracts the module codes from the toc of the mhb
     ├──📁 prototyping_pdf_reader           prototypes for a pdf reader -> might be moved out of web_service folder
     └──📄 server.py                        the web api, which interacts with the requests sent from the user
     └──📄 testing.py                       tests the .py files in web_service
