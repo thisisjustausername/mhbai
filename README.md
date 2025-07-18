@@ -3,7 +3,21 @@
 ## Important licensing details
 This code is licensed. For commercial usage please contact the developer (the owner of this github).
 
+
+This code further contains a pdf reader developed by the developer before the 15th of July 2025
+Note, that all files containing code of the pdf-reader or read pdfs aren't Open-Source and can't freely be used commercially. 
+In case of commercial use, contact the developer.
+
 ## Descirption
+This project is able to analyse MHBs and compare them as well as their content. 
+It is used to compare the courses of two courses of study to evaluate how many ECTS can be used from one course of study in the other one.
+
+Therefore it can be used to see whether changing courses of study or university or starting studying two courses of study makes sense. 
+Also it can be useful in the creation of new courses of study or seeing which courses can be added to an existing course of study.
+
+## Additional informations
+This project is still "under construction."
+
 Analyses MHBs
 
 This code further contains a pdf reader developed by the developer before the 15th of July 2025
@@ -11,16 +25,19 @@ This code further contains a pdf reader developed by the developer before the 15
 ## File structure
 <pre>
 mhbai <br>
-├──📁 pdfs/                          contains all mhb pdfs
-├──📁 web_service/                   webservice, that allows users to interact with the program through a webpage
-    ├──📁 backend/                   contains the web_service specific backend
-    ├──📁 prototyping_pdf_reader     prototypes for a pdf reader -> might be moved out of web_service folder
-    └──📄 server.py                  the web api, which interacts with the requests sent from the user
-├──📁 web_scraping                   contains all files to scrape the mhb pdfs from the universities
-    ├──📁 scrape_uni_augsburg        contains all files to scrape the mhbs of the University of Augsburg
-        └──📄 uni_a_all_mhbs.json    contains all links of the mhbs extracted by download_files.py
-        └──📄 download_files.py      file to recursively find all mhbs from 2018 and newer and download them to ../../pdfs/ (in the code just /pdf since executed via ssh on pi5)
-    └──📄 data.json                  
+├──📁 pdfs/                                contains all mhb pdfs
+├──📁 web_service/                         webservice, that allows users to interact with the program through a webpage
+    ├──📁 backend/                         contains the web_service specific backend
+    ├──📁 prototyping_pdf_reader           prototypes for a pdf reader -> might be moved out of web_service folder
+    └──📄 server.py                        the web api, which interacts with the requests sent from the user
+├──📁 web_scraping                         contains all files to scrape the mhb pdfs from the universities
+    ├──📁 scrape_uni_augsburg              contains all files to scrape the mhbs of the University of Augsburg
+        └──📄 uni_a_all_mhbs.json          contains all links of the mhbs extracted by download_files.py
+        └──📄 download_files.py            file to recursively find all mhbs from 2018 and newer and download them to ../../pdfs/ (in the code just /pdf since executed via ssh on pi5)
+    └──📄 data.json                        holds all the links, that redirect to a course of study
+    └──📄 get_unis_fhs_courses_of_study    gets the links to each course of study of all universities in germany
+    └──📄 get_books.py                     extract the url for the pdfs from all links that link to a bachelors degree course of study - not finished yet
+    └──📄 get_final_books                  not finished yet
 </pre>
 ## Abbreviations
 In order to save time and tremendous amounts of energy, some abbreviations are used in this project. <br>
