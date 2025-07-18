@@ -1,1 +1,7 @@
 import backend.pdf_reader_toc as prt
+import timeit
+
+times = 1000
+execution_time = timeit.timeit(lambda: prt.toc_module_codes("backend/test_pdf.pdf"), number=times)
+length = len(prt.toc_module_codes("backend/test_pdf.pdf"))
+print(f"It approximately takes {execution_time*1000/times:.4f} milliseconds to find {length} modules in the toc of a single mhb.\nThat's around {execution_time*1000/times/length:.4f}ms per module code.")
