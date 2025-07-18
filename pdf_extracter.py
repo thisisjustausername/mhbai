@@ -18,10 +18,12 @@ class Pdf:
             data = file.read()
         return data
 
-    def extract_objects(self) -> list:
+    def extract_objects(self, additional_bytes: int=100000) -> list:
         """
         extract_objects \n
         finds the xref to each object and then extracts that object
+        :additional_bytes: how many bytes to read ahead of start of object in order to select the whole object
+        :type additional_bytes: int
         :return: list of objects
         :rtype: list
         """
@@ -60,11 +62,61 @@ class Pdf:
             offset = int(entry[0:10])
             generation = int(entry[11:16])
             in_use = entry[17:18].decode('ascii')
-            xref_entries.append({
-                'obj_num': start_obj + i,
-                'offset': offset,
-                'generation': generation,
-                'in_use': in_use
-            })
 
-        return
+            next_100k = self.content[offset:offset + additional_bytes]  # read ahead
+
+            # Find the `endobj` marker
+            end_index = next_100k.find(b'endobj')
+            if end_index == -1:
+                xref_entries.append({
+                    'obj_num': start_obj + i,
+                    'offset': offset,
+                    'generation': generation,
+                    'in_use': in_use,
+                    'information': f"The object may be longer than {additional_bytes} bytes."
+                })
+                continue
+
+            # contains the entire data of the object
+            object_data = next_100k[:end_index + len(b'endobj')]
+
+            # if the object is encoded as a stream decode it
+            stream_match = re.search(rb'stream\s*[\r\n]+(.*?)endstream', object_data, re.DOTALL)
+            if stream_match:
+
+                # first match is being saved as stream_raw
+                stream_raw = stream_match.group(1)
+
+                # trying to decode the stream, each stream holds the content of exactly a single page
+                try:
+                    # decompress the stream
+                    stream_decompressed = zlib.decompress(stream_raw)
+
+                    # decode the stream
+                    stream_decoded = stream_decompressed.decode("latin1", errors="ignore")
+
+                    xref_entries.append({'obj_num': start_obj + i,
+                        'offset': offset,
+                        'generation': generation,
+                        'in_use': in_use,
+                        'object_data': stream_decoded,
+                        'information': "success"})
+
+                    # print("new page--------------------------------new page--------------------------------new page")
+                except Exception as e:
+                    xref_entries.append({
+                        'obj_num': start_obj + i,
+                        'offset': offset,
+                        'generation': generation,
+                        'in_use': in_use,
+                        'information': f"The object is a stream but during decompression / decoding an error occured."
+                    })
+                    continue
+            else:
+                xref_entries.append({'obj_num': start_obj + i,
+                                     'offset': offset,
+                                     'generation': generation,
+                                     'in_use': in_use,
+                                     'object_data': object_data,
+                                     'information': "success - no stream"})
+        return xref_entries
