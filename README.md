@@ -81,3 +81,6 @@ The following table lists all of them. <br>
     </tr>
   </tbody>
 </table>
+
+## Information about the pdf reader
+The pdf reader was created in order to allow for more precise table recogniction and faster extraction of document data as well as all the other stuff.
