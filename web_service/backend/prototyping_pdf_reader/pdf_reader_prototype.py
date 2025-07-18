@@ -3,7 +3,7 @@ import zlib
 import requests
 import json
 
-with open("../../../WebScraping/scrape_uni_augsburg/uni_a_all_mhbs.json", "r") as file:
+with open("../../../web_scraping/scrape_uni_augsburg/uni_a_all_mhbs.json", "r") as file:
     urls = json.load(file)
 
 new_data = requests.get(urls[0]).content
