@@ -28,8 +28,10 @@ mhbai <br>
 ├──📁 pdfs/                                contains all mhb pdfs
 ├──📁 web_service/                         webservice, that allows users to interact with the program through a webpage
     ├──📁 backend/                         contains the web_service specific backend
+        └──📄 pdf_reader_toc.py                extracts the module codes from the toc of the mhb
     ├──📁 prototyping_pdf_reader           prototypes for a pdf reader -> might be moved out of web_service folder
     └──📄 server.py                        the web api, which interacts with the requests sent from the user
+    └──📄 testing.py                       tests the .py files in web_service
 ├──📁 web_scraping                         contains all files to scrape the mhb pdfs from the universities
     ├──📁 scrape_uni_augsburg              contains all files to scrape the mhbs of the University of Augsburg
         └──📄 uni_a_all_mhbs.json          contains all links of the mhbs extracted by download_files.py
@@ -73,6 +75,9 @@ The following table lists all of them. <br>
       <td>extr</td>
       <td>pdf_extractor</td>
     </tr>
-    
+    <tr>
+      <td>prt</td>
+      <td>pdf_reader_toc.py</td>
+    </tr>
   </tbody>
 </table>
