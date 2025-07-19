@@ -16,7 +16,7 @@ Therefore it can be used to see whether changing courses of study or university 
 Also it can be useful in the creation of new courses of study or seeing which courses can be added to an existing course of study.
 
 ## Additional informations
-This project is still "under construction."
+This project is still in devolepment.
 
 Analyses MHBs
 
