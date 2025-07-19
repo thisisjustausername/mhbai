@@ -1,4 +1,4 @@
-import pdf_extracter as extr
+import pdf_extractor as extr
 import re
 from itertools import groupby
 from typing import Optional

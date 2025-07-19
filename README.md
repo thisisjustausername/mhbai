@@ -28,7 +28,7 @@ mhbai <br>
 ├──📁 pdfs/                                contains all mhb pdfs
 ├──📁 web_service/                         webservice, that allows users to interact with the program through a webpage
     ├──📁 backend/                         contains the web_service specific backend
-        └──📄 pdf_reader_toc.py            extracts the module codes from the toc of the mhb
+        └──📄 pdf_reader_toc.py            extracts the module codes from the toc of the mhb, as well as information to the modules
     ├──📁 prototyping_pdf_reader           prototypes for a pdf reader -> might be moved out of web_service folder
     └──📄 server.py                        the web api, which interacts with the requests sent from the user
     └──📄 testing.py                       tests the .py files in web_service
@@ -40,6 +40,7 @@ mhbai <br>
     └──📄 get_unis_fhs_courses_of_study    gets the links to each course of study of all universities in germany
     └──📄 get_books.py                     extract the url for the pdfs from all links that link to a bachelors degree course of study - not finished yet
     └──📄 get_final_books                  not finished yet
+└──📄 pdf_extractor.py                     decoding pdfs by reading them as bytes and decoding and decompressing them
 </pre>
 ## Abbreviations
 In order to save time and tremendous amounts of energy, some abbreviations are used in this project. <br>
@@ -84,3 +85,17 @@ The following table lists all of them. <br>
 
 ## Information about the pdf reader
 The pdf reader was created in order to allow for more precise table recogniction and faster extraction of document data as well as all the other stuff.
+
+## Status quo
+### Latest changes
+- adding new features to pdf_reader_toc.py
+  - extracting all module codes from the toc of a mhb
+  - extracting information from each module (still in development); already implemented:
+    - German title for german mhbs english title for english mhbs
+    - ECTS
+    - Content (Inhalte)
+    - Goals (Lernziele und Kompetenzen)
+  - testing the speed of data extraction from pdfs in testing.py (partly already removed)
+    - time to extract module codes from toc of mhb: < 20ms
+    - time to extract title, ects, content, goals module: < 1ms
+  - adding features to pdf_extractor.py
