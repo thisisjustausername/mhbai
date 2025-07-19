@@ -99,3 +99,6 @@ The pdf reader was created in order to allow for more precise table recogniction
   - time to extract module codes from toc of mhb: < 20ms
   - time to extract title, ects, content, goals module: < 1ms
 - adding features to pdf_extractor.py
+### TODOs
+- combining web_server with backend
+- adding options for saving data in csv/xlsx/json etc.
