@@ -35,7 +35,7 @@ class Pdf:
 
         # find the start of xref
         # start_xref the index of the first char after the last match
-        start_xref = int(list(re.finditer(rb'startxref\s+(\d+)', self.content))[-1].group(1))
+        start_xref = int(list(re.finditer(rb'startxref\s+(\d+)', self.content))[0].group(1))
         xref_data = self.content[start_xref:]
         assert xref_data.startswith(b'xref')
 
@@ -46,7 +46,6 @@ class Pdf:
         # start object
         # index of the first object is saved as the first number in the pattern match
         start_obj = int(xref_header_match.group(1))
-
         # number of objects
         # number of elements is saved as the second number in the pattern match
         count = int(xref_header_match.group(2))
@@ -106,6 +105,7 @@ class Pdf:
                         'in_use': in_use,
                         'object_data': stream_decoded,
                         'information': "success"})
+                    #if i < 400 and i > 200: print(stream_decoded)
 
                     #print("new page--------------------------------new page--------------------------------new page")
                 except Exception as e:
