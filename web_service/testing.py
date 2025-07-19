@@ -26,7 +26,7 @@ for i in range(1000):
 end = time.time()
 print((end - start)/ 1000)"""
 
-start = time.time_ns()
+"""start = time.time_ns()
 module_1 = prt.Modules("backend/test_pdf.pdf")
 codes_1 = module_1.toc_module_codes()
 
@@ -42,4 +42,5 @@ for i in module_1.module_codes:
 end = time.time()
 print((end - start) / (len(module_1.module_codes + module_2.module_codes)))
 end = time.time_ns()
-print((end - start)*10e-10)
+print((end - start)*10e-10)"""
+
