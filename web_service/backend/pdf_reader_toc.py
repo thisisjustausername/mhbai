@@ -1,11 +1,9 @@
-from selenium.webdriver.support.expected_conditions import title_contains
-
 import pdf_extracter as extr
 import re
 from itertools import groupby
 from typing import Optional
-import json
 
+# TODO cleanly comment this code
 
 class Modules:
     def __init__(self, pdf_path: str):
@@ -106,6 +104,46 @@ class Modules:
         start_info = title_raw.end()
 
         ects = int(re.search(r' Tm \[\(\d+ ECTS/LP\)\] TJ', matching_pages[0][start_info:]).group(0).split("Tm [(", 1)[1].split("ECTS", 1)[0])
-        
+
+        def search_text_blocks(heading: str) -> str:
+            """
+            inside function search_text_blocks \n
+            This function extracts text blocks for a specific heading in a module (e.g. Inhalt in a module) \n
+            This only works when the box doesn't contain any subcells from the table
+            :param heading: string to search for e.g. Inhalte:
+            :type heading: str
+            :return: the text block
+            """
+            information = [page[start_info:] for page in matching_pages]
+            details_list = []
+            for page in information:
+                start = re.search(r' Tm \[\(' + heading + r'\)\] TJ', page)
+                if start is None:
+                    continue
+                start = start.start()
+                end = re.search(r'\nET\nQ', page[start:]).start()
+                details_list.append(page[start:start + end])
+
+            texts_raw = []
+            for block in details_list:
+                for element in block.split('\n'):
+                    if not re.match(r'1 0 0 -1 ', element):
+                        continue
+                    text_raw = element[re.search(r' Tm \[\(', element).end():]
+                    text_full = text_raw[:re.search(r'\)\] TJ', text_raw).start()]
+                    raw_element = {"width": re.search(r'1 0 0 -1 \d+(?:\.\d+)?', element).group(0)[9:],
+                                   "height": re.search(r' \d+(?:\.\d+)? Tm ', element).group(0)[1:-4],
+                                   "text": text_full}
+                    texts_raw.append(raw_element)
+            lines = [list(group) for key, group in groupby(texts_raw, key=lambda x: x["height"])]
+            text = "\n".join([" ".join(i["text"] for i in line) for line in lines])
+            return text
+
+        content = search_text_blocks("Inhalte:")
+
+        goals = search_text_blocks("Lernziele/Kompetenzen:")
+
         return {"title": title,
-                "ects": ects}
+                "ects": ects,
+                "content": content,
+                "goals": goals}
