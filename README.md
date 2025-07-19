@@ -95,7 +95,7 @@ The pdf reader was created in order to allow for more precise table recogniction
     - ECTS
     - Content (Inhalte)
     - Goals (Lernziele und Kompetenzen)
-  - testing the speed of data extraction from pdfs in testing.py (partly already removed)
-    - time to extract module codes from toc of mhb: < 20ms
-    - time to extract title, ects, content, goals module: < 1ms
-  - adding features to pdf_extractor.py
+- testing the speed of data extraction from pdfs in testing.py (partly already removed)
+  - time to extract module codes from toc of mhb: < 20ms
+  - time to extract title, ects, content, goals module: < 1ms
+- adding features to pdf_extractor.py
