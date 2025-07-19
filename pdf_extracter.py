@@ -9,8 +9,8 @@ class Pdf:
     """
 
     def __init__(self, pdf_path: str):
-        self.path = pdf_path
-        self.content = self.read_content()
+        self.path: str = pdf_path
+        self.content: bytes = self.read_content()
 
     def read_content(self) -> bytes:
         """
@@ -103,7 +103,7 @@ class Pdf:
                         'offset': offset,
                         'generation': generation,
                         'in_use': in_use,
-                        'object_data': stream_decoded,
+                        'data': stream_decoded,
                         'information': "success"})
                     #if i < 400 and i > 200: print(stream_decoded)
 
@@ -122,6 +122,6 @@ class Pdf:
                                      'offset': offset,
                                      'generation': generation,
                                      'in_use': in_use,
-                                     'object_data': object_data,
+                                     'data': object_data,
                                      'information': "success - no stream"})
         return xref_entries

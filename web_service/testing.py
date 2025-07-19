@@ -10,9 +10,12 @@ length = len(prt.toc_module_codes("backend/test_pdf.pdf"))
 print(f"It approximately take-s {execution_time*1000/times:.4f} milliseconds to find {length} modules in the toc of a single mhb.\nThat's around {execution_time*1000/times/length:.4f}ms per module code."""
 
 start = time.time_ns()
-modules_1 = prt.toc_module_codes("backend/test_pdf.pdf")
-modules_2 = prt.toc_module_codes("backend/geo_test.pdf")
-
-print([i for i in modules_1 if i in modules_2])
-
-print((time.time_ns() - start)/10e6)
+module_1 = prt.Modules("backend/test_pdf.pdf")
+module_2 = prt.Modules("backend/geo_test.pdf")
+codes_1 = module_1.toc_module_codes()
+codes_2 = module_2.toc_module_codes()
+overlapping = [i for i in codes_1 if i in codes_2]
+ects_overlapping = sum([module_1.data_to_module(i)["ects"] for i in overlapping])
+print(ects_overlapping)
+duration = (time.time_ns() - start)/10e6
+print(f"It takes {duration:.2f}ms to compare two pdfs.")
