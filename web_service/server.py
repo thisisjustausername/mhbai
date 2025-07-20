@@ -31,7 +31,7 @@ def compare():
 
     modules = [prt.Modules("pdfs/" + i) for i in file_names]
 
-    no_infos = "-"
+    no_infos = "k.A."
 
     extracted_modules = [i.toc_module_codes() for i in modules]
     # sort in order to save operations in the next step
@@ -42,6 +42,7 @@ def compare():
     for i in overlapping_modules:
         try:
             module_data = modules[0].data_to_module(i)
+            module_data = dict((i[0], i[1]) if i[1] != None else (i[0], no_infos) for i in module_data.items())
         except:
             module_data = {"title": no_infos,
                            "module_code": i,
@@ -51,9 +52,6 @@ def compare():
         information_overlaps.append(module_data)
     print(information_overlaps)
     return jsonify({"data": information_overlaps})
-
-    #if not (df.check_url(file_url_1) and df.check_url(file_url_2)):
-    #    return jsonify({"error": '''The url seems to be invalid. Make sure it starts with "https://mhb.uni-augsburg.de/", ends with ".pdf" and isn't longer than 500 characters'''})
 
 if __name__ == "__main__":
     app.run(debug=True)
