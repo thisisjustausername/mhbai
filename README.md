@@ -107,3 +107,4 @@ The pdf reader was created in order to allow for more precise table recogniction
 ### TODOs
 - combining web_server with backend
 - adding options for saving data in csv/xlsx/json etc.
+- update file structure in README for web_service
