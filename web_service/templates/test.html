@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Hide Object on Text Change</title>
+</head>
+<body>
+
+<input type="text" id="textField1" placeholder="Type here...">
+<input type="text" id="textField2" placeholder="Or here...">
+
+<div id="objectToHide" style="margin-top: 20px; background: lightblue; padding: 10px;">
+  This object will be hidden when text changes.
+</div>
+
+<script>
+  const textField1 = document.getElementById('textField1');
+  const textField2 = document.getElementById('textField2');
+  const objectToHide = document.getElementById('objectToHide');
+
+  function hideObject() {
+    objectToHide.style.display = 'none';
+  }
+
+  textField1.addEventListener('input', hideObject);
+  textField2.addEventListener('input', hideObject);
+</script>
+
+</body>
+</html>

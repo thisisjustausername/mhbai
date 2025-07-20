@@ -12,6 +12,7 @@ input[type="text"] {
     margin: 10px 0;
     box-sizing: border-box;
 }
+
 button {
     padding: 10px 20px;
     background-color: rgb(173, 0, 124);
@@ -27,4 +28,35 @@ button:disabled {
     background-color: #ccc;
     cursor: not-allowed;
     color: #666;
+
+}
+.no-border {
+    border-collapse: collapse; /* Removes spacing between cells */
+    width: 100%;
+}
+
+.no-border td {
+    border: none; /* No visible lines */
+    padding: 8px 12px;
+    vertical-align: top;
+}
+
+td {
+    white-space: nowrap;
+    text-align: left;
+    padding-left: 40px;
+}
+th {
+    white-space: nowrap;
+    text-align: left;
+    padding-left: 40px;
+    font-size: 20px;
+}
+
+h2[class="overlaps"] {
+    visibility: hidden;
+}
+
+table[class="overlaps"] {
+    visibility: hidden;
 }

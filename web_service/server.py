@@ -27,17 +27,30 @@ def compare():
     file_names = [i.split("/")[-1] if "/" in i else i for i in file_names]
     file_names = [i + ".pdf" if not ".pdf" in i else i for i in file_names]
     if any([False if i in os.listdir("pdfs") else True for i in file_names]):
-        return jsonify({"error": "File not found"})
+        Exception("No valid pdf files")
 
     modules = [prt.Modules("pdfs/" + i) for i in file_names]
+
+    no_infos = "-"
 
     extracted_modules = [i.toc_module_codes() for i in modules]
     # sort in order to save operations in the next step
     extracted_modules.sort(key=lambda x: len(x))
     overlapping_modules = list(set(extracted_modules[0]).intersection(*extracted_modules[1:]))
 
-    information_overlaps = [modules[0].data_to_module(i) for i in overlapping_modules]
-    return information_overlaps
+    information_overlaps = []
+    for i in overlapping_modules:
+        try:
+            module_data = modules[0].data_to_module(i)
+        except:
+            module_data = {"title": no_infos,
+                           "module_code": i,
+                           "ects": no_infos,
+                           "content": no_infos,
+                           "goals": no_infos}
+        information_overlaps.append(module_data)
+    print(information_overlaps)
+    return jsonify({"data": information_overlaps})
 
     #if not (df.check_url(file_url_1) and df.check_url(file_url_2)):
     #    return jsonify({"error": '''The url seems to be invalid. Make sure it starts with "https://mhb.uni-augsburg.de/", ends with ".pdf" and isn't longer than 500 characters'''})

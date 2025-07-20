@@ -92,19 +92,85 @@ class Modules:
             return None
         matching_pages = [page for page in self.stream_data if re.search(r'Modul ' + module_code, page) is not None]
 
+        # TODO when title goes over two lines, don't ignore second line
         # /F3 10 sets font and size
         titles = re.finditer(r'Tm \[\(Modul ' + module_code, matching_pages[0])
         title_start = [i for i in titles if len(matching_pages[0][i.start()-100: i.start()].split("\n")) > 1 and "/F3 10" in matching_pages[0][i.start()-100: i.start()].split("\n")[-2]][0].end()
-        title_search = matching_pages[0][title_start:title_start+500]
-        title_raw = re.search(r': [^\]]+\)\] TJ', title_search)
-        if title_raw is None:
-            title = None
+        title_search = matching_pages[0][title_start:title_start+700]
+        # if module_code == "GEO-2043":
+        title_search_lines = title_search.split("\n") # split search window into lines
+
+        def find_title(split_line: str, title_search_lines: list):
+            if any([split_line == i for i in title_search_lines]):  # true, when english title was found
+                # shrink window
+                indexer = -1
+                for index, i in enumerate(title_search_lines):
+                    if i == split_line:
+                        indexer = index
+                        break
+                if indexer != -1:  # checks whether window shrink was successful (this is unnecessary, since always true, but for failsave)
+                    local_end_index = len("\n".join(title_search_lines[:indexer])) + 1 # plus new line
+                    title_search_lines = title_search_lines[:indexer]
+                    title_list = []
+                    for index, i in enumerate(title_search_lines):
+                        pattern = r'\[\(.*?\)\]' if index != 0 else r'.*?\)\]'
+                        match = re.search(pattern, i)
+                        if match is not None:
+                            if (index == len(title_search_lines) - 1) or (
+                            not title_search_lines[index + 1].endswith(" rg")):
+                                cleaned = match.group(0)[:-2] if index == 0 and not match.group(0).startswith("[(") else match.group(0).split("[(", 1)[1][:-2]
+                                title_list.append(cleaned)
+
+                    # removes - from the end of line when a word is separated into two lines
+                    clean_titles = []
+                    for index, i in enumerate(title_list):
+                        if index == len(title_list) - 1:
+                            clean_titles.append(i)
+                        elif i.endswith("-") and title_list[index + 1][0].islower():
+                            clean_titles.append(i[:-1])
+                        else:
+                            clean_titles.append(i + " ")
+                    title = "".join(clean_titles)[2:]
+                    return (title, local_end_index)
+                return None
+
+        # no need to check, whether end of box ET or engl title is earlier, since engl title seq doesn't exist near after ET
+        # if english title is found, shrink title window until this begins
+        engl_title_seq = '/F2 9 Tf'
+        result = find_title(engl_title_seq, title_search_lines)
+        if result is not None:
+            title = result[0]
+            start_info = result[1] + title_start
         else:
-            title = title_raw.group(0)[2:].split(")]")[-2]
-        start_info = title_raw.end()
+            end_of_box = "ET"
+            result = find_title(end_of_box, title_search_lines)
+            if result is not None:
+                title = result[0]
+                start_info = result[1] + title_start
+            else:
+                title_raw = re.search(r': [^\]]+\)\] TJ', title_search)
+                if title_raw is None:
+                    title = None
+                else:
+                    title = title_raw.group(0)[2:].split(")]")[-2]
+                    start_info = title_raw.end() + title_start  # doesn't it have to be plus title_start
 
-        ects = int(re.search(r' Tm \[\(\d+ ECTS/LP\)\] TJ', matching_pages[0][start_info:]).group(0).split("Tm [(", 1)[1].split("ECTS", 1)[0])
+        if title is not None:
+            # check whether LP information is in the title
+            title_match = re.search(r'\\\(\d+LP\\\)', title)
+            if title_match is not None:
+                title = title[:title_match.start()] + " " + title[title_match.end():]
+        title = title.strip()
+        title = re.sub(r'\s+', ' ', title)
+        title = title.encode('utf-8').decode('unicode_escape')
+        title = title.replace("\\", "")
 
+
+        # TODO if no ects but everything else available, simply set ects to None
+        try:
+            ects = int(re.search(r' Tm \[\(\d+ ECTS/LP\)\] TJ', matching_pages[0][start_info:]).group(0).split("Tm [(", 1)[1].split("ECTS", 1)[0])
+        except:
+            ects = None
         def search_text_blocks(heading: str) -> str:
             """
             inside function search_text_blocks \n
@@ -139,11 +205,17 @@ class Modules:
             text = "\n".join([" ".join(i["text"] for i in line) for line in lines])
             return text
 
-        content = search_text_blocks("Inhalte:")
-
-        goals = search_text_blocks("Lernziele/Kompetenzen:")
+        try:
+            content = search_text_blocks("Inhalte:")
+        except:
+            content = None
+        try:
+            goals = search_text_blocks("Lernziele/Kompetenzen:")
+        except:
+            goals = None
 
         return {"title": title,
+                "module_code": module_code.encode('utf-8').decode('unicode_escape'),
                 "ects": ects,
-                "content": content,
-                "goals": goals}
+                "content": content.encode('utf-8').decode('unicode_escape'),
+                "goals": goals.encode('utf-8').decode('unicode_escape')}

@@ -13,14 +13,37 @@
             <input type="text" id="mhb1" placeholder="Modulhandbuch 1" />
             <input type="text" id="mhb2" placeholder="Modulhandbuch 2" />
             <button id="compareButton" onclick="compare()" disabled>Vergleichen</button>
+            <h2 class="overlaps" id="infos">Überschneidungen</h2>
         </div>
+        <table class="overlaps">
+                <thead>
+                    <tr>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Modulcode
+                        </th>
+                        <th>
+                            ECTS
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+
+                </tbody>
+            </table>
 
         <script>
               const mhb1 = document.getElementById("mhb1");
               const mhb2 = document.getElementById("mhb2");
               const compareButton = document.getElementById("compareButton");
+              const overlaps = document.getElementsByClassName("overlaps");
 
               function validateFields() {
+                  for (let el of overlaps) {
+                      el.style.visibility = 'hidden';
+                  }
                   if (mhb1.value.trim() !== "" && mhb2.value.trim() !== "") {
                       compareButton.disabled = false;
                   } else {
@@ -36,21 +59,41 @@
                 const mhb2 = document.getElementById("mhb2").value;
                 console.log("MHB1:", mhb1);
                 console.log("MHB2:", mhb2);
+                fetch("/compare", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({"mhb1": mhb1, "mhb2": mhb2})
+                })
+                    .then(response => response.json())
+                    .then(result => {
+                        for (let el of overlaps) {
+                            el.style.visibility = 'visible';
+                        }
+                        const tbody = document.getElementById("table-body");
+                        tbody.innerHTML = "";
+                        result.data.forEach(item => {
+                            const tr = document.createElement("tr");
 
-                try {
-                    const response = fetch("/compare", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({"mhb1": mhb1, "mhb2": mhb2})
+                            const titleTd = document.createElement("td");
+                            titleTd.textContent = item.title;
+                            tr.appendChild(titleTd);
+
+                            const codeTd = document.createElement("td");
+                            codeTd.textContent = item.module_code;
+                            tr.appendChild(codeTd);
+
+                            const ectsTd = document.createElement("td");
+                            ectsTd.textContent = item.ects;
+                            tr.appendChild(ectsTd);
+
+                            tbody.appendChild(tr);
+                          });
+                    })
+                    .catch(err => {
+                        console.error("Request failed:", err);
                     });
-                    const result = response.json();
-                    console.log("Antwort:", result);
-                    alert(result.message);
-                } catch (err) {
-                    console.error("Request failed:", err);
-                }
             }
         </script>
     </body>

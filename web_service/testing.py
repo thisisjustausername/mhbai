@@ -44,3 +44,7 @@ print((end - start) / (len(module_1.module_codes + module_2.module_codes)))
 end = time.time_ns()
 print((end - start)*10e-10)"""
 
+module_2 = prt.Modules("pdfs/Bachelor_Geographie_PO2010_ID6285_2_de_20171009_0951.pdf")
+codes_2 = module_2.toc_module_codes()
+for i in codes_2:
+    print(module_2.data_to_module(i))
