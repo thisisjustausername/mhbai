@@ -1,0 +1,30 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 40px;
+}
+.container {
+    max-width: 400px;
+    margin: auto;
+}
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    box-sizing: border-box;
+}
+button {
+    padding: 10px 20px;
+    background-color: rgb(173, 0, 124);
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+button:hover {
+    background-color: rgb(200, 0, 180);
+}
+
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    color: #666;
+}
