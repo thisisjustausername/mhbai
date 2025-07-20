@@ -1,4 +1,3 @@
-import os
 import json
 
 # load the data to all modules

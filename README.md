@@ -39,6 +39,9 @@ mhbai <br>
         └──📄 data_processing.py           extracts the important data from all mhbs
         └──📄 cleaning_data.py             cleans the data from data_processing.py
     └──📄 data.json                        holds all the links, that redirect to a course of study
+    └──📄 pdf_data.json                    holds the extracted infos about the courses of study and modules
+    └──📄 clean_module_infos.json          holds the cleaned data of module infos
+    └──📄 complete_information.json        holds cleaned and complete data of module infos
     └──📄 get_unis_fhs_courses_of_study    gets the links to each course of study of all universities in germany
     └──📄 get_books.py                     extract the url for the pdfs from all links that link to a bachelors degree course of study - not finished yet
     └──📄 get_final_books                  not finished yet
