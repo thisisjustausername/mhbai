@@ -36,6 +36,8 @@ mhbai <br>
     ├──📁 scrape_uni_augsburg              contains all files to scrape the mhbs of the University of Augsburg
         └──📄 uni_a_all_mhbs.json          contains all links of the mhbs extracted by download_files.py
         └──📄 download_files.py            file to recursively find all mhbs from 2018 and newer and download them to ../../pdfs/ (in the code just /pdf since executed via ssh on pi5)
+        └──📄 data_processing.py           extracts the important data from all mhbs
+        └──📄 cleaning_data.py             cleans the data from data_processing.py
     └──📄 data.json                        holds all the links, that redirect to a course of study
     └──📄 get_unis_fhs_courses_of_study    gets the links to each course of study of all universities in germany
     └──📄 get_books.py                     extract the url for the pdfs from all links that link to a bachelors degree course of study - not finished yet
