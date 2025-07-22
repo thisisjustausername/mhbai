@@ -4,12 +4,7 @@
 #
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
-import json
-import time
-
-import backend.pdf_reader_toc as prt
-import timeit
-import pdf_extractor as extr
+import pdf_reader_toc as prt
 
 """times = 1000
 execution_time = timeit.timeit(lambda: prt.toc_module_codes("backend/test_pdf.pdf"), number=times)
@@ -54,4 +49,5 @@ module_2 = prt.Modules("pdfs/Bachelor_Geographie_PO2010_ID6285_2_de_20171009_095
 codes_2 = module_2.toc_module_codes()
 #for i in codes_2:
 #    print(module_2.data_to_module(i))
-print(module_2.data_to_module("GEO-2045"))
+for i in codes_2:
+    print(module_2.data_to_module(i)["module_code"])

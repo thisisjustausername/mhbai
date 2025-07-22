@@ -4,13 +4,64 @@
 #
 # For usage please contact the developer.
 
-import pdf_extractor as extr
+from pdf_reader import pdf_extractor as extr
 import re
 from itertools import groupby
 from typing import Optional
 
 # TODO cleanly comment this code
-# TODO instead of using dicts rather use tuples to keep the order
+# TODO instead of using dicts rather use tuples to keep the order NOTE this file keeps order, error occures in server.py
+def find_title(split_line: str, title_search_lines: list) -> Optional[tuple]:
+    """
+    find_title \n
+    helper function to extract title from a specific search window
+    :param split_line: the part to split, e.g. english title or end of box
+    :type split_line: str
+    :param title_search_lines: search windows split into lines
+    :type title_search_lines: list
+    :return: title, local index of the end of the title
+    :rtype: Optional[tuple]
+    """
+    if not any([split_line == i for i in title_search_lines]):  # false, when split_line was found
+        return None
+    # shrink window
+    indexer = -1
+    for index, i in enumerate(title_search_lines):
+        if i == split_line:
+            indexer = index
+            break
+    if not indexer != -1:  # checks whether window shrink was successful (this is unnecessary, since always false, but for failsave)
+        return None
+    local_end_index = len("\n".join(title_search_lines[:indexer])) + 1  # plus new line
+    title_search_lines = title_search_lines[:indexer]
+    title_list = []
+    is_gray = False
+    for index, i in enumerate(title_search_lines):
+        if re.match(r'\d+(?:\.\d+)? g', i):
+            is_gray = True
+        elif re.match(r'0 0 1 rg', i):
+            is_gray = False
+        if not is_gray:
+            pattern = r'\[\(.*?\)\]' if index != 0 else r'.*?\)\]'
+            match = re.search(pattern, i)
+            if match is not None:
+                cleaned = match.group(0)[:-2] if index == 0 and not match.group(0).startswith("[(") else \
+                match.group(0).split("[(", 1)[1][:-2]
+                title_list.append(cleaned)
+
+    # removes - from the end of line when a word is separated into two lines
+    clean_titles = []
+    for index, i in enumerate(title_list):
+        if index == len(title_list) - 1:
+            clean_titles.append(i)
+        elif i.endswith("-") and title_list[index + 1][0].islower():
+            clean_titles.append(i[:-1])
+        else:
+            clean_titles.append(i + " ")
+    title = "".join(clean_titles)[2:]
+    return (title, local_end_index)
+
+
 class Modules:
     def __init__(self, pdf_path: str):
         """
@@ -76,9 +127,14 @@ class Modules:
                         module.append(page_number.group(0)[6:-2]) # add page number to module list
             if len(module) > 2: # if the module contains more than one page number, just keep the last one
                 module = [module[0], module[-1]]"""
-
-        # remove duplicates
-        modules = list(set(modules))
+        # remove duplicates, but keeping the order
+        seen_set = set()
+        new_mods = []
+        for i in modules:
+            if not i in seen_set:
+                seen_set.add(i)
+                new_mods.append(i)
+        modules = new_mods
 
         # set class vars and return modules
         self.module_codes = modules
@@ -105,44 +161,6 @@ class Modules:
         title_search = matching_pages[0][title_start:title_start+700]
         # if module_code == "GEO-2043":
         title_search_lines = title_search.split("\n") # split search window into lines
-
-        def find_title(split_line: str, title_search_lines: list):
-            if any([split_line == i for i in title_search_lines]):  # true, when english title was found
-                # shrink window
-                indexer = -1
-                for index, i in enumerate(title_search_lines):
-                    if i == split_line:
-                        indexer = index
-                        break
-                if indexer != -1:  # checks whether window shrink was successful (this is unnecessary, since always true, but for failsave)
-                    local_end_index = len("\n".join(title_search_lines[:indexer])) + 1 # plus new line
-                    title_search_lines = title_search_lines[:indexer]
-                    title_list = []
-                    is_gray = False
-                    for index, i in enumerate(title_search_lines):
-                        if re.match(r'\d+(?:\.\d+)? g', i):
-                            is_gray = True
-                        elif re.match(r'0 0 1 rg', i):
-                            is_gray = False
-                        if not is_gray:
-                            pattern = r'\[\(.*?\)\]' if index != 0 else r'.*?\)\]'
-                            match = re.search(pattern, i)
-                            if match is not None:
-                                cleaned = match.group(0)[:-2] if index == 0 and not match.group(0).startswith("[(") else match.group(0).split("[(", 1)[1][:-2]
-                                title_list.append(cleaned)
-
-                    # removes - from the end of line when a word is separated into two lines
-                    clean_titles = []
-                    for index, i in enumerate(title_list):
-                        if index == len(title_list) - 1:
-                            clean_titles.append(i)
-                        elif i.endswith("-") and title_list[index + 1][0].islower():
-                            clean_titles.append(i[:-1])
-                        else:
-                            clean_titles.append(i + " ")
-                    title = "".join(clean_titles)[2:]
-                    return (title, local_end_index)
-                return None
 
         # no need to check, whether end of box ET or engl title is earlier, since engl title seq doesn't exist near after ET
         # if english title is found, shrink title window until this begins
@@ -181,6 +199,7 @@ class Modules:
             ects = int(re.search(r' Tm \[\(\d+ ECTS/LP\)\] TJ', matching_pages[0][start_info:]).group(0).split("Tm [(", 1)[1].split("ECTS", 1)[0])
         except:
             ects = None
+
         def search_text_blocks(heading: str) -> str:
             """
             inside function search_text_blocks \n

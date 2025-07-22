@@ -4,9 +4,10 @@
 #
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
-from flask import Flask, session, g, flash, render_template, request, redirect, url_for, make_response, jsonify
-import backend.pdf_reader_toc as prt
+from flask import Flask, render_template, request, jsonify
+import pdf_reader_toc as prt
 import os
+import numpy as np
 app = Flask(__name__)
 
 @app.route("/")
@@ -35,13 +36,18 @@ def compare():
         Exception("No valid pdf files")
 
     modules = [prt.Modules("pdfs/" + i) for i in file_names]
-
+    #print(modules[0])
     no_infos = "k.A."
 
     extracted_modules = [i.toc_module_codes() for i in modules]
+    # do not sort in order to keep it cleaner for the user
     # sort in order to save operations in the next step
-    extracted_modules.sort(key=lambda x: len(x))
-    overlapping_modules = list(set(extracted_modules[0]).intersection(*extracted_modules[1:]))
+    # extracted_modules.sort(key=lambda x: len(x))
+    overlaps_out_of_order = set(extracted_modules[0]).intersection(*extracted_modules[1:])
+
+    min_list = extracted_modules[np.argmin([len(i) for i in extracted_modules])]
+    overlapping_modules = [i for i in min_list if i in overlaps_out_of_order]
+    # overlapping_modules = list(set(extracted_modules[0]).intersection(*extracted_modules[1:]))
 
     information_overlaps = []
     for i in overlapping_modules:
@@ -55,7 +61,6 @@ def compare():
                            "content": no_infos,
                            "goals": no_infos}
         information_overlaps.append(module_data)
-    print(information_overlaps)
     return jsonify({"data": information_overlaps})
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@
 
 # run this code on remote host
 
-import web_service.backend.pdf_reader_toc as prt
+import pdf_reader_toc as prt
 import os
 import json
 
