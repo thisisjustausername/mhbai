@@ -1,5 +1,10 @@
+# Copyright (c) 2025 Leon Gattermeyer
+#
+# This file is part of mhbai.
+#
+# Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
+
 from flask import Flask, session, g, flash, render_template, request, redirect, url_for, make_response, jsonify
-#import web_scraping.scrape_uni_augsburg.download_files as df
 import backend.pdf_reader_toc as prt
 import os
 app = Flask(__name__)

@@ -1,3 +1,9 @@
+# Copyright (c) 2025 Leon Gattermeyer
+#
+# This file is part of mhbai and pdf_reader.
+#
+# For usage please contact the developer.
+
 import re
 import zlib
 import json

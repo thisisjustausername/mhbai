@@ -1,3 +1,9 @@
+# Copyright (c) 2025 Leon Gattermeyer
+#
+# This file is part of mhbai and pdf_reader.
+#
+# For usage please contact the developer.
+
 from pdfrw import PdfWriter, PdfDict, PdfName, PdfObject
 
 # creating pdf out of the string
