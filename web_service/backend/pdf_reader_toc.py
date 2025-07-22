@@ -116,8 +116,8 @@ class Modules:
                         pattern = r'\[\(.*?\)\]' if index != 0 else r'.*?\)\]'
                         match = re.search(pattern, i)
                         if match is not None:
-                            if (index == len(title_search_lines) - 1) or (
-                            not title_search_lines[index + 1].endswith(" rg")):
+                            if (index == 0) or (
+                            not title_search_lines[index - 1].endswith(" g")): # means the line is printed gray
                                 cleaned = match.group(0)[:-2] if index == 0 and not match.group(0).startswith("[(") else match.group(0).split("[(", 1)[1][:-2]
                                 title_list.append(cleaned)
 
