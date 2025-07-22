@@ -8,7 +8,7 @@ This code further contains a pdf reader developed by the developer before the 15
 Note, that all files containing code of the pdf-reader or read pdfs aren't Open-Source and can't freely be used commercially. 
 In case of commercial use, contact the developer.
 
-## Descirption
+## Description
 This project is able to analyse MHBs and compare them as well as their content. 
 It is used to compare the courses of two courses of study to evaluate how many ECTS can be used from one course of study in the other one.
 
