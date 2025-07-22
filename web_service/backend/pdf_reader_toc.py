@@ -112,12 +112,16 @@ class Modules:
                     local_end_index = len("\n".join(title_search_lines[:indexer])) + 1 # plus new line
                     title_search_lines = title_search_lines[:indexer]
                     title_list = []
+                    is_gray = False
                     for index, i in enumerate(title_search_lines):
-                        pattern = r'\[\(.*?\)\]' if index != 0 else r'.*?\)\]'
-                        match = re.search(pattern, i)
-                        if match is not None:
-                            if (index == 0) or (
-                            not title_search_lines[index - 1].endswith(" g")): # means the line is printed gray
+                        if re.match(r'\d+(?:\.\d+)? g', i):
+                            is_gray = True
+                        elif re.match(r'0 0 1 rg', i):
+                            is_gray = False
+                        if not is_gray:
+                            pattern = r'\[\(.*?\)\]' if index != 0 else r'.*?\)\]'
+                            match = re.search(pattern, i)
+                            if match is not None:
                                 cleaned = match.group(0)[:-2] if index == 0 and not match.group(0).startswith("[(") else match.group(0).split("[(", 1)[1][:-2]
                                 title_list.append(cleaned)
 
