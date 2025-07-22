@@ -4,7 +4,7 @@ from itertools import groupby
 from typing import Optional
 
 # TODO cleanly comment this code
-
+# TODO instead of using dicts rather use tuples to keep the order
 class Modules:
     def __init__(self, pdf_path: str):
         """
