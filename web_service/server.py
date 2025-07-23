@@ -8,7 +8,11 @@ from flask import Flask, render_template, request, jsonify
 import pdf_reader_toc as prt
 import os
 import numpy as np
+import json
 app = Flask(__name__)
+
+with open("links_info.json", "r") as file:
+    links_data =  json.load(file)
 
 @app.route("/")
 def home():
@@ -30,7 +34,7 @@ def compare():
     file_names = [file_name_1, file_name_2]
 
     # allows to input either filenames (with or without .pdf at the end) or urls
-    file_names = [i.split("/")[-1] if "/" in i else i for i in file_names]
+    file_names = [get_file_name(i) if "/" in i else i for i in file_names]
     file_names = [i + ".pdf" if not ".pdf" in i else i for i in file_names]
     if any([False if i in os.listdir("pdfs") else True for i in file_names]):
         Exception("No valid pdf files")
@@ -62,6 +66,19 @@ def compare():
                            "goals": no_infos}
         information_overlaps.append(module_data)
     return jsonify({"data": information_overlaps})
+
+def get_file_name(url: str) -> str:
+    """
+    get_file_name \n
+    gets the file name that fits to the url
+    :param url: url \n
+    :type url: str
+    :return: file name or link if no file name was found\n
+    :rtype: str
+    """
+    if url not in links_data:
+        return url.split("/")[-1]
+    return links_data[url]
 
 if __name__ == "__main__":
     app.run(debug=True)
