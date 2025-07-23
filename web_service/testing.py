@@ -5,6 +5,7 @@
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
 import pdf_reader_toc as prt
+import json
 
 """times = 1000
 execution_time = timeit.timeit(lambda: prt.toc_module_codes("backend/test_pdf.pdf"), number=times)
@@ -45,9 +46,22 @@ print((end - start) / (len(module_1.module_codes + module_2.module_codes)))
 end = time.time_ns()
 print((end - start)*10e-10)"""
 
-module_2 = prt.Modules("pdfs/Bachelor_Geographie_PO2010_ID6285_2_de_20171009_0951.pdf")
+module_2 = prt.Modules("pdfs/Bachelorstudiengang_Global_Business_Management_PO_2015_ID25918_20_de_20250414_1708.pdf")
 codes_2 = module_2.toc_module_codes()
-#for i in codes_2:
-#    print(module_2.data_to_module(i))
 for i in codes_2:
-    print(module_2.data_to_module(i)["module_code"])
+    module_2.data_to_module(i)
+
+
+"""with open("web_scraping/scrape_uni_augsburg/links_information.json", "r") as file:
+    links_data =  json.load(file)
+
+def get_file_name(url: str) -> str:
+
+
+    if url not in links_data.keys():
+        return url.split("/")[-1]
+    return links_data[url]
+
+url = "https://mhb.uni-augsburg.de/BachelorStudiengaenge/Bachelor+of+Science/Global+Business+Management+%28Hauptfach%29/POVersion+2015/Sommersemester%202025/Bachelorstudiengang_Global_Business_Management_PO_2015.pdf"
+
+print(get_file_name(url))"""

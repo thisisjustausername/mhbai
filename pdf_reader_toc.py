@@ -185,7 +185,13 @@ class Modules:
 
         if title is not None:
             # check whether LP information is in the title
-            title_match = re.search(r'\\\(\d+LP\\\)', title)
+            pattern_list = [r'\\\(\d+LP\\\)', r' \\\(\d+ LP\\\)', r' \d+ CP$']
+
+            title_match = re.search(pattern_list[0], title)
+            if title_match is None:
+                title_match = re.search(pattern_list[1], title)
+                if title_match is None:
+                    title_match = re.search(pattern_list[2], title)
             if title_match is not None:
                 title = title[:title_match.start()] + " " + title[title_match.end():]
         title = title.strip()

@@ -9,9 +9,10 @@ import pdf_reader_toc as prt
 import os
 import numpy as np
 import json
+
 app = Flask(__name__)
 
-with open("links_info.json", "r") as file:
+with open("web_scraping/scrape_uni_augsburg/links_information.json", "r") as file:
     links_data =  json.load(file)
 
 @app.route("/")
@@ -76,7 +77,7 @@ def get_file_name(url: str) -> str:
     :return: file name or link if no file name was found\n
     :rtype: str
     """
-    if url not in links_data:
+    if url not in links_data.keys():
         return url.split("/")[-1]
     return links_data[url]
 
