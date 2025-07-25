@@ -4,10 +4,10 @@
 #
 # For usage please contact the developer.
 
-from pdf_reader import pdf_extractor as extr
+import pdf_extractor as extr
 import re
 from itertools import groupby
-from typing import Optional
+from typing import Optional, List
 
 # TODO cleanly comment this code
 # TODO instead of using dicts rather use tuples to keep the order NOTE this file keeps order, error occures in server.py
@@ -76,6 +76,11 @@ class Modules:
 
 
     def toc_module_codes(self):
+        """
+        def toc_module_codes \n
+        :return list of module_codes
+        :rtype List[str]
+        """
         # this identifies every page of the toc
         # toc_identifier = "BT\n/F1 12 Tf\n1 0 0 -1 0 10.26599979 Tm [(Inhaltsverzeichnis)] TJ\nET"
         toc_pages = [i for i in self.stream_data if "Inhaltsverzeichnis" in i]
