@@ -72,7 +72,7 @@ class Modules:
         self.pdf: extr.Pdf = extr.Pdf(pdf_path=self.path)
         self.content: list = self.pdf.extract_objects()
         self.stream_data: list = [i["data"] for i in self.content if i["information"] == "success"]
-        self.module_codes: Optional[list] = None
+        self.module_codes: list = []
 
 
     def toc_module_codes(self):
@@ -140,6 +140,7 @@ class Modules:
         self.module_codes = modules
         return modules
 
+
     def data_to_module(self, module_code: str) -> Optional[dict]:
         """
         data_to_module \n
@@ -157,31 +158,46 @@ class Modules:
         # TODO when title goes over two lines, don't ignore second line
         # /F3 10 sets font and size
         titles = re.finditer(r'Tm \[\(Modul ' + module_code, matching_pages[0])
-        title_start = [i for i in titles if len(matching_pages[0][i.start()-100: i.start()].split("\n")) > 1 and "/F3 10" in matching_pages[0][i.start()-100: i.start()].split("\n")[-2]][0].end()
-        title_search = matching_pages[0][title_start:title_start+700]
-        # if module_code == "GEO-2043":
-        title_search_lines = title_search.split("\n") # split search window into lines
 
-        # no need to check, whether end of box ET or engl title is earlier, since engl title seq doesn't exist near after ET
-        # if english title is found, shrink title window until this begins
-        engl_title_seq = '/F2 9 Tf'
-        result = find_title(engl_title_seq, title_search_lines)
-        if result is not None:
-            title = result[0]
-            start_info = result[1] + title_start
+        error = True
+        page_index = None
+        for index, match_page in enumerate(matching_pages):
+            try:
+                titles = re.finditer(r'Tm \[\(Modul ' + module_code, matching_pages[index])
+                title_start = [i for i in titles if len(matching_pages[index][i.start()-100: i.start()].split("\n")) > 1 and "/F3 10" in matching_pages[index][i.start()-100: i.start()].split("\n")[-2]][0].end()
+                error = False
+                page_index = index
+                break
+            except:
+                pass
+        if error:
+            title = None
         else:
-            end_of_box = "ET"
-            result = find_title(end_of_box, title_search_lines)
+            # title_start = [i for i in titles if len(matching_pages[0][i.start()-100: i.start()].split("\n")) > 1 and "/F3 10" in matching_pages[0][i.start()-100: i.start()].split("\n")[-2]][0].end()
+            title_search = matching_pages[page_index][title_start:title_start+700]
+            # if module_code == "GEO-2043":
+            title_search_lines = title_search.split("\n") # split search window into lines
+
+            # no need to check, whether end of box ET or engl title is earlier, since engl title seq doesn't exist near after ET
+            # if english title is found, shrink title window until this begins
+            engl_title_seq = '/F2 9 Tf'
+            result = find_title(engl_title_seq, title_search_lines)
             if result is not None:
                 title = result[0]
                 start_info = result[1] + title_start
             else:
-                title_raw = re.search(r': [^\]]+\)\] TJ', title_search)
-                if title_raw is None:
-                    title = None
+                end_of_box = "ET"
+                result = find_title(end_of_box, title_search_lines)
+                if result is not None:
+                    title = result[0]
+                    start_info = result[1] + title_start
                 else:
-                    title = title_raw.group(0)[2:].split(")]")[-2]
-                    start_info = title_raw.end() + title_start  # doesn't it have to be plus title_start
+                    title_raw = re.search(r': [^\]]+\)\] TJ', title_search)
+                    if title_raw is None:
+                        title = None
+                    else:
+                        title = title_raw.group(0)[2:].split(")]")[-2]
+                        start_info = title_raw.end() + title_start  # doesn't it have to be plus title_start
 
         if title is not None:
             # check whether LP information is in the title
@@ -202,7 +218,7 @@ class Modules:
 
         # TODO if no ects but everything else available, simply set ects to None
         try:
-            ects = int(re.search(r' Tm \[\(\d+ ECTS/LP\)\] TJ', matching_pages[0][start_info:]).group(0).split("Tm [(", 1)[1].split("ECTS", 1)[0])
+            ects = int(re.search(r' Tm \[\(\d+ ECTS/LP\)\] TJ', matching_pages[page_index][start_info:]).group(0).split("Tm [(", 1)[1].split("ECTS", 1)[0])
         except:
             ects = None
 

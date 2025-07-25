@@ -4,9 +4,9 @@
 #
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
-import pdf_reader_toc as prt
-import json
-
+from pdf_reader import pdf_reader_toc as prt
+from pdf_reader.MHB_Overlaps import Overlaps
+from pdf_reader.MHB import MHB
 """times = 1000
 execution_time = timeit.timeit(lambda: prt.toc_module_codes("backend/test_pdf.pdf"), number=times)
 length = len(prt.toc_module_codes("backend/test_pdf.pdf"))
@@ -46,10 +46,14 @@ print((end - start) / (len(module_1.module_codes + module_2.module_codes)))
 end = time.time_ns()
 print((end - start)*10e-10)"""
 
-module_2 = prt.Modules("pdfs/Bachelorstudiengang_Global_Business_Management_PO_2015_ID25918_20_de_20250414_1708.pdf")
+"""module_2 = prt.Modules("pdfs/Bachelorstudiengang_Mathematik_ID16200_17_de_20231122_1210.pdf")
 codes_2 = module_2.toc_module_codes()
 for i in codes_2:
-    module_2.data_to_module(i)
+    if i == "MTH-1302":
+        print(module_2.data_to_module(i))"""
+#mhb = MHB("pdfs/Bachelorstudiengang_Data_Science_ID40699_5_de_20241007_0959.pdf")
+mhb2 = MHB("pdfs/Bachelorstudiengang_Mathematik_ID16200_17_de_20231122_1210.pdf")
+#overlaps = Overlaps([mhb, mhb2])
 
 
 """with open("web_scraping/scrape_uni_augsburg/links_information.json", "r") as file:

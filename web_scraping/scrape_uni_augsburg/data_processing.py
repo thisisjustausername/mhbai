@@ -6,7 +6,7 @@
 
 # run this code on remote host
 
-import pdf_reader_toc as prt
+from pdf_reader import pdf_reader_toc as prt
 import os
 import json
 
