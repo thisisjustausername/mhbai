@@ -10,7 +10,6 @@ from itertools import groupby
 from typing import Optional, List
 
 # TODO cleanly comment this code
-# TODO instead of using dicts rather use tuples to keep the order NOTE this file keeps order, error occures in server.py
 def find_title(split_line: str, title_search_lines: list) -> Optional[tuple]:
     """
     find_title \n
@@ -20,46 +19,58 @@ def find_title(split_line: str, title_search_lines: list) -> Optional[tuple]:
     :param title_search_lines: search windows split into lines
     :type title_search_lines: list
     :return: title, local index of the end of the title
-    :rtype: Optional[tuple]
+    :rtype: Optional[str, int]
     """
     if not any([split_line == i for i in title_search_lines]):  # false, when split_line was found
         return None
     # shrink window
+    # set indexer to -1 so it is clear when nothing was found
     indexer = -1
+    # enumerate through lines and if match is found break and save to indexer
     for index, i in enumerate(title_search_lines):
         if i == split_line:
             indexer = index
             break
     if not indexer != -1:  # checks whether window shrink was successful (this is unnecessary, since always false, but for failsave)
         return None
+
+    # save the local index of the end of the title, so it can be added to the global offset to get the position from where on ects etc. will be searched
     local_end_index = len("\n".join(title_search_lines[:indexer])) + 1  # plus new line
-    title_search_lines = title_search_lines[:indexer]
-    title_list = []
-    is_gray = False
+    title_search_lines = title_search_lines[:indexer] # lines to search in for title
+    title_list = [] # contains all title matches
+    is_gray = False # if something is written in gray it is an alternative title / module, so it can be ignored
+
+    # this iteration collects the whole title, also when it spans over multiple lines
+    # enumerate through lines, that may contain title
     for index, i in enumerate(title_search_lines):
-        if re.match(r'\d+(?:\.\d+)? g', i):
+        if re.match(r'\d+(?:\.\d+)? g', i): # pattern for start gray writing
             is_gray = True
-        elif re.match(r'0 0 1 rg', i):
+        elif re.match(r'0 0 1 rg', i): # pattern for end gray writing
             is_gray = False
         if not is_gray:
-            pattern = r'\[\(.*?\)\]' if index != 0 else r'.*?\)\]'
+            pattern = r'\[\(.*?\)\]' if index != 0 else r'.*?\)\]' # pattern for a part of the title
             match = re.search(pattern, i)
             if match is not None:
+                # if title is found, add rawly cleaned part of title
+                # depending on whether the title is in the first line or another, clean it differently
                 cleaned = match.group(0)[:-2] if index == 0 and not match.group(0).startswith("[(") else \
                 match.group(0).split("[(", 1)[1][:-2]
                 title_list.append(cleaned)
 
-    # removes - from the end of line when a word is separated into two lines
+    # removes hyphen from the end of line when a word is separated into two lines
     clean_titles = []
     for index, i in enumerate(title_list):
         if index == len(title_list) - 1:
             clean_titles.append(i)
+        # if title was separated mid-word then remove hyphen
         elif i.endswith("-") and title_list[index + 1][0].islower():
             clean_titles.append(i[:-1])
         else:
             clean_titles.append(i + " ")
+    # add all parts of the title to one string
     title = "".join(clean_titles)[2:]
-    return (title, local_end_index)
+    # return title and the index of the local end of the title
+    return title, local_end_index
 
 
 class Modules:
@@ -103,7 +114,6 @@ class Modules:
         matches = [i for i in matches if " Tm [(.)" not in i[0]]
         # split matches in lines
         # not sorting so that just lines that are together are packed together in order to not ignore page breaks
-        # WATCH OUT with the current code also when a line goes over two pages it is being broken up and ignored
         #matches.sort(key=lambda x: x[1])
         lines = [list(group) for key, group in groupby(matches, key=lambda x:x[1])]
         # TODO in the current code page breaks are ignored. this creates the error of mixing module codes, that are on the same height but on different pages. Fix it by either not ignoring line breaks or making it a different height, when between it is a different height, e.g. by not sorting list before grouping it
@@ -112,20 +122,20 @@ class Modules:
         # TODO if the page number is in the next line, still take it
         # for now simply ignore page number
         for line in lines: # go through every line
-            # is_module = False # if module code is found set to true TODO uncomment if using page numbers
-            # module = [] TODO uncomment if using page numbers
+            # is_module = False # if module code is found set to true NOTE uncomment if using page numbers
+            # module = [] NOTE uncomment if using page numbers
             for part in line: # for every part in the line, check whether it is a module code
-                # TODO uncomment if using page numbers
+                # NOTE uncomment if using page numbers
                 # if not is_module:  # if it is not the first module code, then ignore it
                 code = re.search(r' Tm \[\([A-ZÄÖÜ]{2,}-\d{3,}', part[0])
                 if code is not None: # if module code is found, execute this
-                    # TODO uncomment if using page numbers
+                    # NOTE uncomment if using page numbers
                     # is_module = True # set module code to True
                     modules.append(code.group(0)[6:])
-                    # module.append(code.group(0)[6:-2]) # append the code to the module list TODO uncomment if using page numbers
-                    break # TODO comment this if using page numbers
+                    # module.append(code.group(0)[6:-2]) # append the code to the module list NOTE uncomment if using page numbers
+                    break # NOTE comment this if using page numbers
                 # ignore page number
-                # TODO when uncommenting do this: if the page number is in the next line, still take it
+                # NOTE when uncommenting do this: if the page number is in the next line, still take it
                 r"""else: # if a module code was already found, then search for page numbers
                     page_number = re.search(r' Tm \[\(\d+\)\]', part[0]) # search for page number
                     if page_number is not None: # if page number was found, execute this
@@ -145,25 +155,33 @@ class Modules:
         self.module_codes = modules
         return modules
 
-
+    # TODO in order to make the program more efficient, when finding all title pages already save them for extracting ects etc. instead of searching them again
     def data_to_module(self, module_code: str) -> Optional[dict]:
         """
         data_to_module \n
         :param module_code: module code of the module, that should be searched
         :type module_code: str
         :return: information to the module
-        :rtype: Optional[dict]
+        :rtype: Optional[Dict[str, str | int | None]]
         """
+
+        # if no module_codes were extracted, extract them first
         if self.module_codes is None:
             self.toc_module_codes()
+
+        # set default title start
+        # IMPORTANT can be removed, simply affects ects since in title extraction it is just being used when no error occurred thus it exists
+        title_start = 0
+
+        # if the current pdf doesn't contain passed in module_code, return None
+        # TODO rather than returning None maybe throw Exception
         if module_code not in self.module_codes:
             return None
+
+        # all pages that mentions the module
         matching_pages = [page for page in self.stream_data if re.search(r'Modul ' + module_code, page) is not None]
 
-        # TODO when title goes over two lines, don't ignore second line
-        # /F3 10 sets font and size
-        titles = re.finditer(r'Tm \[\(Modul ' + module_code, matching_pages[0])
-
+        # find the first page that has the module in the heading signature
         error = True
         page_index = None
         for index, match_page in enumerate(matching_pages):
@@ -175,10 +193,11 @@ class Modules:
                 break
             except:
                 pass
+        # if no page was found, set the title to None
         if error:
             title = None
         else:
-            # title_start = [i for i in titles if len(matching_pages[0][i.start()-100: i.start()].split("\n")) > 1 and "/F3 10" in matching_pages[0][i.start()-100: i.start()].split("\n")[-2]][0].end()
+            # create a search window around the found title
             title_search = matching_pages[page_index][title_start:title_start+700]
             # if module_code == "GEO-2043":
             title_search_lines = title_search.split("\n") # split search window into lines
@@ -186,17 +205,19 @@ class Modules:
             # no need to check, whether end of box ET or engl title is earlier, since engl title seq doesn't exist near after ET
             # if english title is found, shrink title window until this begins
             engl_title_seq = '/F2 9 Tf'
-            result = find_title(engl_title_seq, title_search_lines)
+            result = find_title(engl_title_seq, title_search_lines) # try to find english title
+            # if english title exists, then set title
             if result is not None:
                 title = result[0]
                 start_info = result[1] + title_start
-            else:
+            else: # if no english title exists shrink search window to the end of the cell
                 end_of_box = "ET"
                 result = find_title(end_of_box, title_search_lines)
+                # search again for the title
                 if result is not None:
                     title = result[0]
                     start_info = result[1] + title_start
-                else:
+                else: # if no title was found, simply use title pattern for title
                     title_raw = re.search(r': [^\]]+\)\] TJ', title_search)
                     if title_raw is None:
                         title = None
@@ -204,6 +225,7 @@ class Modules:
                         title = title_raw.group(0)[2:].split(")]")[-2]
                         start_info = title_raw.end() + title_start  # doesn't it have to be plus title_start
 
+        # if title was found, do further cleaning
         if title is not None:
             # check whether LP information is in the title
             pattern_list = [r'\\\(\d+LP\\\)', r' \\\(\d+ LP\\\)', r' \d+ CP$']
@@ -222,11 +244,13 @@ class Modules:
 
 
         # TODO if no ects but everything else available, simply set ects to None
+        # TODO when no title was found, then set a default start_info index
         try:
             ects = int(re.search(r' Tm \[\(\d+ ECTS/LP\)\] TJ', matching_pages[page_index][start_info:]).group(0).split("Tm [(", 1)[1].split("ECTS", 1)[0])
         except:
             ects = None
 
+        # TODO comment this
         def search_text_blocks(heading: str) -> str:
             """
             inside function search_text_blocks \n

@@ -1,9 +1,16 @@
 from dataclasses import dataclass, field
-from typing import List, Dict, Union, Optional
+from typing import List, Dict
 from pdf_reader import pdf_reader_toc as prt
 
 @dataclass(frozen=True)
 class MHB:
+    """
+    class MHB \n
+    dataclass to store a single MHB
+    :param path: the file_path to the pdf
+    :type path: str
+    """
+
     path: str
 
     content: bytes = field(init=False)
@@ -13,6 +20,10 @@ class MHB:
     modules: List[Dict[str, str | int | None]] = field(init=False)
 
     def __post_init__(self):
+        """
+        def __post_init__ \n
+        initializes the rest of the class variables automatically
+        """
         modules_data = prt.Modules(pdf_path=self.path) # temporary variable used to retrieve all necessary data
         modules_data.toc_module_codes() # extracting the module codes
         object.__setattr__(self, "content", modules_data.pdf.content) # raw byte content of the pdf

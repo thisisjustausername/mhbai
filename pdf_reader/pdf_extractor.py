@@ -15,6 +15,12 @@ class Pdf:
     """
 
     def __init__(self, pdf_path: str):
+        """
+        def __init__ \n
+        initializes class variables
+        :param pdf_path: path to pdf file
+        :type pdf_path: str
+        """
         self.path: str = pdf_path
         self.content: bytes = self.read_content()
 
@@ -36,13 +42,14 @@ class Pdf:
         :additional_bytes: how many bytes to read ahead of start of object in order to select the whole object
         :type additional_bytes: int
         :return: list of objects
-        :rtype: list
+        :rtype: List[Dict[str, str | bytes | int]]
         """
 
         # find the start of xref
         # start_xref the index of the first char after the last match
         start_xref = int(list(re.finditer(rb'startxref\s+(\d+)', self.content))[0].group(1))
         xref_data = self.content[start_xref:]
+
         assert xref_data.startswith(b'xref')
 
         # find the xref header
@@ -69,6 +76,7 @@ class Pdf:
             if len(entry) < 18:
                 continue  # skip invalid/incomplete lines
 
+            # extract important information about objects
             offset = int(entry[0:10])
             generation = int(entry[11:16])
             in_use = entry[17:18].decode('ascii')
@@ -105,16 +113,15 @@ class Pdf:
                     # decode the stream
                     stream_decoded = stream_decompressed.decode("latin1", errors="ignore")
 
+                    # save information in a dict
                     xref_entries.append({'obj_num': start_obj + i,
                         'offset': offset,
                         'generation': generation,
                         'in_use': in_use,
                         'data': stream_decoded,
                         'information': "success"})
-                    #if i < 400 and i > 200: print(stream_decoded)
 
-                    #print("new page--------------------------------new page--------------------------------new page")
-                except Exception as e:
+                except Exception as e: # if Exception occurs, save without "data"
                     xref_entries.append({
                         'obj_num': start_obj + i,
                         'offset': offset,
@@ -123,11 +130,12 @@ class Pdf:
                         'information': f"The object is a stream but during decompression / decoding an error occured."
                     })
                     continue
-            else:
+            else: # if no stream matched, save this information
                 xref_entries.append({'obj_num': start_obj + i,
                                      'offset': offset,
                                      'generation': generation,
                                      'in_use': in_use,
                                      'data': object_data,
                                      'information': "success - no stream"})
+        # return xref_entries
         return xref_entries
