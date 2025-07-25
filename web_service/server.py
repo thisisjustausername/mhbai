@@ -138,7 +138,7 @@ def export():
     data_list = request.args.get("dataList")
     data_list = data_list.split(",") if data_list is not None else None
 
-    allowed_data_types = ["json", "xlsx", "txt", "pdf", "docx"]
+    allowed_data_types = ["json", "xlsx", "txt", "pdf", "csv"]
 
 
 

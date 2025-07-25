@@ -147,7 +147,7 @@ class Modules:
         :param module_code: module code of the module, that should be searched
         :type module_code: str
         :return: information to the module
-        :rtype: Optional[dict
+        :rtype: Optional[dict]
         """
         if self.module_codes is None:
             self.toc_module_codes()
