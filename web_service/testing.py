@@ -53,7 +53,7 @@ for i in codes_2:
     if i == "MTH-1302":
         print(module_2.data_to_module(i))"""
 #mhb = MHB("pdfs/Bachelorstudiengang_Data_Science_ID40699_5_de_20241007_0959.pdf")
-mhb2 = MHB("pdfs/Bachelorstudiengang_Mathematik_ID16200_17_de_20231122_1210.pdf")
+# mhb2 = MHB("pdfs/Bachelorstudiengang_Mathematik_ID16200_17_de_20231122_1210.pdf")
 #overlaps = Overlaps([mhb, mhb2])
 
 with open("web_scraping/scrape_uni_augsburg/links_information.json", "r") as file:
@@ -67,7 +67,8 @@ def get_file_name(url: str) -> str:
     return links_data[url]
 file_name = get_file_name("https://mhb.uni-augsburg.de/BachelorStudiengaenge/Bachelor+of+Education++LA+Gymnasium+%28modularisiert%29/Lehramtsbezogener+Bachelorstudiengang+Gymnasium+%28Hauptfach%29/POVersion+2019/Sommersemester%202025/Lehramtsbezogener_Bachelorstudiengang_Gymnasium_PO_2019.pdf")
 
-mhb = MHB("pdfs/" + file_name)
+#mhb = MHB("pdfs/" + file_name)
+mhb = MHB("pdfs/Alte_PO_Deutsch_als_Unterrichtsfach_Grund_Hauptschule_ID23040_1_de_20240408_1150.pdf")
 for i in mhb.modules:
     print(i["title"], i["pages"])
 

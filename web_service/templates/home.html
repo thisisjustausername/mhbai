@@ -36,6 +36,9 @@ Licensed under the AGPL-3.0 License. See LICENSE file in the project root for fu
                         <th>
                             ECTS
                         </th>
+                        <th>
+                            Seiten
+                        </th>
                     </tr>
                 </thead>
                 <tbody id="table-body">
@@ -96,6 +99,10 @@ Licensed under the AGPL-3.0 License. See LICENSE file in the project root for fu
                             const ectsTd = document.createElement("td");
                             ectsTd.textContent = item.ects;
                             tr.appendChild(ectsTd);
+
+                            const pagesTd = document.createElement("td");
+                            pagesTd.textContent = item.pages;
+                            tr.appendChild(pagesTd);
 
                             tbody.appendChild(tr);
                           });

@@ -4,13 +4,14 @@
 #
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
+from typing import List
 from flask import Flask, render_template, request, jsonify
 from pdf_reader import pdf_reader_toc as prt
 from pdf_reader.MHB_Overlaps import Overlaps
 import os
 import numpy as np
 import json
-
+from itertools import groupby
 app = Flask(__name__)
 
 with open("web_scraping/scrape_uni_augsburg/links_information.json", "r") as file:
@@ -68,6 +69,14 @@ def compareFast():
 
     return jsonify({"data": information_overlaps})
 
+# NOTE doesn't work when duplicate pages exist
+def group_pages(pages: List[int]) -> List[str]:
+    grouped_pages = []
+    pages.sort()
+    for _, g in groupby(pages, key=lambda x: x - pages.index(x)):
+        group = list(g)
+        grouped_pages.append(f"{group[0]} - {group[-1]}" if len(group) > 1 else str(group[0]))
+    return grouped_pages
 
 @app.route("/compare", methods=["POST"])
 def compare_simple():
@@ -114,8 +123,9 @@ def compare_simple():
                            "goals": no_infos}
         information_overlaps.append(module_data)"""
     overlaps = Overlaps.input_paths(["pdfs/" + i for i in file_names])
-
-    return jsonify({"data": overlaps.ovl_modules})
+    ovl_modules = overlaps.ovl_modules
+    ovl_modules = [{k: v if k != "pages" else group_pages(v) for k, v in i.items()} for i in ovl_modules]
+    return jsonify({"data": ovl_modules})
 
 def get_file_name(url: str) -> str:
     """

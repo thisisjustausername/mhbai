@@ -217,8 +217,9 @@ class Modules:
         correct_pages = [page for page in self.stream_data if re.search(r'Tm \[\(Modul ' + module_code, page) is not None]
         page_nr_list = []
         for i in correct_pages:
-            match = re.search(r' Tm \[\(\d+\)\] TJ\nET\nQ', i)
-            page_nr_list.append(match.group(0)[6:-10] if match is not None else None)
+            # match = re.search(r' Tm \[\(\d+\)\] TJ\nET\nQ\nQ', i)
+            match = list(re.finditer(r' Tm \[\(\d+\)\] TJ\nET\nQ\nQ', i))[-1]
+            page_nr_list.append(match.group(0)[6:-12] if match is not None else None)
         page_nr_list = [int(i) for i in page_nr_list]
         for index, match_page in enumerate(matching_pages):
             # e.g. module is not found if it was mentioned in the chapter of another module
