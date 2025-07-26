@@ -239,7 +239,8 @@ class Modules:
                 title = title[:title_match.start()] + " " + title[title_match.end():]
         title = title.strip()
         title = re.sub(r'\s+', ' ', title)
-        title = title.encode('utf-8').decode('unicode_escape')
+        # title = title.encode('utf-8').decode('unicode_escape')
+        title = title.encode('latin1').decode('utf-8')
         title = title.replace("\\", "")
 
 
