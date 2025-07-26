@@ -4,7 +4,7 @@
 #
 # For usage please contact the developer.
 
-import pdf_extractor as extr
+from pdf_reader import pdf_extractor as extr
 import re
 from itertools import groupby
 from typing import Optional, List
@@ -237,6 +237,19 @@ class Modules:
                     title_match = re.search(pattern_list[2], title)
             if title_match is not None:
                 title = title[:title_match.start()] + " " + title[title_match.end():]
+            # further LP extraction
+            else:
+                # match = re.search(r' \\\(.*\d+ LP.*\\\)', title)
+                partly_pattern_list = [r'[;,] \d+ LP\\\)', r' \d+ LP\\\)']
+                match = re.search(r' \\\(\d+ LP[;,] ', title)
+                if match is not None:
+                    title = title[:match.start()+3] + title[match.end():]
+                else:
+                    for pattern in partly_pattern_list:
+                        match = re.search(pattern, title)
+                        if match is not None:
+                            title = title[:match.start()] + title[match.end()-3:]
+                            break
         title = title.strip()
         title = re.sub(r'\s+', ' ', title)
         title = title.encode('utf-8').decode('unicode_escape')

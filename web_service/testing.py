@@ -68,7 +68,6 @@ def get_file_name(url: str) -> str:
 file_name = get_file_name("https://mhb.uni-augsburg.de/BachelorStudiengaenge/Bachelor+of+Education++LA+Gymnasium+%28modularisiert%29/Lehramtsbezogener+Bachelorstudiengang+Gymnasium+%28Hauptfach%29/POVersion+2019/Sommersemester%202025/Lehramtsbezogener_Bachelorstudiengang_Gymnasium_PO_2019.pdf")
 
 mhb = MHB("pdfs/" + file_name)
-print([i["title"] for i in mhb.modules])
 
 """with open("web_scraping/scrape_uni_augsburg/links_information.json", "r") as file:
     links_data =  json.load(file)
