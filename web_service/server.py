@@ -78,6 +78,7 @@ def group_pages(pages: List[int]) -> str:
         grouped_pages.append(f"{group[0]} - {group[-1]}" if len(group) > 1 else str(group[0]))
     return ", ".join(grouped_pages)
 
+# TODO when both links / pdfs are identical don't do Overlaps but MHB and don't display Überschneidungen but Informationen
 @app.route("/compare", methods=["POST"])
 def compare_simple():
     """compare_simple \n
