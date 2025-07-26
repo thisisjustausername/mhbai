@@ -4,7 +4,7 @@
 #
 # For usage please contact the developer.
 
-import pdf_extractor as extr
+from pdf_reader import pdf_extractor as extr
 import re
 from itertools import groupby
 from typing import Optional, List
@@ -295,7 +295,10 @@ class Modules:
             goals = None
 
         return {"title": title,
-                "module_code": module_code.encode('utf-8').decode('unicode_escape'),
+                # "module_code": module_code.encode('utf-8').decode('unicode_escape'),
+                "module_code": module_code.encode('latin1').decode('utf-8'),
                 "ects": ects,
-                "content": content.encode('utf-8').decode('unicode_escape'),
-                "goals": goals.encode('utf-8').decode('unicode_escape')}
+                # "content": content.encode('utf-8').decode('unicode_escape'),
+                "content": content.encode('latin1').decode('utf-8'),
+                # "goals": goals.encode('utf-8').decode('unicode_escape')}
+                "goals": goals.encode('latin1').decode('utf-8')}
