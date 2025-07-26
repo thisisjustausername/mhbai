@@ -75,16 +75,20 @@ def find_title(split_line: str, title_search_lines: list) -> Optional[tuple]:
     return title, local_end_index
 
 
-def search_text_blocks(heading: str, start_info: int, matching_pages: List[bytes], module_code: str) -> str:
+def search_text_blocks(heading: str, start_info: int, matching_pages: List[bytes]) -> str:
     """
     helper function search_text_blocks \n
-    Can be used as inside function, then just heading is needed as parameter
+    Can be used as inside function, then just heading is needed as parameter \n
     This function extracts text blocks for a specific heading in a module (e.g. Inhalt in a module) \n
     This only works when the box doesn't contain any subcells from the table
     :param heading: string to search for e.g. Inhalte:
     :type heading: str
-    :
+    :param start_info: needed when using it as helper function instead of inside function
+    :type start_info: int
+    :matching_pages: needed when using it as helper function instead of inside function
+    :type matching_pages: List[bytes]
     :return: the text block
+    :rtype: str
     """
 
     information = [page[start_info:] for page in matching_pages]  # shrink search window
@@ -378,7 +382,7 @@ class Modules:
             goals = None
 
         # Hi, is someone reading me?
-        # Will anyone ever read this? (yes|no|maybe)
+        # Will anyone ever read this? (yes|no|maybe) (probably me when making that whole piece of code pretty)
 
         # return a dictionary of title, module_code, ects, content, goals and pages
         detailed_dict = {"title": title,
