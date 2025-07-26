@@ -353,6 +353,9 @@ class Modules:
         except:
             goals = None
 
+        # Hi, is someone reading me?
+        # Will anyone ever read this? (yes|no|maybe)
+
         # return a dictionary of title, module_code, ects, content, goals and pages
         detailed_dict = {"title": title,
                         "module_code": module_code.encode('utf-8').decode('unicode_escape'),

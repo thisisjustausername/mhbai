@@ -70,13 +70,13 @@ def compareFast():
     return jsonify({"data": information_overlaps})
 
 # NOTE doesn't work when duplicate pages exist
-def group_pages(pages: List[int]) -> List[str]:
+def group_pages(pages: List[int]) -> str:
     grouped_pages = []
     pages.sort()
     for _, g in groupby(pages, key=lambda x: x - pages.index(x)):
         group = list(g)
         grouped_pages.append(f"{group[0]} - {group[-1]}" if len(group) > 1 else str(group[0]))
-    return grouped_pages
+    return ", ".join(grouped_pages)
 
 @app.route("/compare", methods=["POST"])
 def compare_simple():
