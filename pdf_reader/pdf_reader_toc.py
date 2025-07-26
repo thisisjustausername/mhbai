@@ -371,13 +371,13 @@ class Modules:
 
         # extract the info description of a module
         try:
-            content =  search_text_blocks("Inhalte:", start_info, matching_pages, module_code)
+            content =  search_text_blocks("Inhalte:", start_info, matching_pages)
         except:
             content = None
 
         # extract the goals of a module
         try:
-            goals = search_text_blocks("Lernziele/Kompetenzen:", start_info, matching_pages, module_code)
+            goals = search_text_blocks("Lernziele/Kompetenzen:", start_info, matching_pages)
         except:
             goals = None
 
