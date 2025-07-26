@@ -68,9 +68,7 @@ def get_file_name(url: str) -> str:
 file_name = get_file_name("https://mhb.uni-augsburg.de/BachelorStudiengaenge/Bachelor+of+Arts+%28Hauptfach%29/Anwendungsorientierte+Interkulturelle+Sprachwissenschaft+%28Hauptfach%29/POVersion+2023/Wintersemester%202024_25/Bachelorstudiengang_Anwendungsorientierte_Interkulturelle_Sprachwissenschaft_ANIS_PO_2023.pdf")
 
 mhb = MHB("pdfs/" + file_name)
-# mhb = MHB("pdfs/Alte_PO_Deutsch_als_Unterrichtsfach_Grund_Hauptschule_ID23040_1_de_20240408_1150.pdf")
-module = [i for i in mhb.modules if i["module_code"] == "SZX-0202"][0]
-print(json.dumps(module, indent=2))
+mhb.export("csv", "test")
 
 """with open("web_scraping/scrape_uni_augsburg/links_information.json", "r") as file:
     links_data =  json.load(file)

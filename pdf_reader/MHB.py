@@ -3,6 +3,9 @@
 # This file is part of mhbai.
 #
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
+
+# TODO add title to mhb, optionally other information like year etc.
+
 import json
 from dataclasses import dataclass, field
 from typing import List, Dict, Literal, Optional, Annotated
@@ -72,24 +75,33 @@ class MHB:
 
         return buffer
 
-    def __csv(self, **kwargs):
+    def __csv(self, data: List[Dict[str, str | int | None]]):
         """
         private def __csv \n
         extracts the specified data as csv
-        :param kwargs: allowed params are information, ordered
-        :type kwargs: dict
+        :param data: the data, that should be converted to json
+        :type data: List[Dict[str, str | int | None]]
         :return: csv representation of the MHB
-        :rtype: csv
+        :rtype: buffer
         """
 
         buffer = io.StringIO()
 
-    def export(self, file_type: Literal["json", "csv", "txt", "pdf"],
+        write_data = [list(data[0].keys())] + [list(i.values()) for i in data]
+
+        writer = csv.writer(buffer)
+        writer.writerows(write_data)
+        buffer.seek(0)
+
+        return buffer
+
+    def export(self, file_type: Literal["json", "csv", "txt", "pdf"], path: str,
                information: List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]] = None,
                ordered: bool = True):
         """
         def export \n
         :param file_type: chosen filetype
+        :param path: path to where to save the file to, not allowed to have file type at the end
         :param information: chosen list of information, data is ordered by this list
         :param ordered: whether the data should stay in order
         """
@@ -97,8 +109,15 @@ class MHB:
             ordered_data = [{k: v for k, v in i.items() if k in information} for i in self.modules]
         else:
             ordered_data = self.modules
+
+        buffer = io.StringIO()
         if file_type == "json":
-            return self.__json()
+            buffer = self.__json(ordered_data)
+        elif file_type == "csv":
+            buffer = self.__csv(ordered_data)
+        with open(f"{path}.{file_type}", "w", encoding="utf-8") as file:
+            file.write(buffer.getvalue())
+
 
     def __repr__(self):
         """
