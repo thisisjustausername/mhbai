@@ -7,6 +7,7 @@
 from pdf_reader import pdf_reader_toc as prt
 from pdf_reader.MHB_Overlaps import Overlaps
 from pdf_reader.MHB import MHB
+import json
 """times = 1000
 execution_time = timeit.timeit(lambda: prt.toc_module_codes("backend/test_pdf.pdf"), number=times)
 length = len(prt.toc_module_codes("backend/test_pdf.pdf"))
@@ -55,6 +56,19 @@ for i in codes_2:
 mhb2 = MHB("pdfs/Bachelorstudiengang_Mathematik_ID16200_17_de_20231122_1210.pdf")
 #overlaps = Overlaps([mhb, mhb2])
 
+with open("web_scraping/scrape_uni_augsburg/links_information.json", "r") as file:
+    links_data =  json.load(file)
+
+def get_file_name(url: str) -> str:
+
+
+    if url not in links_data.keys():
+        return url.split("/")[-1]
+    return links_data[url]
+file_name = get_file_name("https://mhb.uni-augsburg.de/BachelorStudiengaenge/Bachelor+of+Education++LA+Gymnasium+%28modularisiert%29/Lehramtsbezogener+Bachelorstudiengang+Gymnasium+%28Hauptfach%29/POVersion+2019/Sommersemester%202025/Lehramtsbezogener_Bachelorstudiengang_Gymnasium_PO_2019.pdf")
+
+mhb = MHB("pdfs/" + file_name)
+print([i["title"] for i in mhb.modules])
 
 """with open("web_scraping/scrape_uni_augsburg/links_information.json", "r") as file:
     links_data =  json.load(file)
