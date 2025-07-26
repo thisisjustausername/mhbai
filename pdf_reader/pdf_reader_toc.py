@@ -84,6 +84,8 @@ class Modules:
         self.content: list = self.pdf.extract_objects()
         self.stream_data: list = [i["data"] for i in self.content if i["information"] == "success"]
         self.module_codes: list = []
+        # NOTE enable this to extract page numbers from toc, version 2.0
+        # self.module_codes_detailed: list = []
 
 
     def toc_module_codes(self):
@@ -112,6 +114,8 @@ class Modules:
         # remove dots
         # removing dots in advance saves time but makes result little less accurate since it cant be verified that some unexpected data was accidentally selected
         matches = [i for i in matches if " Tm [(.)" not in i[0]]
+        # NOTE rather use this when using page_numbers version2.0 for checking (maybe not implemented yet)
+        # matches = [i for i in matches]
         # split matches in lines
         # not sorting so that just lines that are together are packed together in order to not ignore page breaks
         #matches.sort(key=lambda x: x[1])
@@ -119,21 +123,44 @@ class Modules:
         # probably not anymore: in the current code page breaks are ignored. this creates the error of mixing module codes, that are on the same height but on different pages. Fix it by either not ignoring line breaks or making it a different height, when between it is a different height, e.g. by not sorting list before grouping it
         # get page number and module code
         modules = []
+        # NOTE enable this to extract page numbers from toc, version 2.0
+        # modules_detailed = []
         # TODO if the page number is in the next line, still take it
         # for now simply ignore page number
-        for line in lines: # go through every line
+        for line_index, line in enumerate(lines): # go through every line
             # is_module = False # if module code is found set to true NOTE uncomment if using page numbers
             # module = [] NOTE uncomment if using page numbers
-            for part in line: # for every part in the line, check whether it is a module code
+            for index, part in enumerate(line): # for every part in the line, check whether it is a module code
                 # NOTE uncomment if using page numbers
                 # if not is_module:  # if it is not the first module code, then ignore it
                 code = re.search(r' Tm \[\([A-ZÄÖÜ]{2,}-\d{3,}', part[0])
                 if code is not None: # if module code is found, execute this
+                    # NOTE enable this to extract page numbers from toc, version 2.0
+                    """
+                    # dirty code but it extracts page numbers of modules, if the page number is in the same or up to two lines below the module code
+                    page_nr_index = line_index
+                    dot = " Tm [(.)"
+                    if dot in line[-1]:
+                        if dot in lines[line_index + 1] and len([True for i in lines[line_index + 1] if re.search(r' Tm \[\([A-ZÄÖÜ]{2,}-\d{3,}', i[0]) is not None]) == 0:
+                            page_nr_index += 1
+                        elif dot in lines[line_index + 2] and len([True for i in lines[line_index + 2] if re.search(r' Tm \[\([A-ZÄÖÜ]{2,}-\d{3,}', i[0]) is not None]) == 0:
+                            page_nr_index += 2
+                        else:
+                            page_nr_index = -1
+                    page_nr = None
+                    if page_nr_index != -1:
+                        page_nr_match = re.search(r'\[\(\d+\)', lines[page_nr_index][-1][0])
+                        if page_nr_match is not None:
+                            page_nr = int(page_nr_match.group(0)[2:-1])
+                    """
                     # NOTE uncomment if using page numbers
                     # is_module = True # set module code to True
                     modules.append(code.group(0)[6:])
+                    # NOTE enable this to extract page numbers from toc, version 2.0
+                    # modules_detailed.append({"module_code": code.group(0)[6:], "page_nr": page_nr})
+
                     # module.append(code.group(0)[6:-2]) # append the code to the module list NOTE uncomment if using page numbers
-                    break # NOTE comment this if using page numbers
+                    break # NOTE comment this if using page numbers, version 1.0 and 2.0
                 # ignore page number
                 # NOTE when uncommenting do this: if the page number is in the next line, still take it
                 r"""else: # if a module code was already found, then search for page numbers
@@ -153,7 +180,10 @@ class Modules:
 
         # set class vars and return modules
         self.module_codes = modules
-        return modules
+        # NOTE enable this to extract page numbers from toc, version 2.0
+        # self.module_codes_detailed = modules_detailed
+        return modules #, modules_detailed NOTE enable this to extract page numbers from toc, version 2.0
+
 
     # TODO in order to make the program more efficient, when finding all title pages already save them for extracting ects etc. instead of searching them again
     def data_to_module(self, module_code: str) -> Optional[dict]:
@@ -164,7 +194,7 @@ class Modules:
         :return: information to the module
         :rtype: Optional[Dict[str, str | int | None]]
         """
-
+        # TODO alternative way of extracting page numbers, extract page number of every page that has the module in the head
         # if no module_codes were extracted, extract them first
         if self.module_codes is None:
             self.toc_module_codes()
@@ -184,9 +214,17 @@ class Modules:
         # find the first page that has the module in the heading signature
         error = True
         page_index = None
+        correct_pages = [page for page in self.stream_data if re.search(r'Tm \[\(Modul ' + module_code, page) is not None]
+        page_nr_list = []
+        for i in correct_pages:
+            match = re.search(r' Tm \[\(\d+\)\] TJ\nET\nQ', i)
+            page_nr_list.append(match.group(0)[6:-10] if match is not None else None)
+        page_nr_list = [int(i) for i in page_nr_list]
         for index, match_page in enumerate(matching_pages):
+            # e.g. module is not found if it was mentioned in the chapter of another module
             try:
                 titles = re.finditer(r'Tm \[\(Modul ' + module_code, matching_pages[index])
+                titles_list = list(re.finditer(r'Tm \[\(Modul ' + module_code, matching_pages[index]))
                 title_start = [i for i in titles if len(matching_pages[index][i.start()-100: i.start()].split("\n")) > 1 and "/F3 10" in matching_pages[index][i.start()-100: i.start()].split("\n")[-2]][0].end()
                 error = False
                 page_index = index
@@ -314,9 +352,18 @@ class Modules:
         except:
             goals = None
 
-        # return a dictionary of title, module_code, ects, content amd goals
-        return {"title": title,
-                "module_code": module_code.encode('utf-8').decode('unicode_escape'),
-                "ects": ects,
-                "content": content.encode('utf-8').decode('unicode_escape'),
-                "goals": goals.encode('utf-8').decode('unicode_escape')}
+        # return a dictionary of title, module_code, ects, content, goals and pages
+        detailed_dict = {"title": title,
+                        "module_code": module_code.encode('utf-8').decode('unicode_escape'),
+                        "ects": ects,
+                        "content": content.encode('utf-8').decode('unicode_escape'),
+                        "goals": goals.encode('utf-8').decode('unicode_escape'),
+                        "pages": page_nr_list,
+                        "mhbai_hints": None}
+        # NOTE enable this if validation of page_nrs with toc is wished
+        """
+        toc_page_nr = [i for i in self.module_codes_detailed if i["module_code"] == module_code][0]["page_nr"]
+        if min(page_nr_list) != toc_page_nr:
+        detailed_dict["mhbai_hints"] = f"Pages of module information ({', '.join([str(i) for i in page_nr_list])}) don't match page number ({str(toc_page_nr)}) in table of content "
+        """
+        return detailed_dict

@@ -24,7 +24,6 @@ class MHB:
     xref_entries_filtered: List[Dict[str, int | str | bytes]] = field(init=False)
     module_codes: List[str | None] = field(init=False)
     modules: List[Dict[str, str | int | None]] = field(init=False)
-
     def __post_init__(self):
         """
         def __post_init__ \n
