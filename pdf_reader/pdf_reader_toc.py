@@ -116,7 +116,7 @@ class Modules:
         # not sorting so that just lines that are together are packed together in order to not ignore page breaks
         #matches.sort(key=lambda x: x[1])
         lines = [list(group) for key, group in groupby(matches, key=lambda x:x[1])]
-        # TODO in the current code page breaks are ignored. this creates the error of mixing module codes, that are on the same height but on different pages. Fix it by either not ignoring line breaks or making it a different height, when between it is a different height, e.g. by not sorting list before grouping it
+        # probably not anymore: in the current code page breaks are ignored. this creates the error of mixing module codes, that are on the same height but on different pages. Fix it by either not ignoring line breaks or making it a different height, when between it is a different height, e.g. by not sorting list before grouping it
         # get page number and module code
         modules = []
         # TODO if the page number is in the next line, still take it
@@ -250,7 +250,6 @@ class Modules:
         except:
             ects = None
 
-        # TODO comment this
         def search_text_blocks(heading: str) -> str:
             """
             inside function search_text_blocks \n
@@ -260,16 +259,20 @@ class Modules:
             :type heading: str
             :return: the text block
             """
-            information = [page[start_info:] for page in matching_pages]
-            details_list = []
+
+            information = [page[start_info:] for page in matching_pages] # shrink search window
+            details_list = [] # save cells with information in it in details_list
+            # extracts all cells, that have the desired heading
             for page in information:
+                # for each page search for the heading
                 start = re.search(r' Tm \[\(' + heading + r'\)\] TJ', page)
                 if start is None:
                     continue
                 start = start.start()
-                end = re.search(r'\nET\nQ', page[start:]).start()
+                end = re.search(r'\nET\nQ', page[start:]).start() # end of the cell
                 details_list.append(page[start:start + end])
 
+            # extract the text out of each block
             texts_raw = []
             for block in details_list:
                 for element in block.split('\n'):
@@ -281,19 +284,24 @@ class Modules:
                                    "height": re.search(r' \d+(?:\.\d+)? Tm ', element).group(0)[1:-4],
                                    "text": text_full}
                     texts_raw.append(raw_element)
+            # groups all blocks and combines them with "\n"
             lines = [list(group) for key, group in groupby(texts_raw, key=lambda x: x["height"])]
             text = "\n".join([" ".join(i["text"] for i in line) for line in lines])
             return text
 
+        # extract the info description of a module
         try:
             content = search_text_blocks("Inhalte:")
         except:
             content = None
+
+        # extract the goals of a module
         try:
             goals = search_text_blocks("Lernziele/Kompetenzen:")
         except:
             goals = None
 
+        # return a dictionary of title, module_code, ects, content amd goals
         return {"title": title,
                 # "module_code": module_code.encode('utf-8').decode('unicode_escape'),
                 "module_code": module_code.encode('latin1').decode('utf-8'),

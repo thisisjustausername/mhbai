@@ -50,6 +50,8 @@ def fetch_valid_urls(url_list=["https://mhb.uni-augsburg.de/"], final_links=[]):
     return fetch_valid_urls(new_urls, final_links)
 
 def download_all_pdfs():
+    """download_all_pdfs \n
+    downloads all mhb pdfs"""
     with open("uni_a_all_mhbs.json", "r") as file:
         data = json.load(file)
     for index, i in enumerate(data):
@@ -62,6 +64,10 @@ def download_all_pdfs():
 
 if __name__ == "__main__":
     def do_everything():
+        """
+        do_everything \n
+        combines everything by extracting all mhb links and then downloading all mhbs
+        """
         data = fetch_valid_urls()
         print(f"It took approximately {time.time() - start} seconds to fetch all mhbs of the Uni Augsburg.")
         with open("uni_a_all_mhbs.json", "w") as file:
