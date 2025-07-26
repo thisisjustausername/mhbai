@@ -75,6 +75,69 @@ def find_title(split_line: str, title_search_lines: list) -> Optional[tuple]:
     return title, local_end_index
 
 
+def search_text_blocks(heading: str, start_info: int, matching_pages: List[bytes], module_code: str) -> str:
+    """
+    helper function search_text_blocks \n
+    Can be used as inside function, then just heading is needed as parameter
+    This function extracts text blocks for a specific heading in a module (e.g. Inhalt in a module) \n
+    This only works when the box doesn't contain any subcells from the table
+    :param heading: string to search for e.g. Inhalte:
+    :type heading: str
+    :
+    :return: the text block
+    """
+
+    information = [page[start_info:] for page in matching_pages]  # shrink search window
+    page_numbers = []
+    for e in information:
+        page_match = list(re.finditer(r' Tm \[\(\d+\)\] TJ\nET\nQ\nQ', e))[-1]
+        page_numbers.append(page_match.group(0)[6:-12] if page_match is not None else None)
+    details_list = []  # save cells with information in it in details_list
+    # extracts all cells, that have the desired heading
+    pages_selected = []
+    for indexer, page in enumerate(information):
+        # for each page search for the heading
+        start = re.search(r' Tm \[\(' + heading + r'\)\] TJ', page)
+        if start is None:
+            continue
+        start = start.start()
+        end = re.search(r'\nET\nQ', page[start:]).start()  # end of the cell
+        details_list.append(page[start:start + end])
+        pages_selected.append(page_numbers[indexer])
+    # extract the text out of each block
+    texts_raw = []
+    for block, page_nr in zip(details_list, page_numbers):
+        for element in block.split('\n'):
+            if not re.match(r'1 0 0 -1 ', element):
+                continue
+            text_raw = element[re.search(r' Tm \[\(', element).end():]
+            text_full = text_raw[:re.search(r'\)\] TJ', text_raw).start()]
+            raw_element = {"width": re.search(r'1 0 0 -1 \d+(?:\.\d+)?', element).group(0)[9:],
+                           "height": re.search(r' \d+(?:\.\d+)? Tm ', element).group(0)[1:-4],
+                           "text": text_full,
+                           "page_nr": int(page_nr)}
+            texts_raw.append(raw_element)
+    # groups all blocks and combines them with "\n"
+    pgnr_sorted = [list(ge) for _, ge in groupby(texts_raw, key=lambda z: z["page_nr"])] # groups all stuff from one page together
+    adjacent_junks = [e for _, i in groupby(pgnr_sorted, key=lambda z: z[0]["page_nr"] - pgnr_sorted.index(z)) for e in i] # groups all stuff from adjacent pages together
+    junks_text = []
+    for junk_block in adjacent_junks:
+        lines = [list(group) for key, group in groupby(junk_block, key=lambda x: x["height"])]
+        text = "\n".join([" ".join(i["text"] for i in line) for line in lines])
+        junks_text.append(text)
+    seen_set = set()
+    new_texts = []
+    for i in junks_text:
+        if not i in seen_set:
+            seen_set.add(i)
+            new_texts.append(i)
+    text = "\n".join(new_texts)
+    # if above code doesn't work, use this instead
+    """lines = [list(group) for key, group in groupby(texts_raw, key=lambda x: x["height"])]
+    text = "\n".join([" ".join(i["text"] for i in line) for line in lines])"""
+    return text
+
+
 class Modules:
     def __init__(self, pdf_path: str):
         """
@@ -139,7 +202,7 @@ class Modules:
                 if code is not None: # if module code is found, execute this
                     # NOTE enable this to extract page numbers from toc, version 2.0
                     """
-                    # dirty code but it extracts page numbers of modules, if the page number is in the same or up to two lines below the module code
+                    # not working dirty code but it extracts page numbers of modules, if the page number is in the same or up to two lines below the module code
                     page_nr_index = line_index
                     dot = " Tm [(.)"
                     if dot in line[-1]:
@@ -240,7 +303,6 @@ class Modules:
         else:
             # create a search window around the found title
             title_search = matching_pages[page_index][title_start:title_start+700]
-            # if module_code == "GEO-2043":
             title_search_lines = title_search.split("\n") # split search window into lines
 
             # no need to check, whether end of box ET or engl title is earlier, since engl title seq doesn't exist near after ET
@@ -296,7 +358,6 @@ class Modules:
         title = title.encode('utf-8').decode('unicode_escape')
         title = title.replace("\\", "")
 
-
         # TODO if no ects but everything else available, simply set ects to None
         # TODO when no title was found, then set a default start_info index
         try:
@@ -304,54 +365,15 @@ class Modules:
         except:
             ects = None
 
-        def search_text_blocks(heading: str) -> str:
-            """
-            inside function search_text_blocks \n
-            This function extracts text blocks for a specific heading in a module (e.g. Inhalt in a module) \n
-            This only works when the box doesn't contain any subcells from the table
-            :param heading: string to search for e.g. Inhalte:
-            :type heading: str
-            :return: the text block
-            """
-
-            information = [page[start_info:] for page in matching_pages] # shrink search window
-            details_list = [] # save cells with information in it in details_list
-            # extracts all cells, that have the desired heading
-            for page in information:
-                # for each page search for the heading
-                start = re.search(r' Tm \[\(' + heading + r'\)\] TJ', page)
-                if start is None:
-                    continue
-                start = start.start()
-                end = re.search(r'\nET\nQ', page[start:]).start() # end of the cell
-                details_list.append(page[start:start + end])
-
-            # extract the text out of each block
-            texts_raw = []
-            for block in details_list:
-                for element in block.split('\n'):
-                    if not re.match(r'1 0 0 -1 ', element):
-                        continue
-                    text_raw = element[re.search(r' Tm \[\(', element).end():]
-                    text_full = text_raw[:re.search(r'\)\] TJ', text_raw).start()]
-                    raw_element = {"width": re.search(r'1 0 0 -1 \d+(?:\.\d+)?', element).group(0)[9:],
-                                   "height": re.search(r' \d+(?:\.\d+)? Tm ', element).group(0)[1:-4],
-                                   "text": text_full}
-                    texts_raw.append(raw_element)
-            # groups all blocks and combines them with "\n"
-            lines = [list(group) for key, group in groupby(texts_raw, key=lambda x: x["height"])]
-            text = "\n".join([" ".join(i["text"] for i in line) for line in lines])
-            return text
-
         # extract the info description of a module
         try:
-            content = search_text_blocks("Inhalte:")
+            content =  search_text_blocks("Inhalte:", start_info, matching_pages, module_code)
         except:
             content = None
 
         # extract the goals of a module
         try:
-            goals = search_text_blocks("Lernziele/Kompetenzen:")
+            goals = search_text_blocks("Lernziele/Kompetenzen:", start_info, matching_pages, module_code)
         except:
             goals = None
 
@@ -373,3 +395,4 @@ class Modules:
         detailed_dict["mhbai_hints"] = f"Pages of module information ({', '.join([str(i) for i in page_nr_list])}) don't match page number ({str(toc_page_nr)}) in table of content "
         """
         return detailed_dict
+
