@@ -5,7 +5,7 @@
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
 from typing import List
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session, Response
 from pdf_reader import pdf_reader_toc as prt
 from pdf_reader.MHB_Overlaps import Overlaps
 import os
@@ -13,6 +13,8 @@ import numpy as np
 import json
 from itertools import groupby
 app = Flask(__name__)
+
+global overlaps
 
 with open("web_scraping/scrape_uni_augsburg/links_information.json", "r") as file:
     links_data =  json.load(file)
@@ -81,6 +83,7 @@ def group_pages(pages: List[int]) -> str:
 # TODO when both links / pdfs are identical don't do Overlaps but MHB and don't display Überschneidungen but Informationen
 @app.route("/compare", methods=["POST"])
 def compare_simple():
+    global overlaps
     """compare_simple \n
     compares two mhbs"""
 
@@ -141,17 +144,21 @@ def get_file_name(url: str) -> str:
         return url.split("/")[-1]
     return links_data[url]
 
-@app.route("/export", methods=["POST"])
+@app.route("/export", methods=["GET"])
 def export():
     """def export \n
     exports the data in a wished format and with or without detailed information"""
-    data_type = request.args.get("dataType")
+    
+    """data_type = request.args.get("dataType")
     data_list = request.args.get("dataList")
     data_list = data_list.split(",") if data_list is not None else None
-
     allowed_data_types = ["json", "xlsx", "txt", "pdf", "csv"]
-
-
+    """
+    global overlaps
+    name = "__".join([i.name for i in overlaps.mhbs])
+    return Response(overlaps.export(file_type="html").getvalue(), 
+                    headers={"Content-Disposition": f"attachment; filename={name}"})
+    return name, overlaps.export(file_type="html")
 
 if __name__ == "__main__":
     app.run(debug=True)

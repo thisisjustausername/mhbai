@@ -25,9 +25,9 @@ Licensed under the AGPL-3.0 License. See LICENSE file in the project root for fu
             <h2 class="overlaps" id="infos">Überschneidungen</h2>
         </div>
         <table class="overlaps">
-                <thead>
-                    <tr>
-                        <th>
+            <thead>
+                <tr>
+                    <th>
                             Name
                         </th>
                         <th>
@@ -44,27 +44,56 @@ Licensed under the AGPL-3.0 License. See LICENSE file in the project root for fu
                 <tbody id="table-body">
 
                 </tbody>
-            </table>
+        </table>
+        <button id="export" onclick="to_export()" disabled>Exportieren</button>
+
 
         <script>
-              const mhb1 = document.getElementById("mhb1");
-              const mhb2 = document.getElementById("mhb2");
-              const compareButton = document.getElementById("compareButton");
-              const overlaps = document.getElementsByClassName("overlaps");
+            const mhb1 = document.getElementById("mhb1");
+            const mhb2 = document.getElementById("mhb2");
+            const compareButton = document.getElementById("compareButton");
+            const overlaps = document.getElementsByClassName("overlaps");
 
-              function validateFields() {
-                  for (let el of overlaps) {
-                      el.style.visibility = 'hidden';
-                  }
-                  if (mhb1.value.trim() !== "" && mhb2.value.trim() !== "") {
-                      compareButton.disabled = false;
-                  } else {
-                      compareButton.disabled = true;
-                  }
-              }
+            function validateFields() {
+                for (let el of overlaps) {
+                    el.style.visibility = 'hidden';
+                }
+                if (mhb1.value.trim() !== "" && mhb2.value.trim() !== "") {
+                    compareButton.disabled = false;
+                } else {
+                    compareButton.disabled = true;
+                    const exportButton = document.getElementById("export");
+                    exportButton.disabled = false;
+                }
+            }
 
-              mhb1.addEventListener("input", validateFields);
-              mhb2.addEventListener("input", validateFields);
+            mhb1.addEventListener("input", validateFields);
+            mhb2.addEventListener("input", validateFields);
+
+            function to_export() {
+                fetch("/export")
+                .then(response => {
+                    const disposition = response.headers.get("Content-Disposition");
+                    let filename = "download.html"; // fallback name
+
+                    if (disposition && disposition.includes("filename=")) {
+                        const filenameMatch = disposition.match(/filename="?(.+?)"?$/);
+                        if (filenameMatch.length > 1) filename = filenameMatch[1];
+                    }
+                    return response.blob().then(blob => ({blob, filename}));
+                })
+                .then(({blob, filename}) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                })
+                .catch(console.error);
+            }
 
             function compare() {
                 const mhb1 = document.getElementById("mhb1").value;
@@ -106,6 +135,8 @@ Licensed under the AGPL-3.0 License. See LICENSE file in the project root for fu
 
                             tbody.appendChild(tr);
                           });
+                          const exportButton = document.getElementById("export");
+                          exportButton.disabled = false;
                     })
                     .catch(err => {
                         console.error("Request failed:", err);

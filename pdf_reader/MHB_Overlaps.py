@@ -5,7 +5,8 @@
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
 from dataclasses import dataclass, field
-from typing import List, Dict, Literal
+import io
+from typing import Annotated, List, Dict, Literal, Optional
 from pdf_reader.MHB import MHB
 import numpy as np
 
@@ -50,20 +51,33 @@ class Overlaps:
         object.__setattr__(self, "ovl_module_codes", [module_code for module_code in self.mhbs[0].module_codes if all(module_code in mhb for mhb in all_modules_separated)])
         object.__setattr__(self, "ovl_modules", [next((module for module in shortest_modules if module["module_code"] == module_code), None) for module_code in self.ovl_module_codes])
 
-    # TODO finish this function
-    def export(self, file_type: Literal["json", "csv", "txt", "pdf", "md", "html"], information: List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals"]]):
+    def export(self, file_type: Literal["json", "csv", "txt", "pdf", "md", "html"], file_path: str | None = None,
+               information: Optional[List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]]] = None,
+               ordered: bool = True, delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"] = None) -> None | io.StringIO:
         """
         def export \n
+        export \n
         :param file_type: chosen filetype
+        :type file_type: Literal["json", "csv", "txt", "pdf", "md", "html"]
+        :param file_path: path to where to save the file to, not allowed to have file type at the end, if file_path is None, buffer will be returned
+        :type file_path: str | None
         :param information: chosen list of information, data is ordered by this list
+        :type information: Optional[List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]]]
+        :param ordered: whether the data should stay in order
+        :type ordered: bool
+        :param delimiter: delimiter to separate the data in each row; mutually exclusive with the values json, pdf, md, html in file_type
+        :type delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"]
+        :return: buffer of the data in the correct format
+        :rtype: buffer
         """
-        if len(information) == 0:
-            raise Exception("No information selected")
-
-        data = {}
         
+        # TODO remove this when pdf is working
+        if file_type in ["pdf"]:
+            raise NotImplementedError(f"{file_type} is not implemented yet.")
+        
+        name = ", ".join([i.name for i in self.mhbs])
 
-
+        return MHB.export_global(file_type=file_type, file_path=file_path, information=information, ordered=ordered, delimiter=delimiter, modules=self.ovl_modules, name=name)
 
     def __repr__(self):
         """
