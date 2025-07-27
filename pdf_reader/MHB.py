@@ -89,22 +89,45 @@ class MHB:
 
         write_data = [list(data[0].keys())] + [list(i.values()) for i in data]
 
-        writer = csv.writer(buffer)
+        writer = csv.writer(buffer, delimiter=";")
         writer.writerows(write_data)
         buffer.seek(0)
 
         return buffer
 
-    def export(self, file_type: Literal["json", "csv", "txt", "pdf"], path: str,
+    def __txt(self, data: List[Dict[str, str | int | None]], delimiter: Literal[";", "\t", ","]):
+        """
+        private def __txt \n
+        extracts the specified data as txt
+        :param data: the data, that should be converted to json
+        :type data: List[Dict[str, str | int | None]]
+        :param delimiter: the delimiter to use
+        :type delimiter: Literal[";", "\t", ","]
+        :return: txt representation of the MHB, divided by tabs
+        :rtype: buffer
+        """
+
+        buffer = io.StringIO()
+
+        write_data = [list(data[0].keys())] + [list(i.values()) for i in data]
+        buffer.write("\n".join([delimiter.join(i) for i in write_data]))
+        buffer.seek(0)
+
+        return buffer
+
+    def export(self, file_type: Literal["json", "csv", "txt", "pdf", "md", "html"], file_path: str,
                information: List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]] = None,
                ordered: bool = True):
         """
         def export \n
         :param file_type: chosen filetype
-        :param path: path to where to save the file to, not allowed to have file type at the end
+        :param file_path: path to where to save the file to, not allowed to have file type at the end
         :param information: chosen list of information, data is ordered by this list
         :param ordered: whether the data should stay in order
         """
+        if file_type in ["md", "html"]:
+            raise NotImplementedError("not implemented yet")
+
         if information is not None:
             ordered_data = [{k: v for k, v in i.items() if k in information} for i in self.modules]
         else:
@@ -115,7 +138,7 @@ class MHB:
             buffer = self.__json(ordered_data)
         elif file_type == "csv":
             buffer = self.__csv(ordered_data)
-        with open(f"{path}.{file_type}", "w", encoding="utf-8") as file:
+        with open(f"{file_path}.{file_type}", "w", encoding="utf-8") as file:
             file.write(buffer.getvalue())
 
 
