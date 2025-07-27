@@ -51,7 +51,7 @@ class Overlaps:
         object.__setattr__(self, "ovl_modules", [next((module for module in shortest_modules if module["module_code"] == module_code), None) for module_code in self.ovl_module_codes])
 
     # TODO finish this function
-    def export(self, file_type: Literal["json", "csv", "xlsx", "txt", "pdf"], information: List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals"]]):
+    def export(self, file_type: Literal["json", "csv", "txt", "pdf", "md", "html"], information: List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals"]]):
         """
         def export \n
         :param file_type: chosen filetype

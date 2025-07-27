@@ -105,7 +105,7 @@ class MHB:
         """
         private def __txt \n
         extracts the specified data as txt
-        :param data: the data, that should be converted to json
+        :param data: the data, that should be converted to txt
         :type data: List[Dict[str, str | int | None]]
         :param delimiter: the delimiter to use
         :type delimiter: Literal[";", "\t", ","]
@@ -120,10 +120,34 @@ class MHB:
         buffer.seek(0)
 
         return buffer
+    
+    def __md(self, data: List[Dict[str, str | int | None]]):
+        """
+        private def __md \n
+        extracts the specified data as markdown
+        :param data: the data, that should be converted to markdown
+        :type data: List[Dict[str, str | int | None]]
+        :param delimiter: the delimiter to use
+        :type delimiter: Literal[";", "\t", ","]
+        :return: markdown representation of the MHB as tables
+        :rtype: buffer
+        """
+        # since using above python 3.7 dicts stay ordered
+        data_row = lambda row: f"<tr>{[f'<td>{e}</td>' for e in row.values()]}</tr>"
+
+        buffer = io.StringIO()
+
+        markdown = f"""<table>\n<thead>\n<tr>\n{'\n'.join([f'<th>{i}</th>' for i in data[0].keys()])}\n</tr>\n</thead>\n<tbody>\n{'\n'.join([data_row(i) for i in data])}\n</tbody>\n</table>"""
+
+        buffer.write(markdown)
+        buffer.seek(0)
+        return buffer        
+
 
     def export(self, file_type: Literal["json", "csv", "txt", "pdf", "md", "html"], file_path: str,
                information: Optional[List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]]] = None,
-               ordered: bool = True, delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"] = None):
+               ordered: bool = True, delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"] = None, 
+               modules: Optional[List[Dict[str, str | int | None]]] = None):
         """
         def export \n
         :param file_type: chosen filetype
@@ -136,19 +160,25 @@ class MHB:
         :type ordered: bool
         :param delimiter: delimiter to separate the data in each row; mutually exclusive with the values json, pdf, md, html in file_type
         :type delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"]
+        :param modules: if specified instead of the modules of the current MHB, the specified modules are used
+        :type modules: Optional[List[Dict[str, str | int | None]]]
         :return: buffer of the data in the correct format
         :rtype: buffer
         """
-        if file_type in ["md", "html"]:
+
+        if modules is None:
+            modules = self.modules
+
+        if file_type in ["html"]:
             raise NotImplementedError("not implemented yet")
 
         if delimiter is not None and file_type not in ["csv", "txt"]:
             raise ValueError("delimiter is mutually exclusive with the values json, pdf, md, html in file_type")
 
         if information is not None:
-            ordered_data = [{k: v for k, v in i.items() if k in information} for i in self.modules]
+            ordered_data = [{k: v for k, v in i.items() if k in information} for i in modules]
         else:
-            ordered_data = self.modules
+            ordered_data = modules
 
         buffer = io.StringIO()
         encoding = "utf-8"
@@ -161,6 +191,8 @@ class MHB:
                 encoding += "-sig"
             elif file_type == "txt":
                 buffer = self.__txt(ordered_data, delimiter=";" if delimiter is None else delimiter)
+            elif file_type == "md":
+                buffer = self.__md(ordered_data)
         with open(f"{file_path}.{file_type}", "w", encoding=encoding) as file:
             file.write(buffer.getvalue())
 
