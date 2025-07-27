@@ -87,10 +87,14 @@ class MHB:
 
         buffer = io.StringIO()
 
-        write_data = [list(data[0].keys())] + [list(i.values()) for i in data]
+        """write_data = [list(data[0].keys())] + [list(i.values()) for i in data]
 
         writer = csv.writer(buffer, delimiter=";")
-        writer.writerows(write_data)
+        writer.writerows(write_data)"""
+        writer = csv.DictWriter(buffer, fieldnames=list(data[0].keys()), delimiter=";")
+        writer.writeheader()
+        writer.writerows(data)
+
         buffer.seek(0)
 
         return buffer
