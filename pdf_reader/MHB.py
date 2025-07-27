@@ -122,15 +122,22 @@ class MHB:
         return buffer
 
     def export(self, file_type: Literal["json", "csv", "txt", "pdf", "md", "html"], file_path: str,
-               information: List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]] = None,
+               information: Optional[List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]]] = None,
                ordered: bool = True, delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"] = None):
         """
         def export \n
         :param file_type: chosen filetype
+        :type file_type: Literal["json", "csv", "txt", "pdf", "md", "html"]
         :param file_path: path to where to save the file to, not allowed to have file type at the end
+        :type file_path: str
         :param information: chosen list of information, data is ordered by this list
+        :type information: Optional[List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]]]
         :param ordered: whether the data should stay in order
+        :type ordered: bool
         :param delimiter: delimiter to separate the data in each row; mutually exclusive with the values json, pdf, md, html in file_type
+        :type delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"]
+        :return: buffer of the data in the correct format
+        :rtype: buffer
         """
         if file_type in ["md", "html"]:
             raise NotImplementedError("not implemented yet")
@@ -166,6 +173,7 @@ class MHB:
         length = max([len(i["title"]) for i in self.modules])
         return f"{self.path.split('/')[-1].replace('.pdf', '')}\n     " + '\n     '.join([f"{module['title']:<{length}} {module['module_code']}" for module in self.modules])
 
+# TODO remove this after debugging
 if __name__ == "__main__":
     path = "pdfs/Bachelor_Geographie_PO2010_ID6285_2_de_20171009_0951.pdf"
     mhb_1 = MHB(path)
