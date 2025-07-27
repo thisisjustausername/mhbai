@@ -131,7 +131,7 @@ class MHB:
         :rtype: io.StringIO | str
         """
         # since using above python 3.7 dicts stay ordered
-        data_row = lambda row: f"<tr>{'\n'.join([f'<td>{e}</td>' for e in list(row.values())])}</tr>"
+        data_row = lambda row: f"<tr>{'\n'.join([f'<td>{str(e).replace("\n", "<br>")}</td>' for e in list(row.values())])}</tr>"
 
         markdown = f"""<table>\n<thead>\n<tr>\n{'\n'.join([f'<th>{i}</th>' for i in data[0].keys()])}\n</tr>\n</thead>\n<tbody>\n{'\n'.join([data_row(i) for i in data])}\n</tbody>\n</table>"""
 
@@ -194,8 +194,6 @@ class MHB:
         else:
             ordered_data = modules
         
-        # clean ordered data
-        ordered_data = [{k: v if type(v) != str else v.replace("\\", "") for k, v in i.items()} for i in ordered_data]
 
         buffer = io.StringIO()
         encoding = "utf-8"

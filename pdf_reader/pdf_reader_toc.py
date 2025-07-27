@@ -5,7 +5,6 @@
 # For usage please contact the developer.
 
 # TODO when module is found twice just use the information once, so when the information comes from two pages that aren't adjacent, handle other page differently when they're sharing the same cell like "goals"
-# FIXME still mistakes in unicde decryption
 
 from pdf_reader import pdf_extractor as extr
 import re
@@ -385,14 +384,16 @@ class Modules:
         # Hi, is someone reading me?
         # Will anyone ever read this? (yes|no|maybe) (probably me when making that whole piece of code pretty)
 
+        # TODO instead of decoding fancy chars remove them when using data to train ai
         # return a dictionary of title, module_code, ects, content, goals and pages
         detailed_dict = {"title": title,
                         "module_code": module_code.encode('utf-8').decode('unicode_escape'),
                         "ects": ects,
-                        "content": content.encode('utf-8').decode('unicode_escape'),
-                        "goals": goals.encode('utf-8').decode('unicode_escape'),
+                        "content": content.encode('latin-1').decode('unicode_escape').encode("latin-1").decode('cp1252').encode("utf-8").decode("utf-8").replace("\\", ""),
+                        "goals": goals.encode('latin-1').decode('unicode_escape').encode("latin-1").decode('cp1252').encode("utf-8").decode("utf-8").replace("\\", ""),
                         "pages": page_nr_list,
                         "mhbai_hints": None}
+
         # NOTE enable this if validation of page_nrs with toc is wished
         """
         toc_page_nr = [i for i in self.module_codes_detailed if i["module_code"] == module_code][0]["page_nr"]
