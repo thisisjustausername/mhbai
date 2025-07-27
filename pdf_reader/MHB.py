@@ -75,12 +75,14 @@ class MHB:
 
         return buffer
 
-    def __csv(self, data: List[Dict[str, str | int | None]]):
+    def __csv(self, data: List[Dict[str, str | int | None]], delimiter: Literal[";", "\t", ","]):
         """
         private def __csv \n
         extracts the specified data as csv
         :param data: the data, that should be converted to json
         :type data: List[Dict[str, str | int | None]]
+        :param delimiter: delimiter to separate the data in each row
+        :type delimiter: Literal[";", "\t", ","]
         :return: csv representation of the MHB
         :rtype: buffer
         """
@@ -91,7 +93,7 @@ class MHB:
 
         writer = csv.writer(buffer, delimiter=";")
         writer.writerows(write_data)"""
-        writer = csv.DictWriter(buffer, fieldnames=list(data[0].keys()), delimiter=";")
+        writer = csv.DictWriter(buffer, fieldnames=list(data[0].keys()), delimiter=delimiter)
         writer.writeheader()
         writer.writerows(data)
 
@@ -121,16 +123,20 @@ class MHB:
 
     def export(self, file_type: Literal["json", "csv", "txt", "pdf", "md", "html"], file_path: str,
                information: List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]] = None,
-               ordered: bool = True):
+               ordered: bool = True, delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"] = None):
         """
         def export \n
         :param file_type: chosen filetype
         :param file_path: path to where to save the file to, not allowed to have file type at the end
         :param information: chosen list of information, data is ordered by this list
         :param ordered: whether the data should stay in order
+        :param delimiter: delimiter to separate the data in each row; mutually exclusive with the values json, pdf, md, html in file_type
         """
         if file_type in ["md", "html"]:
             raise NotImplementedError("not implemented yet")
+
+        if delimiter is not None and file_type not in ["csv", "txt"]:
+            raise ValueError("delimiter is mutually exclusive with the values json, pdf, md, html in file_type")
 
         if information is not None:
             ordered_data = [{k: v for k, v in i.items() if k in information} for i in self.modules]
@@ -138,11 +144,17 @@ class MHB:
             ordered_data = self.modules
 
         buffer = io.StringIO()
+        encoding = "utf-8"
         if file_type == "json":
             buffer = self.__json(ordered_data)
-        elif file_type == "csv":
-            buffer = self.__csv(ordered_data)
-        with open(f"{file_path}.{file_type}", "w", encoding="utf-8") as file:
+        else:
+            ordered_data = [{k: v if type(v) != list else ", ".join([str(e) for e in v]) for k, v in i.items()} for i in ordered_data]
+            if file_type == "csv":
+                buffer = self.__csv(ordered_data, delimiter=";" if delimiter is None else delimiter)
+                encoding += "-sig"
+            elif file_type == "txt":
+                buffer = self.__txt(ordered_data, delimiter=";" if delimiter is None else delimiter)
+        with open(f"{file_path}.{file_type}", "w", encoding=encoding) as file:
             file.write(buffer.getvalue())
 
 
