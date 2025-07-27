@@ -133,8 +133,7 @@ class MHB:
         :rtype: buffer
         """
         # since using above python 3.7 dicts stay ordered
-        data_row = lambda row: f"<tr>{[f'<td>{e}</td>' for e in row.values()]}</tr>"
-
+        data_row = lambda row: f"<tr>{'\n'.join([f'<td>{e}</td>' for e in list(row.values())])}</tr>"
         buffer = io.StringIO()
 
         markdown = f"""<table>\n<thead>\n<tr>\n{'\n'.join([f'<th>{i}</th>' for i in data[0].keys()])}\n</tr>\n</thead>\n<tbody>\n{'\n'.join([data_row(i) for i in data])}\n</tbody>\n</table>"""
