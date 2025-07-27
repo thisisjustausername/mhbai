@@ -109,3 +109,5 @@ The pdf reader was created in order to allow for more precise table recogniction
 - adding options for saving data in csv/xlsx/json etc.
 - update file structure in README for web_service
 - finish commenting pdf_reader_toc.py
+- enable the export button in home.html just when the data is loaded
+- test exporting
