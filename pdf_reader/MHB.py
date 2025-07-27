@@ -45,7 +45,7 @@ class MHB:
 
     def __json(self, data: List[Dict[str, str | int | None]],
                ordered: Annotated[bool, "Mutually exclusive with module_code_key"] = True,
-               module_code_key: Annotated[bool, "Mutually exclusive with ordered"] = False):
+               module_code_key: Annotated[bool, "Mutually exclusive with ordered"] = False) -> io.StringIO:
         """
         private def __json \n
         extracts the specified data as json
@@ -56,7 +56,7 @@ class MHB:
         :param module_code_key: when specified, data is saved as dict with module_code as key; mutually exclusive with ordered
         :type module_code_key: bool
         :return: json representation of the MHB
-        :rtype: buffer
+        :rtype: io.StringIO
 
         :raises ValueError: if ordered and module_code_key are specified
         """
@@ -75,7 +75,7 @@ class MHB:
 
         return buffer
 
-    def __csv(self, data: List[Dict[str, str | int | None]], delimiter: Literal[";", "\t", ","]):
+    def __csv(self, data: List[Dict[str, str | int | None]], delimiter: Literal[";", "\t", ","]) -> io.StringIO:
         """
         private def __csv \n
         extracts the specified data as csv
@@ -84,7 +84,7 @@ class MHB:
         :param delimiter: delimiter to separate the data in each row
         :type delimiter: Literal[";", "\t", ","]
         :return: csv representation of the MHB
-        :rtype: buffer
+        :rtype: io.StringIO
         """
 
         buffer = io.StringIO()
@@ -101,7 +101,7 @@ class MHB:
 
         return buffer
 
-    def __txt(self, data: List[Dict[str, str | int | None]], delimiter: Literal[";", "\t", ","]):
+    def __txt(self, data: List[Dict[str, str | int | None]], delimiter: Literal[";", "\t", ","]) -> io.StringIO:
         """
         private def __txt \n
         extracts the specified data as txt
@@ -110,7 +110,7 @@ class MHB:
         :param delimiter: the delimiter to use
         :type delimiter: Literal[";", "\t", ","]
         :return: txt representation of the MHB, divided by tabs
-        :rtype: buffer
+        :rtype: io.StringIO
         """
 
         buffer = io.StringIO()
@@ -121,27 +121,45 @@ class MHB:
 
         return buffer
     
-    def __md(self, data: List[Dict[str, str | int | None]]):
+    def __md(self, data: List[Dict[str, str | int | None]], return_type: io.StringIO | str = io.StringIO) -> io.StringIO | str:
         """
         private def __md \n
         extracts the specified data as markdown
         :param data: the data, that should be converted to markdown
         :type data: List[Dict[str, str | int | None]]
-        :param delimiter: the delimiter to use
-        :type delimiter: Literal[";", "\t", ","]
         :return: markdown representation of the MHB as tables
-        :rtype: buffer
+        :rtype: io.StringIO | str
         """
         # since using above python 3.7 dicts stay ordered
         data_row = lambda row: f"<tr>{'\n'.join([f'<td>{e}</td>' for e in list(row.values())])}</tr>"
-        buffer = io.StringIO()
 
         markdown = f"""<table>\n<thead>\n<tr>\n{'\n'.join([f'<th>{i}</th>' for i in data[0].keys()])}\n</tr>\n</thead>\n<tbody>\n{'\n'.join([data_row(i) for i in data])}\n</tbody>\n</table>"""
 
+        if return_type == str:
+            return markdown
+
+        buffer = io.StringIO()
         buffer.write(markdown)
         buffer.seek(0)
-        return buffer        
+        return buffer
+    
+    def __html(self, data: List[Dict[str, str | int | None]]) -> io.StringIO:
+        """
+        private def __html \n
+        extracts the specified data as html
+        :param data: the data, that should be converted to html
+        :type data: List[Dict[str, str | int | None]]
+        :return: html representation of the MHB as tables
+        :rtype: io.StringIO
+        """
 
+        buffer = io.StringIO()
+
+        html = f"<!DOCTYPE html>\n<html>\n<head>\n<title>MHB</title>\n</head>\n<body>\n{self.__md(data=data, return_type=str)}\n</body></html>"
+        buffer.write(html)
+        buffer.seek(0)
+
+        return buffer
 
     def export(self, file_type: Literal["json", "csv", "txt", "pdf", "md", "html"], file_path: str,
                information: Optional[List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]]] = None,
@@ -168,9 +186,6 @@ class MHB:
         if modules is None:
             modules = self.modules
 
-        if file_type in ["html"]:
-            raise NotImplementedError("not implemented yet")
-
         if delimiter is not None and file_type not in ["csv", "txt"]:
             raise ValueError("delimiter is mutually exclusive with the values json, pdf, md, html in file_type")
 
@@ -178,6 +193,9 @@ class MHB:
             ordered_data = [{k: v for k, v in i.items() if k in information} for i in modules]
         else:
             ordered_data = modules
+        
+        # clean ordered data
+        ordered_data = [{k: v if type(v) != str else v.replace("\\", "") for k, v in i.items()} for i in ordered_data]
 
         buffer = io.StringIO()
         encoding = "utf-8"
@@ -192,6 +210,8 @@ class MHB:
                 buffer = self.__txt(ordered_data, delimiter=";" if delimiter is None else delimiter)
             elif file_type == "md":
                 buffer = self.__md(ordered_data)
+            elif file_type == "html":
+                buffer = self.__html(ordered_data)
         with open(f"{file_path}.{file_type}", "w", encoding=encoding) as file:
             file.write(buffer.getvalue())
 

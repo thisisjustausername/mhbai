@@ -5,6 +5,7 @@
 # For usage please contact the developer.
 
 # TODO when module is found twice just use the information once, so when the information comes from two pages that aren't adjacent, handle other page differently when they're sharing the same cell like "goals"
+# TODO still mistakes in unicde decryption
 
 from pdf_reader import pdf_extractor as extr
 import re

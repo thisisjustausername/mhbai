@@ -9,3 +9,5 @@ lib64
 bin
 pyvenv.cfg
 test.csv
+test.html
+test.md

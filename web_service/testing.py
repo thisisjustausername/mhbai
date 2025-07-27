@@ -69,7 +69,7 @@ file_name = get_file_name("https://mhb.uni-augsburg.de/BachelorStudiengaenge/Bac
 
 mhb = MHB("pdfs/" + file_name)
 #mhb.export("csv", "test")
-mhb.export("md", "test")
+mhb.export("html", "test")
 
 """with open("web_scraping/scrape_uni_augsburg/links_information.json", "r") as file:
     links_data =  json.load(file)

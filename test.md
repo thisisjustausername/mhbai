@@ -19,7 +19,7 @@ Augenmerk auf mündlicher Ausdrucksfähigkeit anhand von authentischen Texten un
 <td>Befähigung zur sicheren Anwendung der erworbenen Kenntnisse und Fertigkeiten und zu flüssiger und
 situationsgerechter Kommunikation; pragmatische Kompetenz; Entwicklung einer  language awareness  und Erwerb
 von Strategien zur Erweiterung des Wortschatzes und für die Weiterentwicklung der sprachlichen Kompetenz.
-\(Zielniveau B2+ GER\)</td>
+(Zielniveau B2+ GER)</td>
 <td>12, 13</td>
 <td>None</td></tr>
 <tr><td>Compétences orales</td>
@@ -28,7 +28,7 @@ von Strategien zur Erweiterung des Wortschatzes und für die Weiterentwicklung d
 <td> Prononciation
  Expression orale  oder  Analyse de textes de presse</td>
 <td>Konsolidierung der fremdsprachlichen Kompetenz in den Bereichen der grundlegenden sprachlichen Strukturen;
-Schwerpunkte: Aussprache, Sprechfertigkeit, Textverständnis \(Ausgangsniveau B2 GER, Zielniveau B2+ GER\)</td>
+Schwerpunkte: Aussprache, Sprechfertigkeit, Textverständnis (Ausgangsniveau B2 GER, Zielniveau B2+ GER)</td>
 <td>14, 15</td>
 <td>None</td></tr>
 <tr><td>Competenza orale</td>
@@ -37,8 +37,8 @@ Schwerpunkte: Aussprache, Sprechfertigkeit, Textverständnis \(Ausgangsniveau B2
 <td> Pronuncia e intonazione
  Espressione orale</td>
 <td>Konsolidierung der fremdsprachlichen Kompetenz in den Bereichen der grundlegenden sprachlichen
-Strukturen; Schwerpunkte: Aussprache, Sprechfertigkeit, Textverständnis \(Ausgangsniveau B2 GER, Zielniveau B2+
-GER\)</td>
+Strukturen; Schwerpunkte: Aussprache, Sprechfertigkeit, Textverständnis (Ausgangsniveau B2 GER, Zielniveau B2+
+GER)</td>
 <td>16, 17</td>
 <td>None</td></tr>
 <tr><td>Destrezas orales</td>
@@ -47,8 +47,8 @@ GER\)</td>
 <td> Pronunciación y entonación
  Expresión oral  oder  Análisis de textos de actualidad</td>
 <td>Konsolidierung der fremdsprachlichen Kompetenz in den Bereichen der grundlegenden sprachlichen
-Strukturen; Schwerpunkte: Aussprache, Sprechfertigkeit, Textverständnis \(Ausgangsniveau B2 GER, Zielniveau B2+
-GER\)</td>
+Strukturen; Schwerpunkte: Aussprache, Sprechfertigkeit, Textverständnis (Ausgangsniveau B2 GER, Zielniveau B2+
+GER)</td>
 <td>18, 19</td>
 <td>None</td></tr>
 <tr><td>Structures linguistiques</td>
@@ -57,7 +57,7 @@ GER\)</td>
 <td> Structures grammaticales
  Exercices contrastifs</td>
 <td>Konsolidierung der fremdsprachlichen Kompetenz in den Bereichen der grundlegenden sprachlichen Strukturen;
-Schwerpunkte: grammatische und kontrastive Sprachkompetenz \(Ausgangsniveau B2 GER, Zielniveau B2+ GER\)</td>
+Schwerpunkte: grammatische und kontrastive Sprachkompetenz (Ausgangsniveau B2 GER, Zielniveau B2+ GER)</td>
 <td>20, 21</td>
 <td>None</td></tr>
 <tr><td>Strutture linguistiche</td>
@@ -66,8 +66,8 @@ Schwerpunkte: grammatische und kontrastive Sprachkompetenz \(Ausgangsniveau B2 G
 <td> Strutture grammaticali
  Esercizi contrastivi</td>
 <td>Konsolidierung der fremdsprachlichen Kompetenz in den Bereichen der grundlegenden sprachlichen
-Strukturen; Schwerpunkte: grammatische und kontrastive Sprachkompetenz \(Ausgangsniveau B2 GER, Zielniveau
-B2+ GER\)</td>
+Strukturen; Schwerpunkte: grammatische und kontrastive Sprachkompetenz (Ausgangsniveau B2 GER, Zielniveau
+B2+ GER)</td>
 <td>22, 23</td>
 <td>None</td></tr>
 <tr><td>Estructuras lingüísticas</td>
@@ -76,8 +76,8 @@ B2+ GER\)</td>
 <td> Estructuras gramaticales
  Ejercicios contrastivos</td>
 <td>Konsolidierung der fremdsprachlichen Kompetenz in den Bereichen der grundlegenden sprachlichen
-Strukturen; Schwerpunkte: grammatische und kontrastive Sprachkompetenz \(Ausgangsniveau B2 GER, Zielniveau
-B2+ GER\)</td>
+Strukturen; Schwerpunkte: grammatische und kontrastive Sprachkompetenz (Ausgangsniveau B2 GER, Zielniveau
+B2+ GER)</td>
 <td>24, 25</td>
 <td>None</td></tr>
 <tr><td>Arabisch 1</td>
@@ -104,32 +104,32 @@ B2+ GER\)</td>
 <tr><td>Português 1</td>
 <td>SZP-0201</td>
 <td>6</td>
-<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprech-
-fertigkeit\) für die elementare Sprachverwendung</td>
+<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprech-
+fertigkeit) für die elementare Sprachverwendung</td>
 <td>Niveau A1 GER</td>
 <td>29, 237</td>
 <td>None</td></tr>
 <tr><td>Rumänisch 1</td>
 <td>SZQ-0201</td>
 <td>6</td>
-<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprech-
-fertigkeit\) für die elementare Sprachverwendung</td>
+<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprech-
+fertigkeit) für die elementare Sprachverwendung</td>
 <td>Niveau A1 GER</td>
 <td>30, 241</td>
 <td>None</td></tr>
 <tr><td>Russisch 1</td>
 <td>SZR-0202</td>
 <td>6</td>
-<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben,
-Sprechfertigkeit\) für die elementare Sprachverwendung</td>
+<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben,
+Sprechfertigkeit) für die elementare Sprachverwendung</td>
 <td>Niveau A1 GER</td>
 <td>31, 245</td>
 <td>None</td></tr>
 <tr><td>Schwedisch 1</td>
 <td>SZW-0201</td>
 <td>6</td>
-<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprech-
-fertigkeit\) für die elementare Sprachverwendung</td>
+<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprech-
+fertigkeit) für die elementare Sprachverwendung</td>
 <td>Niveau A1 GER</td>
 <td>32, 249</td>
 <td>None</td></tr>
@@ -151,31 +151,31 @@ Grammatik</td>
 <tr><td>Arabisch 2</td>
 <td>SZA-0205</td>
 <td>6</td>
-<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben,
-Sprechfertigkeit\) für die elementare Sprachverwendung</td>
+<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben,
+Sprechfertigkeit) für die elementare Sprachverwendung</td>
 <td>Niveau A1 GER</td>
 <td>35, 209</td>
 <td>None</td></tr>
 <tr><td>Chinesisch 2</td>
 <td>SZC-0205</td>
 <td>6</td>
-<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben,
-Sprechfertigkeit\) für die elementare Sprachverwendung</td>
+<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben,
+Sprechfertigkeit) für die elementare Sprachverwendung</td>
 <td>Niveau A1 GER</td>
 <td>36, 213</td>
 <td>None</td></tr>
 <tr><td>Japanisch 2</td>
 <td>SZX-0205</td>
 <td>6</td>
-<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben,
-Sprechfertigkeit\) für die elementare Sprachverwendung</td>
+<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben,
+Sprechfertigkeit) für die elementare Sprachverwendung</td>
 <td>Niveau A1 GER und N5 Japanese Language Proficiency Test</td>
 <td>37, 234</td>
 <td>None</td></tr>
 <tr><td>Português 2</td>
 <td>SZP-0204</td>
 <td>6</td>
-<td>Erwerb von soliden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit\) für die
+<td>Erwerb von soliden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit) für die
 elementare Sprachverwendung</td>
 <td>Niveau A2 GER</td>
 <td>38, 238</td>
@@ -183,7 +183,7 @@ elementare Sprachverwendung</td>
 <tr><td>Rumänisch 2</td>
 <td>SZQ-0204</td>
 <td>6</td>
-<td>Erwerb von soliden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit\) für die
+<td>Erwerb von soliden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit) für die
 elementare Sprachverwendung</td>
 <td>Niveau A2 GER</td>
 <td>39, 242</td>
@@ -191,7 +191,7 @@ elementare Sprachverwendung</td>
 <tr><td>Russisch 2</td>
 <td>SZR-0205</td>
 <td>6</td>
-<td>Erwerb von soliden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit\) für die
+<td>Erwerb von soliden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit) für die
 elementare Sprachverwendung</td>
 <td>Niveau A2 GER</td>
 <td>40, 246</td>
@@ -199,7 +199,7 @@ elementare Sprachverwendung</td>
 <tr><td>Schwedisch 2</td>
 <td>SZW-0204</td>
 <td>6</td>
-<td>Erwerb von soliden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit\) für die
+<td>Erwerb von soliden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit) für die
 elementare Sprachverwendung</td>
 <td>Niveau A2 GER</td>
 <td>41, 250</td>
@@ -207,8 +207,8 @@ elementare Sprachverwendung</td>
 <tr><td>Türkisch 2</td>
 <td>SZT-0205</td>
 <td>6</td>
-<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben,
-Sprechfertigkeit\) für die elementare Sprachverwendung</td>
+<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben,
+Sprechfertigkeit) für die elementare Sprachverwendung</td>
 <td>Niveau A1 GER</td>
 <td>42, 264</td>
 <td>None</td></tr>
@@ -234,8 +234,8 @@ englischen Sprachgebrauchs und dessen Angemessenheit in unterschiedlichen Kontex
 sprachwissenschaftlichen Analyse und kritischen Reflektion auf den Gebieten der Syntax, Morphologie, Phonetik/
 Phonologie, Semantik und Pragmatik.
 Methodisch:
-Kompetenz in linguistischen Arbeitsmethoden, wie u.a. Deskription, empirische Datenanalyse \(quantitativ
-und qualitativ\), kontrastive Analyse. Anwendung einfacher Testverfahren. Integrativer Erwerb von
+Kompetenz in linguistischen Arbeitsmethoden, wie u.a. Deskription, empirische Datenanalyse (quantitativ
+und qualitativ), kontrastive Analyse. Anwendung einfacher Testverfahren. Integrativer Erwerb von
 sprachwissenschaftlichen Techniken des wissenschaftlichen Arbeitens.
 Sozial/personal/kommunikativ:
 Strategien zur Aneignung von fachwissenschaftlicher Einführungsliteratur sowie deren kritischer Reflektion und
@@ -251,9 +251,9 @@ im Kontext. Angemessene sprachliche Darstellung. Zeitmanagement</td>
 Die Studierenden sind vertraut mit grundlegenden Begriffen, Theorien und Arbeitsmethoden der Sprachwissenschaft
 und sind in der Lage, das erworbene Fachwissen auf das Französische anzuwenden. Die behandelten zentralen
 Fragestellungen, Termini und Ansätze der Sprachwissenschaft stellen die Basis für die zu erlangende Fähigkeit zur
-wissenschaftlichen Auseinandersetzung mit Gegenständen der \(Französischen\) Sprachwissenschaft dar.
+wissenschaftlichen Auseinandersetzung mit Gegenständen der (Französischen) Sprachwissenschaft dar.
 Methodisch:
-Die Studierenden erarbeiten in der Lerngruppe anhand bereitgestellter Materialien Grundlagen der \(Französischen\)
+Die Studierenden erarbeiten in der Lerngruppe anhand bereitgestellter Materialien Grundlagen der (Französischen)
 Sprachwissenschaft. Darüber hinaus sind sie in der Lage, eigenständig Fachliteratur aus grundlegenden Bereichen
 der Sprachwissenschaft zu erschließen.
 Sozial/personal:
@@ -269,9 +269,9 @@ adäquat darzustellen und gegebenenfalls zu modifizieren.</td>
 Die Studierenden sind vertraut mit grundlegenden Begriffen, Theorien und Arbeitsmethoden der Sprachwissenschaft
 und sind in der Lage, das erworbene Fachwissen auf das Italienische anzuwenden. Die behandelten zentralen
 Fragestellungen, Termini und Ansätze der Sprachwissenschaft stellen die Basis für die zu erlangende Fähigkeit zur
-wissenschaftlichen Auseinandersetzung mit Gegenständen der \(Italienischen\) Sprachwissenschaft dar.
+wissenschaftlichen Auseinandersetzung mit Gegenständen der (Italienischen) Sprachwissenschaft dar.
 Methodisch:
-Die Studierenden erarbeiten in der Lerngruppe anhand bereitgestellter Materialien Grundlagen der \(Italienischen\)
+Die Studierenden erarbeiten in der Lerngruppe anhand bereitgestellter Materialien Grundlagen der (Italienischen)
 Sprachwissenschaft. Darüber hinaus sind sie in der Lage, eigenständig Fachliteratur aus grundlegenden Bereichen
 der Sprachwissenschaft zu erschließen.
 Sozial/personal:
@@ -287,11 +287,11 @@ adäquat darzustellen und gegebenenfalls zu modifizieren.</td>
 Die Studierenden sind mit grundlegenden Begriffen, Theorien und Arbeitsmethoden der Sprachwissenschaft
 vertraut und in der Lage, das erworbene Fachwissen auf das Spanische anzuwenden. Die behandelten zentralen
 Fragestellungen, Termini und Ansätze der Sprachwissenschaft stellen die Basis für die zu erlangende Fähigkeit zur
-wissenschaftlichen Auseinandersetzung mit Gegenständen der \(Spanischen\) Sprachwissenschaft dar.
+wissenschaftlichen Auseinandersetzung mit Gegenständen der (Spanischen) Sprachwissenschaft dar.
 Methodisch:
 Die Studierenden erarbeiten in der Lerngruppe anhand zur Verfügung gestellter Materialien Grundlagen der
-\(Spanischen\) Sprachwissenschaft. Darüber hinaus sind sie in der Lage, eigenständig Literatur aus grundlegenden
-Bereichen der \(Spanischen\) Sprachwissenschaft zu erschließen.
+(Spanischen) Sprachwissenschaft. Darüber hinaus sind sie in der Lage, eigenständig Literatur aus grundlegenden
+Bereichen der (Spanischen) Sprachwissenschaft zu erschließen.
 Sozial/personal:
 Die Studierenden können sich adressaten- und sachgerecht ausdrücken und sind in der Lage, eigene Positionen
 adäquat darzustellen und gegebenenfalls zu modifizieren.</td>
@@ -304,18 +304,18 @@ adäquat darzustellen und gegebenenfalls zu modifizieren.</td>
 Hinführung an fremdsprachendidaktische Forschungsfragen, Fachinhalte und Lernziele, Grundlagen des
 Fremdsprachenerwerbs und Schwerpunktfragen des Fremdsprachenunterrichts; Einbindung in berufs- und
 praxisbezogene Kontexte.
-In this supplementary course \(Begleitübung\) to the lecture Introduction to the Teaching of English, students
+In this supplementary course (Begleitübung) to the lecture Introduction to the Teaching of English, students
 acquire basic knowledge and skills in dealing with academic key concepts and techniques from a TEFL
 perspective, which they will later on need, apply and further deepen in the context of their study program. For
 example, students will acquire knowledge of how to prepare, conduct and evaluate classroom observations
-\(observation of English lessons\) in a criterion-guided manner. They will explore the aspects that need to be taken
-into account when developing their own teaching and learning materials \(e.g. worksheets, tasks, exercises\)
+(observation of English lessons) in a criterion-guided manner. They will explore the aspects that need to be taken
+into account when developing their own teaching and learning materials (e.g. worksheets, tasks, exercises)
 and understand which didactic principles of TEFL are used to design modern textbooks. Another focus is the
 acquisition of basic knowledge and skills with regard to the writing of term papers in TEFL. Aspects such as finding
 and developing a topic, researching relevant secondary literature, structuring term papers, working with the style
 sheet as well as acquiring the rules and conventions of citation will be dealt with.
-Depending on the requirements of your study program, this supplementary course \( Begleitübung\)  is an obligatory
-one and needs to be taken in the same semester with the introductory lecture \( Einführungsvorlesung \). The final
+Depending on the requirements of your study program, this supplementary course ( Begleitübung)  is an obligatory
+one and needs to be taken in the same semester with the introductory lecture ( Einführungsvorlesung ). The final
 exam will cover both the introductory lecture and the supplementary course.</td>
 <td>Fachlich:
 Die Studierenden verfügen über grundlegende Kenntnisse in der Fachdidaktik des Englischen. Sie sind in der
@@ -328,7 +328,7 @@ anzufertigen. Sie können mit fachdidaktischen Grundlagentexten selbstständig u
 Rahmen der Vor- bzw. Nachbereitung von Lehrveranstaltungen gewinnbringend zu nutzen.
 Sozial/personal:
 Die Studierenden lernen grundlegende Formen wissenschaftlicher Kommunikation kennen. Sie erfassen die Differenz
-zwischen ihren alltagsweltlichen \(Schul-\)Vorerfahrungen und einer wissenschaftlichen Objektkonstitution. Im
+zwischen ihren alltagsweltlichen (Schul-)Vorerfahrungen und einer wissenschaftlichen Objektkonstitution. Im
 ersten Kontakt mit dem Fachbereich werden eigene wissenschaftliche Positionen begründet und fachliche Neugier
 entwickelt.</td>
 <td>53, 54, 55</td>
@@ -396,7 +396,7 @@ Bereich; Verfassen klar strukturierter englischer Texte zu komplexen Sachverhalt
 <td>Fähigkeit, komplexe Texte kritisch zu rezipieren, zusammenzufassen, zu paraphrasieren und zu kommentieren;
 Fähigkeit, komplexe Sachverhalte und Argumentationen in grammatisch und lexikalisch korrektem Englisch
 verständlich, kohärent und stilistisch angemessen darzustellen; pragmatische Kompetenz und die Fähigkeit, Texte zu
-beurteilen und konstruktives Feedback zu Textentwürfen zu geben. \(Zielniveau C1 GER\)</td>
+beurteilen und konstruktives Feedback zu Textentwürfen zu geben. (Zielniveau C1 GER)</td>
 <td>62</td>
 <td>None</td></tr>
 <tr><td>Intercultural Mediation</td>
@@ -417,7 +417,7 @@ der Muttersprache; Fähigkeit, kulturspezifische Phänomene zu erfassen und in e
 <td> Approfondissement des connaissances grammaticales
  Expression écrite</td>
 <td>Ausbau der kommunikativen Kompetenz unter besonderer Berücksichtigung des schriftlichen Ausdrucks
-\(Ausgangsniveau B2+ GER, Zielniveau C1 GER\)</td>
+(Ausgangsniveau B2+ GER, Zielniveau C1 GER)</td>
 <td>64</td>
 <td>None</td></tr>
 <tr><td>Comunicazione scritta</td>
@@ -426,7 +426,7 @@ der Muttersprache; Fähigkeit, kulturspezifische Phänomene zu erfassen und in e
 <td> Approfondimenti grammaticali
  Esercitazione scritta</td>
 <td>Ausbau der kommunikativen Kompetenz unter besonderer Berücksichtigung des schriftlichen Ausdrucks
-\(Ausgangsniveau B2+ GER, Zielniveau C1 GER\)</td>
+(Ausgangsniveau B2+ GER, Zielniveau C1 GER)</td>
 <td>65</td>
 <td>None</td></tr>
 <tr><td>Comunicación escrita</td>
@@ -435,53 +435,53 @@ der Muttersprache; Fähigkeit, kulturspezifische Phänomene zu erfassen und in e
 <td> Gramática comunicativa
  Expresión escrita</td>
 <td>Ausbau der kommunikativen Kompetenz unter besonderer Berücksichtigung des schriftsprachlichen Ausdrucks
-\(Ausgangsniveau B2+ GER, Zielniveau C1 GER\)</td>
+(Ausgangsniveau B2+ GER, Zielniveau C1 GER)</td>
 <td>66</td>
 <td>None</td></tr>
 <tr><td>Arabisch 3</td>
 <td>SZA-0208</td>
 <td>6</td>
-<td>Erwerb von weiterführenden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben,
-Sprechfertigkeit\) für die elementare Sprachverwendung</td>
+<td>Erwerb von weiterführenden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben,
+Sprechfertigkeit) für die elementare Sprachverwendung</td>
 <td>Niveau A1+ GER</td>
 <td>67, 210</td>
 <td>None</td></tr>
 <tr><td>Chinesisch 3</td>
 <td>SZC-0208</td>
 <td>6</td>
-<td>Erwerb von weiterführenden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprech-
-fertigkeit\) für die elementare Sprachverwendung</td>
+<td>Erwerb von weiterführenden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprech-
+fertigkeit) für die elementare Sprachverwendung</td>
 <td>Niveau A1+ GER</td>
 <td>68, 214</td>
 <td>None</td></tr>
 <tr><td>Japanisch 3</td>
 <td>SZX-0208</td>
 <td>6</td>
-<td>Erwerb von weiterführenden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben,
-Sprechfertigkeit\) für die elementare Sprachverwendung</td>
+<td>Erwerb von weiterführenden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben,
+Sprechfertigkeit) für die elementare Sprachverwendung</td>
 <td>Niveau A1+ GER</td>
 <td>69, 235</td>
 <td>None</td></tr>
 <tr><td>Português 3</td>
 <td>SZP-0207</td>
 <td>6</td>
-<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprech-
-fertigkeit\) für die selbstständige Sprachverwendung</td>
+<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprech-
+fertigkeit) für die selbstständige Sprachverwendung</td>
 <td>Niveau B1 GER</td>
 <td>70, 239</td>
 <td>None</td></tr>
 <tr><td>Rumänisch 3</td>
 <td>SZQ-0207</td>
 <td>6</td>
-<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprech-
-fertigkeit\) für die selbstständige Sprachverwendung</td>
+<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprech-
+fertigkeit) für die selbstständige Sprachverwendung</td>
 <td>Niveau B1 GER</td>
 <td>71, 243</td>
 <td>None</td></tr>
 <tr><td>Russisch 3</td>
 <td>SZR-0208</td>
 <td>6</td>
-<td>Erwerb von fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit\) für den
+<td>Erwerb von fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit) für den
 Übergang von der elementaren zur selbstständigen Sprachverwendung</td>
 <td>Niveau A2+ GER</td>
 <td>72, 247</td>
@@ -489,15 +489,15 @@ fertigkeit\) für die selbstständige Sprachverwendung</td>
 <tr><td>Schwedisch 3</td>
 <td>SZW-0207</td>
 <td>6</td>
-<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben,
-Sprechfertigkeit\) für die selbstständige Sprachverwendung</td>
+<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben,
+Sprechfertigkeit) für die selbstständige Sprachverwendung</td>
 <td>Niveau B1 GER</td>
 <td>73, 251</td>
 <td>None</td></tr>
 <tr><td>Türkisch 3</td>
 <td>SZT-0208</td>
 <td>6</td>
-<td>Erwerb von soliden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit\) für die
+<td>Erwerb von soliden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit) für die
 elementare Sprachverwendung</td>
 <td>Niveau A2 GER</td>
 <td>74, 265</td>
@@ -513,7 +513,7 @@ Wissenschaftssprache</td>
 <tr><td>Arabisch 4</td>
 <td>SZA-0211</td>
 <td>6</td>
-<td>Erwerb von soliden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit\) für die
+<td>Erwerb von soliden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit) für die
 elementare Sprachverwendung</td>
 <td>Niveau A2 GER</td>
 <td>76, 211</td>
@@ -521,7 +521,7 @@ elementare Sprachverwendung</td>
 <tr><td>Chinesisch 4</td>
 <td>SZC-0211</td>
 <td>6</td>
-<td>Erwerb von soliden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit\) für die
+<td>Erwerb von soliden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit) für die
 elementare Sprachverwendung</td>
 <td>Niveau A2 GER</td>
 <td>77, 215</td>
@@ -529,7 +529,7 @@ elementare Sprachverwendung</td>
 <tr><td>Japanisch 4</td>
 <td>SZX-0211</td>
 <td>6</td>
-<td>Erwerb von soliden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit\) für die
+<td>Erwerb von soliden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit) für die
 elementare Sprachverwendung</td>
 <td>Niveau A2 GER und N4 Japanese Language Proficiency Test</td>
 <td>78, 236</td>
@@ -537,7 +537,7 @@ elementare Sprachverwendung</td>
 <tr><td>Português 4</td>
 <td>SZP-0210</td>
 <td>6</td>
-<td>Erwerb von soliden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit\) für die
+<td>Erwerb von soliden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit) für die
 selbstständige Sprachverwendung</td>
 <td>Niveau B2 GER</td>
 <td>79, 240</td>
@@ -545,31 +545,31 @@ selbstständige Sprachverwendung</td>
 <tr><td>Rumänisch 4</td>
 <td>SZQ-0210</td>
 <td>6</td>
-<td>Erwerb von weiterführenden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben,
-Sprechfertigkeit\) für die selbstständige Sprachverwendung</td>
+<td>Erwerb von weiterführenden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben,
+Sprechfertigkeit) für die selbstständige Sprachverwendung</td>
 <td>Niveau B1+ GER</td>
 <td>80, 244</td>
 <td>None</td></tr>
 <tr><td>Russisch 4</td>
 <td>SZR-0211</td>
 <td>6</td>
-<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben,
-Sprechfertigkeit\) für die selbstständige Sprachverwendung</td>
+<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben,
+Sprechfertigkeit) für die selbstständige Sprachverwendung</td>
 <td>Niveau B1 GER</td>
 <td>81, 248</td>
 <td>None</td></tr>
 <tr><td>Schwedisch 4</td>
 <td>SZW-0210</td>
 <td>6</td>
-<td>Erwerb von weiterführenden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben,
-Sprechfertigkeit\) für die selbstständige Sprachverwendung</td>
+<td>Erwerb von weiterführenden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben,
+Sprechfertigkeit) für die selbstständige Sprachverwendung</td>
 <td>Niveau B1+ GER</td>
 <td>82, 252</td>
 <td>None</td></tr>
 <tr><td>Türkisch 4</td>
 <td>SZT-0211</td>
 <td>6</td>
-<td>Erwerb von fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit\) für den
+<td>Erwerb von fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit) für den
 Übergang von der elementaren zur selbstständigen Sprachverwendung</td>
 <td>Niveau A2+ GER</td>
 <td>83, 266</td>
@@ -679,7 +679,7 @@ gegebenenfalls die eigene Sichtweise zu modifizieren.</td>
 <td>6</td>
 <td>Einarbeitung in zentrale Prinzipien und aktuelle Forschungsbereiche und -themen der theoretischen und angewandten
 Sprachwissenschaft, z.B. Varietäten und sprachhistorische Entwicklungen des Englischen, kognitive Aspekte der
-Sprachverarbeitung \(insbesondere Prinzipien des Zweitspracherwerbs auch in Verbindung zu Mehrsprachigkeit,
+Sprachverarbeitung (insbesondere Prinzipien des Zweitspracherwerbs auch in Verbindung zu Mehrsprachigkeit,
 grundlegende Theorien und Methoden der Pragmatik, Diskurs- und Medienlinguistik, der computervermittelten
 Kommunikation und der multimodalen Diskursanalyse.</td>
 <td>Fachkompetenz :
@@ -696,7 +696,7 @@ transmediale Wechselwirkungen zu erkennen und diese kontextangemessen auf die An
 Medientexten zu übertragen. Fähigkeit zur Analyse der Nutzung und Wirkungsweise sprachlicher Strukturen und Stile
 für die Bedeutung und Interpretation von Diskurs. Kenntnis linguistischer Arbeits- und Analysemethoden im Bereich
 der diachronen, synchronen und dialektologischen Sprachwissenschaft. Fähigkeit zur systematischen Analyse
-fremdsprachlicher Einflüsse beim Erwerb einer Zweitsprache \(insbes. Deutsch L1 vs. Englisch L2\).
+fremdsprachlicher Einflüsse beim Erwerb einer Zweitsprache (insbes. Deutsch L1 vs. Englisch L2).
 Sozialkompetenz :
 Transferfähigkeiten, internationale Orientierung, Präsentations- und Diskussionsfähigkeit, Teamfähigkeit
 Selbstkompetenz :
@@ -706,8 +706,8 @@ Selbstmanagement, fachliche Flexibilität</td>
 <tr><td>Linguistics: Applied Background Studies</td>
 <td>EAS-2188</td>
 <td>4</td>
-<td>Praktische Untersuchung, Analyse und Interpretation verschiedener Manifestationen von Sprachdaten \(phonetische
-Analyse, grammatische Analyse, Text- und Diskursanalyse, Arbeit mit Sprachkorpora\). Summarische Präsentation der
+<td>Praktische Untersuchung, Analyse und Interpretation verschiedener Manifestationen von Sprachdaten (phonetische
+Analyse, grammatische Analyse, Text- und Diskursanalyse, Arbeit mit Sprachkorpora). Summarische Präsentation der
 grundlegenden linguistischen Kerngebiete.</td>
 <td>Fachkompetenz :
 Vertiefte Kenntnisse aller Manifestationen des Sprachgebrauchs auf Laut-, Grammatik-, Bedeutungs- und
@@ -878,7 +878,7 @@ Kommunikationsverhalten zeigen.</td>
 anwendungsorientierte Aufgabenstellungen in unterschiedlichen authentischen kommunikativen Situationen.</td>
 <td>Fähigkeit, komplexe Sachverhalte schriftlich und mündlich in idiomatischem, nahezu muttersprachlichem Englisch
 situationsadäquat darzustellen; Weiterentwicklung der  language awareness ; Befähigung, eigenverantwortlich sowie
-als Mitglied eines Teams zu arbeiten; Problemlösungskompetenz und kritisches Denken. \(Zielniveau C1+ GER\)</td>
+als Mitglied eines Teams zu arbeiten; Problemlösungskompetenz und kritisches Denken. (Zielniveau C1+ GER)</td>
 <td>115, 116</td>
 <td>None</td></tr>
 <tr><td>Production de textes et traduction</td>
@@ -886,8 +886,8 @@ als Mitglied eines Teams zu arbeiten; Problemlösungskompetenz und kritisches De
 <td>7</td>
 <td> Version
  Production de textes</td>
-<td>Optimierung fremdsprachlicher Fertigkeiten; Schwerpunkte: Übersetzung, Textproduktion \(Ausgangsniveau C1 GER,
-Zielniveau C1+ GER\)</td>
+<td>Optimierung fremdsprachlicher Fertigkeiten; Schwerpunkte: Übersetzung, Textproduktion (Ausgangsniveau C1 GER,
+Zielniveau C1+ GER)</td>
 <td>117</td>
 <td>None</td></tr>
 <tr><td>Produzione di testi e traduzione</td>
@@ -895,8 +895,8 @@ Zielniveau C1+ GER\)</td>
 <td>7</td>
 <td> Traduzione italiano-tedesco
  Produzione scritta</td>
-<td>Optimierung fremdsprachlicher Fertigkeiten; Schwerpunkte: Übersetzung, Textproduktion \(Ausgangsniveau C1 GER,
-Zielniveau C1+ GER\)</td>
+<td>Optimierung fremdsprachlicher Fertigkeiten; Schwerpunkte: Übersetzung, Textproduktion (Ausgangsniveau C1 GER,
+Zielniveau C1+ GER)</td>
 <td>118</td>
 <td>None</td></tr>
 <tr><td>Redacción y traducción</td>
@@ -904,29 +904,29 @@ Zielniveau C1+ GER\)</td>
 <td>7</td>
 <td> Traducción español-alemán
  Producción de textos</td>
-<td>Optimierung fremdsprachlicher Fertigkeiten; Schwerpunkte: Übersetzung, Textproduktion \(Ausgangsniveau C1 GER,
-Zielniveau C1+ GER\)</td>
+<td>Optimierung fremdsprachlicher Fertigkeiten; Schwerpunkte: Übersetzung, Textproduktion (Ausgangsniveau C1 GER,
+Zielniveau C1+ GER)</td>
 <td>119</td>
 <td>None</td></tr>
 <tr><td>Présentation orale et discussion</td>
 <td>SZF-0108</td>
 <td>5</td>
 <td> Communication orale</td>
-<td>Optimierung der Sprechfertigkeit \(Ausgangsniveau C1 GER, Zielniveau C1+ GER\)</td>
+<td>Optimierung der Sprechfertigkeit (Ausgangsniveau C1 GER, Zielniveau C1+ GER)</td>
 <td>120</td>
 <td>None</td></tr>
 <tr><td>Presentazione orale e discussione</td>
 <td>SZI-0108</td>
 <td>5</td>
 <td> Comunicazione orale</td>
-<td>Optimierung der Sprechfertigkeit \(Ausgangsniveau C1 GER, Zielniveau C1+ GER\)</td>
+<td>Optimierung der Sprechfertigkeit (Ausgangsniveau C1 GER, Zielniveau C1+ GER)</td>
 <td>121</td>
 <td>None</td></tr>
 <tr><td>Presentación oral y discusión</td>
 <td>SZS-0108</td>
 <td>5</td>
 <td> Comunicación oral</td>
-<td>Optimierung der Sprechfertigkeit \(Ausgangsniveau C1 GER, Zielniveau C1+ GER\)</td>
+<td>Optimierung der Sprechfertigkeit (Ausgangsniveau C1 GER, Zielniveau C1+ GER)</td>
 <td>122</td>
 <td>None</td></tr>
 <tr><td>Vertiefungsstufe Angewandte Sprachwissenschaft (Sprachlern-/Sprachlehrforschung/ Translationswissenschaft/Wörterbuchforschung/ Terminologiearbeit)</td>
@@ -1468,12 +1468,12 @@ Ausgabenprogramme eigenständig analysieren und bewerten.</td>
 Die erfolgreiche Teilnahme an diesem Modul versetzt die Studierenden in die Lage, einfache empirische Studien
 eigenständig anzufertigen und zudem empirische Forschungsarbeiten kompetent einzuordnen. Die Veranstaltung
 vermittelt die dazu notwenigen statistischen und ökonometrischen Grundlagen und zudem Kenntnisse über eine
-geeignete Ökonometriesoftware \(R\).
+geeignete Ökonometriesoftware (R).
 Methodische Kompetenzen:
 Mit Hilfe der in der Veranstaltung eingeführten quantitativen Methoden können die Studierenden nach der Teilnahme
-Zusammenhänge bzw. Kausalitäten zwischen Variablen \(wie beispielsweise den Ausgaben für Marketingmaßnahmen
-und Umsatz oder Volkseinkommen und Konsum\) schätzen und interpretieren. Sie sind insbesondere in der Lage, die
-erlernten statistischen Verfahren in der Ökonometriesoftware R \(freeware\) umzusetzen.
+Zusammenhänge bzw. Kausalitäten zwischen Variablen (wie beispielsweise den Ausgaben für Marketingmaßnahmen
+und Umsatz oder Volkseinkommen und Konsum) schätzen und interpretieren. Sie sind insbesondere in der Lage, die
+erlernten statistischen Verfahren in der Ökonometriesoftware R (freeware) umzusetzen.
 Fachübergreifende Kompetenzen:
 Die Studierenden können das Erlernte nicht nur in weiterführenden Veranstaltungen der
 Wirtschaftswissenschaftlichen Fakultät anwenden, sondern darüber hinaus - den Alltag der Studierenden
@@ -1518,7 +1518,7 @@ der Angebots- bzw. Nachfrageseite zu verstehen, Aussagen bezüglich der Markterg
 und gesamtwirtschaftlicher Ebene zu entwickeln und zu bewerten sowie daraus Handlungsoptionen für die
 verschiedenen Marktteilnehmer abzuleiten. Darüber hinaus sind die Studierenden in der Lage, verschiedene
 Unternehmensstrategien, wie Produktdifferenzierung, Fusionen, "Limit"-Strategien und andere, zu analysieren und zu
-bewerten. Unter anderem wird dabei ein Fokus auf Märkte mit \(direkten oder indirekten\) Netzwerkeffekten gelegt.
+bewerten. Unter anderem wird dabei ein Fokus auf Märkte mit (direkten oder indirekten) Netzwerkeffekten gelegt.
 Methodische Kompetenzen:
 Die Studierenden können unterschiedliche Formen der Marktstruktur, wie Oligopol oder dominantes Unternehmen
 mit Wettbewerbsrand, analysieren, die Auswirkungen auf das Marktverhalten und das Marktergebnis verdeutlichen
@@ -1575,8 +1575,8 @@ both the behaviour of exchange rates and develop the consequences of trade, mone
 framework of various open economy models such as the Mundell-Fleming model.
 Methodological competencies:
 Students are able to determine equilibria of different markets within an open economy graphically and analytically.
-They can independently make changes to individual model elements \(e.g., tariffs, exchange rates, trade flows,
-interest rates, taxes, consumption preferences\) and forecast their effects mathematically and based on experience.
+They can independently make changes to individual model elements (e.g., tariffs, exchange rates, trade flows,
+interest rates, taxes, consumption preferences) and forecast their effects mathematically and based on experience.
 Furthermore, students are familiar with the method of the comparative-static analysis of the Mundell-Fleming model
 and various exchange rate theories such as interest parity or the Dornbusch overshooting model.
 Interdisciplinary competencies:
@@ -1728,7 +1728,7 @@ einer modellgestützten Lösung zu gelangen, die sie vor Außenstehenden kompete
 <td></td>
 <td>Nach der erfolgreichen Teilnahme an diesem Modul sind die Studierenden mit den wichtigsten
 verhaltensökonomischen Modellen vertraut und können diese kompetent anwenden. Die Studierenden wissen
-inwieweit \(traditionelle\) ökonomische Theorien der experimentellen Überprüfung standhalten. Die Studierenden
+inwieweit (traditionelle) ökonomische Theorien der experimentellen Überprüfung standhalten. Die Studierenden
 wissen wie Präferenzen und Nutzen modelliert werden können, um bestimmte psychologische Verhaltensmotive, zu
 erfassen. Zudem verstehen Sie wie sich identifizierte Irrationalitäten auf den Markt auswirken.</td>
 <td>204, 205</td>
@@ -1771,15 +1771,15 @@ verstehen und kritisch zu hinterfragen.</td>
 <tr><td>Français 1</td>
 <td>SZF-0201</td>
 <td>6</td>
-<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprech-
-fertigkeit\) für die elementare Sprachverwendung</td>
+<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprech-
+fertigkeit) für die elementare Sprachverwendung</td>
 <td>Niveau A1 GER</td>
 <td>216</td>
 <td>None</td></tr>
 <tr><td>Français 2</td>
 <td>SZF-0202</td>
 <td>6</td>
-<td>Erwerb von soliden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit\) für die
+<td>Erwerb von soliden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit) für die
 elementare Sprachverwendung</td>
 <td>Niveau A2 GER</td>
 <td>217</td>
@@ -1787,7 +1787,7 @@ elementare Sprachverwendung</td>
 <tr><td>Français 3</td>
 <td>SZF-0204</td>
 <td>6</td>
-<td>Erwerb von fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit\)  für den
+<td>Erwerb von fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit)  für den
 Übergang von der elementaren zur selbstständigen Sprachverwendung</td>
 <td>Niveau A2+ GER</td>
 <td>218</td>
@@ -1795,23 +1795,23 @@ elementare Sprachverwendung</td>
 <tr><td>Français 4</td>
 <td>SZF-0205</td>
 <td>6</td>
-<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben,
-Sprechfertigkeit\)  für die selbstständige Sprachverwendung</td>
+<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben,
+Sprechfertigkeit)  für die selbstständige Sprachverwendung</td>
 <td>Niveau B1 GER</td>
 <td>219</td>
 <td>None</td></tr>
 <tr><td>Français 5</td>
 <td>SZF-0206</td>
 <td>6</td>
-<td>Erwerb von weiterführenden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben,
-Sprechfertigkeit\)  für die selbstständige Sprachverwendung</td>
+<td>Erwerb von weiterführenden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben,
+Sprechfertigkeit)  für die selbstständige Sprachverwendung</td>
 <td>Niveau B1+ GER</td>
 <td>220</td>
 <td>None</td></tr>
 <tr><td>Français 6</td>
 <td>SZF-0207</td>
 <td>6</td>
-<td>Erwerb von soliden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit\)  für
+<td>Erwerb von soliden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit)  für
 die selbstständige Sprachverwendung</td>
 <td>Niveau B2 GER</td>
 <td>221</td>
@@ -1822,22 +1822,22 @@ die selbstständige Sprachverwendung</td>
 <td> Prononciation
  Expression orale  oder  Analyse de textes de presse</td>
 <td>Konsolidierung der fremdsprachlichen Kompetenz in den Bereichen der grundlegenden sprachlichen
-Strukturen; Schwerpunkte: Aussprache, Sprechfertigkeit, Textverständnis \(Ausgangsniveau B2 GER, Zielniveau B2+
-GER\)</td>
+Strukturen; Schwerpunkte: Aussprache, Sprechfertigkeit, Textverständnis (Ausgangsniveau B2 GER, Zielniveau B2+
+GER)</td>
 <td>222, 223</td>
 <td>None</td></tr>
 <tr><td>Italiano 1</td>
 <td>SZI-0201</td>
 <td>6</td>
-<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprech-
-fertigkeit\) für die elementare Sprachverwendung</td>
+<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprech-
+fertigkeit) für die elementare Sprachverwendung</td>
 <td>Niveau A1 GER</td>
 <td>224, 225</td>
 <td>None</td></tr>
 <tr><td>Italiano 2</td>
 <td>SZI-0204</td>
 <td>6</td>
-<td>Erwerb von soliden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit\) für die
+<td>Erwerb von soliden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit) für die
 elementare Sprachverwendung</td>
 <td>Niveau A2 GER</td>
 <td>226, 227</td>
@@ -1845,15 +1845,15 @@ elementare Sprachverwendung</td>
 <tr><td>Italiano 3</td>
 <td>SZI-0207</td>
 <td>6</td>
-<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben,
-Sprechfertigkeit\) für die selbstständige Sprachverwendung</td>
+<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben,
+Sprechfertigkeit) für die selbstständige Sprachverwendung</td>
 <td>Niveau B1 GER</td>
 <td>228, 229</td>
 <td>None</td></tr>
 <tr><td>Italiano 4</td>
 <td>SZI-0210</td>
 <td>6</td>
-<td>Erwerb von soliden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit\) für die
+<td>Erwerb von soliden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit) für die
 selbstständige Sprachverwendung</td>
 <td>Niveau B2 GER</td>
 <td>230</td>
@@ -1864,22 +1864,22 @@ selbstständige Sprachverwendung</td>
 <td> Pronuncia e intonazione
  Espressione orale</td>
 <td>Konsolidierung der fremdsprachlichen Kompetenz in den Bereichen der grundlegenden sprachlichen
-Strukturen; Schwerpunkte: Aussprache, Sprechfertigkeit, Textverständnis \(Ausgangsniveau B2 GER, Zielniveau B2+
-GER\)</td>
+Strukturen; Schwerpunkte: Aussprache, Sprechfertigkeit, Textverständnis (Ausgangsniveau B2 GER, Zielniveau B2+
+GER)</td>
 <td>231, 232</td>
 <td>None</td></tr>
 <tr><td>Español 1</td>
 <td>SZS-0201</td>
 <td>6</td>
-<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprech-
-fertigkeit\) für die elementare Sprachverwendung</td>
+<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprech-
+fertigkeit) für die elementare Sprachverwendung</td>
 <td>Niveau A1 GER</td>
 <td>253, 254</td>
 <td>None</td></tr>
 <tr><td>Español 2</td>
 <td>SZS-0204</td>
 <td>6</td>
-<td>Erwerb von soliden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit\) für die
+<td>Erwerb von soliden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit) für die
 elementare Sprachverwendung</td>
 <td>Niveau A2 GER</td>
 <td>255, 256</td>
@@ -1887,15 +1887,15 @@ elementare Sprachverwendung</td>
 <tr><td>Español 3</td>
 <td>SZS-0207</td>
 <td>6</td>
-<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben,
-Sprechfertigkeit\) für die selbstständige Sprachverwendung</td>
+<td>Erwerb von grundlegenden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben,
+Sprechfertigkeit) für die selbstständige Sprachverwendung</td>
 <td>Niveau B1 GER</td>
 <td>257, 258</td>
 <td>None</td></tr>
 <tr><td>Español 4</td>
 <td>SZS-0210</td>
 <td>6</td>
-<td>Erwerb von soliden fremdsprachlichen Fertigkeiten \(Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit\) für die
+<td>Erwerb von soliden fremdsprachlichen Fertigkeiten (Leseverstehen, Hörverstehen, Schreiben, Sprechfertigkeit) für die
 selbstständige Sprachverwendung</td>
 <td>Niveau B2 GER</td>
 <td>259, 260</td>
@@ -1906,8 +1906,8 @@ selbstständige Sprachverwendung</td>
 <td> Pronunciación y entonación
  Expresión oral  oder  Análisis de textos de actualidad</td>
 <td>Konsolidierung der fremdsprachlichen Kompetenz in den Bereichen der grundlegenden sprachlichen
-Strukturen; Schwerpunkte: Aussprache, Sprechfertigkeit, Textverständnis \(Ausgangsniveau B2 GER, Zielniveau B2+
-GER\)</td>
+Strukturen; Schwerpunkte: Aussprache, Sprechfertigkeit, Textverständnis (Ausgangsniveau B2 GER, Zielniveau B2+
+GER)</td>
 <td>261, 262</td>
 <td>None</td></tr>
 <tr><td>Deutsch als Fremdsprache C1: Grammatik und schriftlicher Ausdruck 2</td>
@@ -1964,7 +1964,7 @@ Die Studierenden entwickeln eigenständige berufsfeldbezogene Interessen und üb
 Organisation und Durchführung eines Praktikums. Sie sind in der Lage, sich in neue arbeitsweltliche Prozesse zu
 integrieren und sich und die während des Studiums erworbenen Kompetenzen einzubringen.
 oder:
-Die Studierenden sind in der Lage, Arbeitsprozesse im Rahmen eines \(universitären\) Projekts sowohl eigenständig als
+Die Studierenden sind in der Lage, Arbeitsprozesse im Rahmen eines (universitären) Projekts sowohl eigenständig als
 auch kooperativ zu organisieren und zu gestalten und die Arbeitsergebnisse adäquat zu präsentieren.</td>
 <td>271, 272</td>
 <td>None</td></tr>
@@ -1988,7 +1988,7 @@ Die Studierenden entwickeln eigenständige berufsfeldbezogene Interessen und üb
 Organisation und Durchführung eines Praktikums. Sie sind in der Lage, sich in neue arbeitsweltliche Prozesse zu
 integrieren und sich und die während des Studiums erworbenen Kompetenzen einzubringen.
 und/oder:
-Die Studierenden sind in der Lage, Arbeitsprozesse im Rahmen eines \(universitären\) Projekts sowohl eigenständig als
+Die Studierenden sind in der Lage, Arbeitsprozesse im Rahmen eines (universitären) Projekts sowohl eigenständig als
 auch kooperativ zu organisieren und zu gestalten und die Arbeitsergebnisse adäquat zu präsentieren.</td>
 <td>273, 274</td>
 <td>None</td></tr>
@@ -2013,7 +2013,7 @@ bei der Organisation und Durchführung eines längeren Praktikums. Sie sind in d
 arbeitsweltliche Prozesse zu integrieren und sich und die während des Studiums erworbenen Kompetenzen
 einzubringen.
 und/oder:
-Die Studierenden sind in der Lage, Arbeitsprozesse im Rahmen eines umfangreicheren \(universitären\) Projekts
+Die Studierenden sind in der Lage, Arbeitsprozesse im Rahmen eines umfangreicheren (universitären) Projekts
 sowohl eigenständig als auch kooperativ zu organisieren und zu gestalten und die Arbeitsergebnisse adäquat zu
 präsentieren.</td>
 <td>275, 276</td>
@@ -2039,7 +2039,7 @@ der Organisation und Durchführung eines längerfristigen Praktikums. Sie sind i
 arbeitsweltliche Prozesse zu integrieren und sich und die während des Studiums erworbenen Kompetenzen
 einzubringen.
 und/oder:
-Die Studierenden sind in der Lage, Arbeitsprozesse im Rahmen eines umfangreicheren \(universitären\) Projekts
+Die Studierenden sind in der Lage, Arbeitsprozesse im Rahmen eines umfangreicheren (universitären) Projekts
 sowohl eigenständig als auch kooperativ zu organisieren und zu gestalten und die Arbeitsergebnisse adäquat zu
 präsentieren.</td>
 <td>277, 278</td>
