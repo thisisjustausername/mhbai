@@ -12,7 +12,6 @@ import requests
 import sys
 from bs4 import BeautifulSoup
 
-
 options = Options()
 """options.add_argument("--headless=new")  # newer headless mode, works better
 options.add_argument("--no-sandbox")
@@ -31,6 +30,32 @@ def wait_for_page_load(driver, timeout=10):
         lambda d: d.execute_script('return document.readyState') == 'complete'
     )
 
+
+# just for retrying error urls
+with open("rwth_aachen_errors.json", "r") as file:
+    errors = json.load(file)
+
+with open("rwth_aachen.json", "r") as file:
+    old_data = json.load(file)
+
+urls = []
+for i in errors:
+    driver.get(i)
+    wait = WebDriverWait(driver, 15)
+    element = wait.until(EC.visibility_of_element_located((By.TAG_NAME, 'iframe')))
+    iframe = driver.find_element(By.TAG_NAME, 'iframe')
+    driver.switch_to.frame(iframe)
+    elements = driver.find_elements(By.CSS_SELECTOR, '[class=" MaskRenderer"]')
+    data = [i.find_element(By.TAG_NAME, "a") for i in elements if len(i.find_elements(By.TAG_NAME, 'a')) > 0]
+    data = [{"name": i.get_attribute("text"), "url": i.get_attribute("href")} for i in data]
+    urls += data
+    print(driver.current_url)
+
+old_data += urls
+
+with open("rwth_aachen.json", "w") as file:
+    json.dump(old_data, file)
+sys.exit()
 
 # between 1770 and 2074
 number = 1770
