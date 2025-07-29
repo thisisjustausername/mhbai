@@ -47,6 +47,7 @@ for i in data:
     except:
         error_list.append(i)
 
+# unnecessary since already ignoring ads
 new_data = [i for i in url_list if "ad_domain" not in i[1]]
 error_data = [i[0] for i in url_list if "ad_domain" in i[1]]
 error_list += error_data
