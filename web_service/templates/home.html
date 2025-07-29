@@ -62,8 +62,6 @@ Licensed under the AGPL-3.0 License. See LICENSE file in the project root for fu
                     compareButton.disabled = false;
                 } else {
                     compareButton.disabled = true;
-                    const exportButton = document.getElementById("export");
-                    exportButton.disabled = false;
                 }
             }
 
@@ -137,6 +135,7 @@ Licensed under the AGPL-3.0 License. See LICENSE file in the project root for fu
                           });
                           const exportButton = document.getElementById("export");
                           exportButton.disabled = false;
+                          
                     })
                     .catch(err => {
                         console.error("Request failed:", err);
