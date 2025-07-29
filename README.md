@@ -104,6 +104,10 @@ The pdf reader was created in order to allow for more precise table recogniction
   - time to extract module codes from toc of mhb: < 20ms
   - time to extract title, ects, content, goals module: < 1ms
 - adding features to pdf_extractor.py
+- working on byte to string decryption (not finished yet)
+- implementing export functions for csv, html, md, txt
+- scraping mhbs from other universities
+- testing ultimate tools to extract mhbs from all universities no matter their internal website structure (first tests successful)
 ### TODOs
 - combining web_server with backend
 - adding options for saving data in csv/xlsx/json etc.
