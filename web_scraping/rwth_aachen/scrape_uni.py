@@ -31,7 +31,7 @@ def wait_for_page_load(driver, timeout=10):
     )
 
 
-# just for retrying error urls
+"""# just for retrying error urls
 with open("rwth_aachen_errors.json", "r") as file:
     errors = json.load(file)
 
@@ -55,7 +55,7 @@ old_data += urls
 
 with open("rwth_aachen.json", "w") as file:
     json.dump(old_data, file)
-sys.exit()
+sys.exit()"""
 
 # between 1770 and 2074
 number = 1770
