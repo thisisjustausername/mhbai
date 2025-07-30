@@ -187,14 +187,16 @@ class MHB:
         return buffer
 
     @staticmethod
-    def export_global(file_type: Literal["json", "csv", "txt", "pdf", "md", "html"], file_path: str | None = None,
+    def export_global(file_type: Literal["json", "csv", "txt", "pdf", "md", "html"], modules: List[Dict[str, str | int | None]], file_path: str | None = None,
                information: Optional[List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]]] = None,
                ordered: bool = True, delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"] = None, 
-               modules: Optional[List[Dict[str, str | int | None]]] = None, name: None | str = None) -> None | io.StringIO:
+               name: None | str = None) -> None | io.StringIO:
         """
         staticmethod export_global \n
         :param file_type: chosen filetype
         :type file_type: Literal["json", "csv", "txt", "pdf", "md", "html"]
+        :param modules: if specified instead of the modules of the current MHB, the specified modules are used
+        :type modules: List[Dict[str, str | int | None]]
         :param file_path: path to where to save the file to, not allowed to have file type at the end, if file_path is None, buffer will be returned
         :type file_path: str | None
         :param information: chosen list of information, data is ordered by this list
@@ -203,8 +205,6 @@ class MHB:
         :type ordered: bool
         :param delimiter: delimiter to separate the data in each row; mutually exclusive with the values json, pdf, md, html in file_type
         :type delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"]
-        :param modules: if specified instead of the modules of the current MHB, the specified modules are used
-        :type modules: Optional[List[Dict[str, str | int | None]]]
         :param name: name of the file
         :type name: None | str
         :return: buffer of the data in the correct format
@@ -262,7 +262,7 @@ class MHB:
         :return: buffer of the data in the correct format
         :rtype: buffer
         """
-        return MHB.export_global(file_type=file_type, file_path=file_path if file_path is not None else self.name, information=information, ordered=ordered, delimiter=delimiter, modules=self.modules, name=self.name)
+        return MHB.export_global(file_type=file_type, modules=self.modules, file_path=file_path, information=information, ordered=ordered, delimiter=delimiter, name=self.name)
 
     def __repr__(self):
         """

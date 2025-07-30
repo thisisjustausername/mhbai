@@ -8,6 +8,7 @@ from typing import List
 from flask import Flask, render_template, request, jsonify, session, Response
 from pdf_reader import pdf_reader_toc as prt
 from pdf_reader.MHB_Overlaps import Overlaps
+from pdf_reader.MHB import MHB
 import os
 import numpy as np
 import json
@@ -126,8 +127,13 @@ def compare_simple():
                            "content": no_infos,
                            "goals": no_infos}
         information_overlaps.append(module_data)"""
-    overlaps = Overlaps.input_paths(["pdfs/" + i for i in file_names])
-    ovl_modules = overlaps.ovl_modules
+
+    if len(set(file_names)) == 1:
+        overlaps = MHB("pdfs/" + file_names[0])
+        ovl_modules = overlaps.modules
+    else:
+        overlaps = Overlaps.input_paths(["pdfs/" + i for i in file_names])
+        ovl_modules = overlaps.ovl_modules
     ovl_modules = [{k: v if k != "pages" else group_pages(v) for k, v in i.items()} for i in ovl_modules]
     return jsonify({"data": ovl_modules})
 
@@ -155,7 +161,10 @@ def export():
     allowed_data_types = ["json", "xlsx", "txt", "pdf", "csv"]
     """
     global overlaps
-    name = "__".join([i.name for i in overlaps.mhbs])
+    if isinstance(overlaps, Overlaps):
+        name = "__".join([i.name for i in overlaps.mhbs])
+    else:
+        name = overlaps.name
     return Response(overlaps.export(file_type="html").getvalue(), 
                     headers={"Content-Disposition": f"attachment; filename={name}"})
     return name, overlaps.export(file_type="html")
