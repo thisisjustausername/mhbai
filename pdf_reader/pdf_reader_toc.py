@@ -357,9 +357,10 @@ class Modules:
                         if match is not None:
                             title = title[:match.start()] + title[match.end()-3:]
                             break
+        
         title = title.strip()
         title = re.sub(r'\s+', ' ', title)
-        title = title.encode('utf-8').decode('unicode_escape')
+        title = title.encode('latin-1').decode('unicode_escape').encode("latin-1").decode('cp1252').encode("utf-8").decode("utf-8").replace("\\", "")
         title = title.replace("\\", "")
 
         # TODO if no ects but everything else available, simply set ects to None
