@@ -156,6 +156,26 @@ class Modules:
         # NOTE enable this to extract page numbers from toc, version 2.0
         # self.module_codes_detailed: list = []
 
+    def title(self) -> str:
+        """
+        def title \n
+        :return: title of the mhb extracted from the mhb
+        :rtype: str
+        """
+        
+        match = None
+        for i in self.stream_data:
+            match = re.search('Modulhandbuch', i)
+            if match is not None:
+                break
+        if match is None: return None
+        search_window = i[match.end():]
+        search_list = search_window.split("\n")[2:4]
+        title_match = re.search(r"\[\(Modulhandbuch ", search_list[0])
+        if title_match is None: return None
+        title = search_list[0][title_match.start()+2:-5]
+        title = title.replace("\\", "")
+        return title
 
     def toc_module_codes(self):
         """

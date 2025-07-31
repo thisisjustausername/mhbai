@@ -49,7 +49,7 @@ class Overlaps:
         with open("mhb_overlaps.json", "w") as file:
             file.write(str(self.mhbs[shortest_mhb].content))
         object.__setattr__(self, "ovl_module_codes", [module_code for module_code in self.mhbs[0].module_codes if all(module_code in mhb for mhb in all_modules_separated)])
-        object.__setattr__(self, "ovl_modules", [next((module for module in shortest_modules if module["module_code"] == module_code), None) for module_code in self.ovl_module_codes])
+        object.__setattr__(self, "ovl_modules", [next(({k: v for k, v in module.items() if k != "pages"} for module in shortest_modules if module["module_code"] == module_code), None) for module_code in self.ovl_module_codes])
 
     def export(self, file_type: Literal["json", "csv", "txt", "pdf", "md", "html"], file_path: str | None = None,
                information: Optional[List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]]] = None,

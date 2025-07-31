@@ -30,6 +30,7 @@ class MHB:
     xref_entries_filtered: List[Dict[str, int | str | bytes]] = field(init=False)
     module_codes: List[str | None] = field(init=False)
     modules: List[Dict[str, str | int | None]] = field(init=False)
+    title: str = field(init=False)
     def __post_init__(self):
         """
         def __post_init__ \n
@@ -37,12 +38,13 @@ class MHB:
         """
         modules_data = prt.Modules(pdf_path=self.path) # temporary variable used to retrieve all necessary data
         modules_data.toc_module_codes() # extracting the module codes
-        object.__setattr__(self, "name", self.path.split("/")[-1].split(".pdf")[0]) # sets the title
+        object.__setattr__(self, "name", self.path.split("/")[-1].split(".pdf")[0]) # sets the name using the name of the pdf (can act as id)
         object.__setattr__(self, "content", modules_data.pdf.content) # raw byte content of the pdf
         object.__setattr__(self, "xref_entries", modules_data.content) # xref_entries of pdf
         object.__setattr__(self, "xref_entries_filtered", modules_data.stream_data) # filtered xref_entries of pdf
         object.__setattr__(self, "module_codes", modules_data.module_codes) # all module codes of pdf from toc
         object.__setattr__(self, "modules", [modules_data.data_to_module(i) for i in self.module_codes]) # all modules from toc with information
+        object.__setattr__(self, "title", modules_data.title()) # set the name of the mhb (extracted from pdf)
         del modules_data # delete modules_data, so it can't alter data of immutable dataclass MHB
 
     @staticmethod

@@ -134,7 +134,7 @@ def compare_simple():
     else:
         overlaps = Overlaps.input_paths(["pdfs/" + i for i in file_names])
         ovl_modules = overlaps.ovl_modules
-    ovl_modules = [{k: v if k != "pages" else group_pages(v) for k, v in i.items()} for i in ovl_modules]
+    # ovl_modules = [{k: v if k != "pages" else group_pages(v) for k, v in i.items()} for i in ovl_modules]
     return jsonify({"data": ovl_modules})
 
 def get_file_name(url: str) -> str:
