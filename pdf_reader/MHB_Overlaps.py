@@ -53,7 +53,8 @@ class Overlaps:
 
     def export(self, file_type: Literal["json", "csv", "txt", "pdf", "md", "html"], file_path: str | None = None,
                information: Optional[List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]]] = None,
-               ordered: bool = True, delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"] = None) -> None | io.StringIO:
+               ordered: bool = True, delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"] = None, 
+               borders: Annotated[False | True, "Only works with file_types html"] = False) -> None | io.StringIO:
         """
         def export \n
         export \n
@@ -67,6 +68,8 @@ class Overlaps:
         :type ordered: bool
         :param delimiter: delimiter to separate the data in each row; mutually exclusive with the values json, pdf, md, html in file_type
         :type delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"]
+        :param borders: specifies whether the table should contain borders or not
+        :type: Annotated[False | True, "Only works with file_types html"]
         :return: buffer of the data in the correct format
         :rtype: buffer
         """
@@ -77,7 +80,7 @@ class Overlaps:
         
         name = ", ".join([i.title for i in self.mhbs])
 
-        return MHB.export_global(file_type=file_type, file_path=file_path, information=information, ordered=ordered, delimiter=delimiter, modules=self.ovl_modules, name=name)
+        return MHB.export_global(file_type=file_type, file_path=file_path, information=information, ordered=ordered, delimiter=delimiter, modules=self.ovl_modules, name=name, borders=borders)
 
     def __repr__(self):
         """

@@ -9,6 +9,7 @@
 import json
 from dataclasses import dataclass, field
 from typing import List, Dict, Literal, Optional, Annotated
+from typing import get_type_hints
 import csv
 import io
 from pdf_reader import pdf_reader_toc as prt
@@ -46,6 +47,13 @@ class MHB:
         object.__setattr__(self, "modules", [modules_data.data_to_module(i) for i in self.module_codes]) # all modules from toc with information
         object.__setattr__(self, "title", modules_data.title()) # set the name of the mhb (extracted from pdf)
         del modules_data # delete modules_data, so it can't alter data of immutable dataclass MHB
+
+    # TODO implement type checker
+    @staticmethod
+    def check_types(func, *args, **kwargs):
+        hints = get_type_hints(func)
+
+
 
     @staticmethod
     def __json(self, data: List[Dict[str, str | int | None]],
@@ -138,7 +146,7 @@ class MHB:
         return buffer
     
     @staticmethod
-    def __md(data: List[Dict[str, str | int | None]], name: None | str = None, return_type: io.StringIO | str = io.StringIO) -> io.StringIO | str:
+    def __md(data: List[Dict[str, str | int | None]], name: None | str = None, return_type: io.StringIO | str = io.StringIO, borders: Annotated[False | True, "True is mutually exclusive with return_type = io.StringIO"] = False) -> io.StringIO | str:
         """
         private staticmethod def __md \n
         extracts the specified data as markdown
@@ -148,13 +156,19 @@ class MHB:
         :type name: None | str
         :param return_type: specify whether to return a buffer or a string
         :type: io.StringIO | str
+        :param borders: specifies whether the table should contain borders or not
+        :type: Annotated[False | True, "True is mutually exclusive with return_type = io.StringIO"]
         :return: markdown representation of the MHB as tables
         :rtype: io.StringIO | str
         """
+
+        if return_type == io.StringIO and borders:
+            raise ValueError("borders = True is mutually exclusive with return_type = io.StringIO")
+
         # since using above python 3.7 dicts stay ordered
         data_row = lambda row: f"<tr>{'\n'.join([f'<td>{str(e).replace("\n", "<br>")}</td>' for e in list(row.values())])}</tr>"
 
-        markdown = f"<table>\n<thead>\n<tr>\n{'\n'.join([f'<th>{i}</th>' for i in data[0].keys()])}\n</tr>\n</thead>\n<tbody>\n{'\n'.join([data_row(i) for i in data])}\n</tbody>\n</table>"
+        markdown = f'<table {'border="1"' if borders else ''}>\n<thead>\n<tr>\n{'\n'.join([f'<th>{i}</th>' for i in data[0].keys()])}\n</tr>\n</thead>\n<tbody>\n{'\n'.join([data_row(i) for i in data])}\n</tbody>\n</table>'
 
         if return_type == str:
             return markdown
@@ -165,7 +179,7 @@ class MHB:
         return buffer
     
     @staticmethod
-    def __html(data: List[Dict[str, str | int | None]], name: str) -> io.StringIO:
+    def __html(data: List[Dict[str, str | int | None]], name: str, borders: bool = False) -> io.StringIO:
         """
         private staticmethod def __html \n
         extracts the specified data as html
@@ -173,6 +187,8 @@ class MHB:
         :type data: List[Dict[str, str | int | None]]
         :param name: name of the file
         :type name: str
+        :param borders: specifies whether the table should contain borders or not
+        :type: bool
         :return: html representation of the MHB as tables
         :rtype: io.StringIO
         """
@@ -181,7 +197,7 @@ class MHB:
 
         html = f"<!DOCTYPE html>\n<html>\n<head>\n<title>{name}</title>\n</head>\n<body>\n"
         html += f"<h1>{name}</h1>\n"
-        html += f"{MHB.__md(data=data, return_type=str)}\n</body></html>"
+        html += f"{MHB.__md(data=data, return_type=str, borders=borders)}\n</body></html>"
         buffer.write(html)
         buffer.seek(0)
 
@@ -190,7 +206,8 @@ class MHB:
     @staticmethod
     def export_global(file_type: Literal["json", "csv", "txt", "pdf", "md", "html"], modules: List[Dict[str, str | int | None]], name: str, file_path: str | None = None,
                information: Optional[List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]]] = None,
-               ordered: bool = True, delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"] = None) -> None | io.StringIO:
+               ordered: bool = True, delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"] = None, 
+               borders: Annotated[False | True, "Only works with file_types html"] = False) -> None | io.StringIO:
         """
         staticmethod export_global \n
         :param file_type: chosen filetype
@@ -207,6 +224,8 @@ class MHB:
         :type ordered: bool
         :param delimiter: delimiter to separate the data in each row; mutually exclusive with the values json, pdf, md, html in file_type
         :type delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"]
+        :param borders: specifies whether the table should contain borders or not
+        :type: Annotated[False | True, "Only works with file_types html"] = False
         :return: buffer of the data in the correct format
         :rtype: buffer
         """
@@ -223,9 +242,9 @@ class MHB:
         else:
             ordered_data = modules
         
-
         buffer = io.StringIO()
         encoding = "utf-8"
+        
         if file_type == "json":
             buffer = MHB.__json(ordered_data, name=name)
         else:
@@ -236,17 +255,18 @@ class MHB:
             elif file_type == "txt":
                 buffer = MHB.__txt(ordered_data, delimiter=";" if delimiter is None else delimiter, name=name)
             elif file_type == "md":
-                buffer = MHB.__md(ordered_data, name=name)
+                buffer = MHB.__md(ordered_data, name=name, borders=borders)
             elif file_type == "html":
-                buffer = MHB.__html(ordered_data, name=name)
+                buffer = MHB.__html(ordered_data, name=name, borders=borders)
         if file_path is None:
             return buffer
-        with open(f"{file_path if file_path is not None else name}.{file_type}", "w", encoding=encoding) as file:
+        with open(f"{file_path}.{file_type}", "w", encoding=encoding) as file:
             file.write(buffer.getvalue())
     
     def export(self, file_type: Literal["json", "csv", "txt", "pdf", "md", "html"], file_path: str | None = None,
                information: Optional[List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]]] = None,
-               ordered: bool = True, delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"] = None) -> None | io.StringIO:
+               ordered: bool = True, delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"] = None, 
+               borders: Annotated[False | True, "Only works with file_types html"] = False) -> None | io.StringIO:
         """
         export \n
         :param file_type: chosen filetype
@@ -259,10 +279,13 @@ class MHB:
         :type ordered: bool
         :param delimiter: delimiter to separate the data in each row; mutually exclusive with the values json, pdf, md, html in file_type
         :type delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"]
+        :param borders: specifies whether the table should contain borders or not
+        :type: Annotated[False | True, "Only works with file_types html"]
         :return: buffer of the data in the correct format
         :rtype: buffer
         """
-        return MHB.export_global(file_type=file_type, modules=self.modules, file_path=file_path, information=information, ordered=ordered, delimiter=delimiter, name=self.title)
+        return MHB.export_global(file_type=file_type, modules=self.modules, file_path=file_path, information=information, ordered=ordered, 
+                                 delimiter=delimiter, name=self.title, borders=borders)
 
     def __repr__(self):
         """

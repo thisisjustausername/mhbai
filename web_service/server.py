@@ -165,7 +165,7 @@ def export():
         name = "__".join([i.name for i in overlaps.mhbs])
     else:
         name = overlaps.name
-    return Response(overlaps.export(file_type="html").getvalue(), 
+    return Response(overlaps.export(file_type="html", borders=True).getvalue(), 
                     headers={"Content-Disposition": f"attachment; filename={name}.html"})
     return name, overlaps.export(file_type="html")
 
