@@ -115,3 +115,4 @@ The pdf reader was created in order to allow for more precise table recogniction
 - finish commenting pdf_reader_toc.py
 - enable the export button in home.html just when the data is loaded
 - test exporting
+- important bug-fix. For pages always the pages of the shortest module are used. For the website and export, show the pages for all mhbs and specify which page list correlates to which mhb
