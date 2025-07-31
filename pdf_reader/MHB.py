@@ -8,11 +8,12 @@
 
 import json
 from dataclasses import dataclass, field
-from typing import List, Dict, Literal, Optional, Annotated
+from typing import List, Dict, Literal, Optional, Annotated, Type
 from typing import get_type_hints
 import csv
 import io
 from pdf_reader import pdf_reader_toc as prt
+from pdf_reader.Type_Checker import type_check
 
 @dataclass(frozen=True)
 class MHB:
@@ -29,7 +30,7 @@ class MHB:
     content: bytes = field(init=False)
     xref_entries: List[Dict[str, str | bytes | int]] = field(init=False)
     xref_entries_filtered: List[Dict[str, int | str | bytes]] = field(init=False)
-    module_codes: List[str | None] = field(init=False)
+    module_codes: List[str] = field(init=False)
     modules: List[Dict[str, str | int | None]] = field(init=False)
     title: str = field(init=False)
     def __post_init__(self):
@@ -48,15 +49,9 @@ class MHB:
         object.__setattr__(self, "title", modules_data.title()) # set the name of the mhb (extracted from pdf)
         del modules_data # delete modules_data, so it can't alter data of immutable dataclass MHB
 
-    # TODO implement type checker
     @staticmethod
-    def check_types(func, *args, **kwargs):
-        hints = get_type_hints(func)
-
-
-
-    @staticmethod
-    def __json(self, data: List[Dict[str, str | int | None]],
+    # @type_check
+    def __json(data: List[Dict[str, str | int | None]],
                ordered: Annotated[bool, "Mutually exclusive with module_code_key"] = True,
                module_code_key: Annotated[bool, "Mutually exclusive with ordered"] = False, 
                name: None | str = None) -> io.StringIO:
@@ -93,6 +88,7 @@ class MHB:
         return buffer
     
     @staticmethod
+    # @type_check
     def __csv(data: List[Dict[str, str | int | None]], delimiter: Literal[";", "\t", ","], name: None | str = None) -> io.StringIO:
         """
         private staticmethod def __csv \n
@@ -114,7 +110,12 @@ class MHB:
         writer = csv.writer(buffer, delimiter=";")
         writer.writerows(write_data)"""
         writer = csv.DictWriter(buffer, fieldnames=list(data[0].keys()), delimiter=delimiter)
-        writer.writeheader() if name is None else writer.writeheader(name)
+        
+        # TODO test, whether this works as intended
+        if name is not None:
+            buffer.write(f"{name}\n")
+        
+        writer.writeheader()
         writer.writerows(data)
 
         buffer.seek(0)
@@ -122,6 +123,7 @@ class MHB:
         return buffer
     
     @staticmethod
+    # @type_check
     def __txt(data: List[Dict[str, str | int | None]], delimiter: Literal[";", "\t", ","], name: None | str = None) -> io.StringIO:
         """
         private staticmethod def __txt \n
@@ -140,13 +142,14 @@ class MHB:
         if name is not None:
             buffer.write(f"{name}\n")
         write_data = [list(data[0].keys())] + [list(i.values()) for i in data]
-        buffer.write("\n".join([delimiter.join(i) for i in write_data]))
+        buffer.write("\n".join([delimiter.join(str(i)) for i in write_data]))
         buffer.seek(0)
 
         return buffer
     
     @staticmethod
-    def __md(data: List[Dict[str, str | int | None]], name: None | str = None, return_type: io.StringIO | str = io.StringIO, borders: Annotated[False | True, "True is mutually exclusive with return_type = io.StringIO"] = False) -> io.StringIO | str:
+    # @type_check
+    def __md(data: List[Dict[str, str | int | None]], name: None | str = None, return_type: Type[io.StringIO] | Type[str] = io.StringIO, borders: Annotated[bool, "True is mutually exclusive with return_type = io.StringIO"] = False) -> io.StringIO | str:
         """
         private staticmethod def __md \n
         extracts the specified data as markdown
@@ -162,7 +165,7 @@ class MHB:
         :rtype: io.StringIO | str
         """
 
-        if return_type == io.StringIO and borders:
+        if return_type is io.StringIO and borders:
             raise ValueError("borders = True is mutually exclusive with return_type = io.StringIO")
 
         # since using above python 3.7 dicts stay ordered
@@ -170,7 +173,7 @@ class MHB:
 
         markdown = f'<table {'border="1"' if borders else ''}>\n<thead>\n<tr>\n{'\n'.join([f'<th>{i}</th>' for i in data[0].keys()])}\n</tr>\n</thead>\n<tbody>\n{'\n'.join([data_row(i) for i in data])}\n</tbody>\n</table>'
 
-        if return_type == str:
+        if return_type is str:
             return markdown
         markdown = f"# {name}\n" + markdown
         buffer = io.StringIO()
@@ -179,6 +182,7 @@ class MHB:
         return buffer
     
     @staticmethod
+    # @type_check
     def __html(data: List[Dict[str, str | int | None]], name: str, borders: bool = False) -> io.StringIO:
         """
         private staticmethod def __html \n
@@ -204,10 +208,11 @@ class MHB:
         return buffer
 
     @staticmethod
+    # @type_check
     def export_global(file_type: Literal["json", "csv", "txt", "pdf", "md", "html"], modules: List[Dict[str, str | int | None]], name: str, file_path: str | None = None,
                information: Optional[List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]]] = None,
                ordered: bool = True, delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"] = None, 
-               borders: Annotated[False | True, "Only works with file_types html"] = False) -> None | io.StringIO:
+               borders: Annotated[bool, "True only works with file_types html"] = False) -> None | io.StringIO:
         """
         staticmethod export_global \n
         :param file_type: chosen filetype
@@ -246,9 +251,9 @@ class MHB:
         encoding = "utf-8"
         
         if file_type == "json":
-            buffer = MHB.__json(ordered_data, name=name)
+            buffer = MHB.__json(data=ordered_data, name=name)
         else:
-            ordered_data = [{k: v if type(v) != list else ", ".join([str(e) for e in v]) for k, v in i.items()} for i in ordered_data]
+            ordered_data = [{k: v if type(v) != list else ", ".join([str(e) for e in v]) for k, v in i.items()} for i in ordered_data] # type: ignore[reportGeneralTypeIssues]
             if file_type == "csv":
                 buffer = MHB.__csv(ordered_data, delimiter=";" if delimiter is None else delimiter, name=name)
                 encoding += "-sig"
@@ -259,14 +264,15 @@ class MHB:
             elif file_type == "html":
                 buffer = MHB.__html(ordered_data, name=name, borders=borders)
         if file_path is None:
-            return buffer
+            return buffer # type: ignore[ReportReturnType]
         with open(f"{file_path}.{file_type}", "w", encoding=encoding) as file:
-            file.write(buffer.getvalue())
+            file.write(buffer.getvalue()) # type: ignore[ReportReturnType]
     
+    # @type_check
     def export(self, file_type: Literal["json", "csv", "txt", "pdf", "md", "html"], file_path: str | None = None,
                information: Optional[List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]]] = None,
                ordered: bool = True, delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"] = None, 
-               borders: Annotated[False | True, "Only works with file_types html"] = False) -> None | io.StringIO:
+               borders: Annotated[bool, "True only works with file_types html"] = False) -> None | io.StringIO:
         """
         export \n
         :param file_type: chosen filetype
@@ -292,7 +298,7 @@ class MHB:
         __repr__ \n
         overwrite the pretty_print function
         """
-        length = max([len(i["title"]) for i in self.modules])
+        length = max([len(i["title"]) for i in self.modules]) # type: ignore[reportArgumentType]
         return f"{self.path.split('/')[-1].replace('.pdf', '')}\n     " + '\n     '.join([f"{module['title']:<{length}} {module['module_code']}" for module in self.modules])
 
 # TODO remove this after debugging

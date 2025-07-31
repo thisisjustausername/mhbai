@@ -152,7 +152,7 @@ class Modules:
         self.pdf: extr.Pdf = extr.Pdf(pdf_path=self.path)
         self.content: list = self.pdf.extract_objects()
         self.stream_data: list = [i["data"] for i in self.content if i["information"] == "success"]
-        self.module_codes: list = []
+        self.module_codes: List[str] = []
         # NOTE enable this to extract page numbers from toc, version 2.0
         # self.module_codes_detailed: list = []
 
