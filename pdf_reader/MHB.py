@@ -165,23 +165,22 @@ class MHB:
         return buffer
     
     @staticmethod
-    def __html(data: List[Dict[str, str | int | None]], name: None | str = None) -> io.StringIO:
+    def __html(data: List[Dict[str, str | int | None]], name: str) -> io.StringIO:
         """
         private staticmethod def __html \n
         extracts the specified data as html
         :param data: the data, that should be converted to html
         :type data: List[Dict[str, str | int | None]]
         :param name: name of the file
-        :type name: None | str
+        :type name: str
         :return: html representation of the MHB as tables
         :rtype: io.StringIO
         """
 
         buffer = io.StringIO()
 
-        html = f"<!DOCTYPE html>\n<html>\n<head>\n<title>{name if name is not None else 'MHB'}</title>\n</head>\n<body>\n"
-        if name is not None:
-            html += f"<h1>{name}</h1>\n"
+        html = f"<!DOCTYPE html>\n<html>\n<head>\n<title>{name}</title>\n</head>\n<body>\n"
+        html += f"<h1>{name}</h1>\n"
         html += f"{MHB.__md(data=data, return_type=str)}\n</body></html>"
         buffer.write(html)
         buffer.seek(0)
@@ -189,16 +188,17 @@ class MHB:
         return buffer
 
     @staticmethod
-    def export_global(file_type: Literal["json", "csv", "txt", "pdf", "md", "html"], modules: List[Dict[str, str | int | None]], file_path: str | None = None,
+    def export_global(file_type: Literal["json", "csv", "txt", "pdf", "md", "html"], modules: List[Dict[str, str | int | None]], name: str, file_path: str | None = None,
                information: Optional[List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]]] = None,
-               ordered: bool = True, delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"] = None, 
-               name: None | str = None) -> None | io.StringIO:
+               ordered: bool = True, delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"] = None) -> None | io.StringIO:
         """
         staticmethod export_global \n
         :param file_type: chosen filetype
         :type file_type: Literal["json", "csv", "txt", "pdf", "md", "html"]
         :param modules: if specified instead of the modules of the current MHB, the specified modules are used
         :type modules: List[Dict[str, str | int | None]]
+        :param name: name of the file
+        :type name: str
         :param file_path: path to where to save the file to, not allowed to have file type at the end, if file_path is None, buffer will be returned
         :type file_path: str | None
         :param information: chosen list of information, data is ordered by this list
@@ -207,8 +207,6 @@ class MHB:
         :type ordered: bool
         :param delimiter: delimiter to separate the data in each row; mutually exclusive with the values json, pdf, md, html in file_type
         :type delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"]
-        :param name: name of the file
-        :type name: None | str
         :return: buffer of the data in the correct format
         :rtype: buffer
         """
@@ -264,7 +262,7 @@ class MHB:
         :return: buffer of the data in the correct format
         :rtype: buffer
         """
-        return MHB.export_global(file_type=file_type, modules=self.modules, file_path=file_path, information=information, ordered=ordered, delimiter=delimiter, name=self.name)
+        return MHB.export_global(file_type=file_type, modules=self.modules, file_path=file_path, information=information, ordered=ordered, delimiter=delimiter, name=self.title)
 
     def __repr__(self):
         """

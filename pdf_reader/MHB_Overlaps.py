@@ -75,7 +75,7 @@ class Overlaps:
         if file_type in ["pdf"]:
             raise NotImplementedError(f"{file_type} is not implemented yet.")
         
-        name = ", ".join([i.name for i in self.mhbs])
+        name = ", ".join([i.title for i in self.mhbs])
 
         return MHB.export_global(file_type=file_type, file_path=file_path, information=information, ordered=ordered, delimiter=delimiter, modules=self.ovl_modules, name=name)
 
