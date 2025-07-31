@@ -131,10 +131,10 @@ def compare_simple():
     if len(set(file_names)) == 1:
         overlaps = MHB("pdfs/" + file_names[0])
         ovl_modules = overlaps.modules
+        ovl_modules = [{k: v if k != "pages" else group_pages(v) for k, v in i.items()} for i in ovl_modules]
     else:
         overlaps = Overlaps.input_paths(["pdfs/" + i for i in file_names])
         ovl_modules = overlaps.ovl_modules
-    # ovl_modules = [{k: v if k != "pages" else group_pages(v) for k, v in i.items()} for i in ovl_modules]
     return jsonify({"data": ovl_modules})
 
 def get_file_name(url: str) -> str:
@@ -166,7 +166,7 @@ def export():
     else:
         name = overlaps.name
     return Response(overlaps.export(file_type="html").getvalue(), 
-                    headers={"Content-Disposition": f"attachment; filename={name}"})
+                    headers={"Content-Disposition": f"attachment; filename={name}.html"})
     return name, overlaps.export(file_type="html")
 
 if __name__ == "__main__":

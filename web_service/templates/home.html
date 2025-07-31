@@ -72,7 +72,7 @@ Licensed under the AGPL-3.0 License. See LICENSE file in the project root for fu
                 fetch("/export")
                 .then(response => {
                     const disposition = response.headers.get("Content-Disposition");
-                    let filename = "download.html"; // fallback name
+                    let filename = "error.html"; // fallback name
 
                     if (disposition && disposition.includes("filename=")) {
                         const filenameMatch = disposition.match(/filename="?(.+?)"?$/);

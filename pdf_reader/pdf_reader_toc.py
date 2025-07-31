@@ -171,9 +171,9 @@ class Modules:
         if match is None: return None
         search_window = i[match.end():]
         search_list = search_window.split("\n")[2:4]
-        title_match = re.search(r"\[\(Modulhandbuch ", search_list[0])
+        title_match = re.search(r"\[\(", search_list[0])
         if title_match is None: return None
-        title = search_list[0][title_match.start()+2:-5]
+        title = search_list[0][title_match.end():-5]
         title = title.replace("\\", "")
         return title
 
