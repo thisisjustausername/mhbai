@@ -135,7 +135,7 @@ class Pdf:
                                      'offset': offset,
                                      'generation': generation,
                                      'in_use': in_use,
-                                     'data': object_data,
+                                     'data': object_data.decode("latin1", errors="ignore"), # TODO works without decoding too, but for typechecking make it str, check whether this actually works
                                      'information': "success - no stream"})
         # return xref_entries
         return xref_entries

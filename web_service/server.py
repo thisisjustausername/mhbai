@@ -61,7 +61,7 @@ def compareFast():
     for i in overlapping_modules:
         try:
             module_data = modules[0].data_to_module(i)
-            module_data = dict((i[0], i[1]) if i[1] != None else (i[0], no_infos) for i in module_data.items())
+            module_data = dict((i[0], i[1]) if i[1] != None else (i[0], no_infos) for i in module_data.items()) #type: ignore[OptionalMemberAccess]
         except:
             module_data = {"title": no_infos,
                            "module_code": i,
@@ -165,9 +165,9 @@ def export():
         name = "__".join([i.name for i in overlaps.mhbs])
     else:
         name = overlaps.name
-    return Response(overlaps.export(file_type="html", borders=True).getvalue(), 
+    return Response(overlaps.export(file_type="html", borders=True).getvalue(), #type: ignore[OptionalMemberAccess]
                     headers={"Content-Disposition": f"attachment; filename={name}.html"})
-    return name, overlaps.export(file_type="html")
+    # return name, overlaps.export(file_type="html")
 
 if __name__ == "__main__":
     app.run(debug=True)

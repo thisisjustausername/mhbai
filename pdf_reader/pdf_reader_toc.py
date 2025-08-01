@@ -156,7 +156,7 @@ class Modules:
         # NOTE enable this to extract page numbers from toc, version 2.0
         # self.module_codes_detailed: list = []
 
-    def title(self) -> str:
+    def title(self) -> str | None:
         """
         def title \n
         :return: title of the mhb extracted from the mhb
@@ -326,7 +326,7 @@ class Modules:
             title = None
         else:
             # create a search window around the found title
-            title_search = matching_pages[page_index][title_start:title_start+700]
+            title_search = matching_pages[page_index][title_start:title_start+700] # type: ignore[ReportCallIssue]
             title_search_lines = title_search.split("\n") # split search window into lines
 
             # no need to check, whether end of box ET or engl title is earlier, since engl title seq doesn't exist near after ET
@@ -377,16 +377,16 @@ class Modules:
                         if match is not None:
                             title = title[:match.start()] + title[match.end()-3:]
                             break
-        
-        title = title.strip()
-        title = re.sub(r'\s+', ' ', title)
-        title = title.encode('latin-1').decode('unicode_escape').encode("latin-1").decode('cp1252').encode("utf-8").decode("utf-8").replace("\\", "")
-        title = title.replace("\\", "")
+        if title is not None:
+            title = title.strip()
+            title = re.sub(r'\s+', ' ', title)
+            title = title.encode('latin-1').decode('unicode_escape').encode("latin-1").decode('cp1252').encode("utf-8").decode("utf-8").replace("\\", "")
+            title = title.replace("\\", "")
 
         # TODO if no ects but everything else available, simply set ects to None
         # TODO when no title was found, then set a default start_info index
         try:
-            ects = int(re.search(r' Tm \[\(\d+ ECTS/LP\)\] TJ', matching_pages[page_index][start_info:]).group(0).split("Tm [(", 1)[1].split("ECTS", 1)[0])
+            ects = int(re.search(r' Tm \[\(\d+ ECTS/LP\)\] TJ', matching_pages[page_index][start_info:]).group(0).split("Tm [(", 1)[1].split("ECTS", 1)[0]) # type: ignore[ReportCallIssue, ReportOptionalMemberAccess]
         except:
             ects = None
 
@@ -410,8 +410,8 @@ class Modules:
         detailed_dict = {"title": title,
                         "module_code": module_code.encode('utf-8').decode('unicode_escape'),
                         "ects": ects,
-                        "content": content.encode('latin-1').decode('unicode_escape').encode("latin-1").decode('cp1252').encode("utf-8").decode("utf-8").replace("\\", ""),
-                        "goals": goals.encode('latin-1').decode('unicode_escape').encode("latin-1").decode('cp1252').encode("utf-8").decode("utf-8").replace("\\", ""),
+                        "content": content.encode('latin-1').decode('unicode_escape').encode("latin-1").decode('cp1252').encode("utf-8").decode("utf-8").replace("\\", "") if content is not None else None,
+                        "goals": goals.encode('latin-1').decode('unicode_escape').encode("latin-1").decode('cp1252').encode("utf-8").decode("utf-8").replace("\\", "") if goals is not None else None,
                         "pages": page_nr_list,
                         "mhbai_hints": None}
 
