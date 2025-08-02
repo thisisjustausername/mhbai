@@ -8,7 +8,7 @@
 
 import json
 from dataclasses import dataclass, field
-from typing import List, Dict, Literal, Optional, Annotated, Type
+from typing import Literal, Annotated, Type
 from typing import get_type_hints
 import csv
 import io
@@ -28,11 +28,12 @@ class MHB:
 
     name: str = field(init=False)
     content: bytes = field(init=False)
-    xref_entries: List[Dict[str, str | bytes | int]] = field(init=False)
-    xref_entries_filtered: List[Dict[str, int | str | bytes]] = field(init=False)
-    module_codes: List[str] = field(init=False)
-    modules: List[Dict[str, str | int | None]] = field(init=False)
+    xref_entries: list[dict[str, str | bytes | int]] = field(init=False)
+    xref_entries_filtered: list[dict[str, int | str | bytes]] = field(init=False)
+    module_codes: list[str] = field(init=False)
+    modules: list[dict[str, str | int | None]] = field(init=False)
     title: str = field(init=False)
+
     def __post_init__(self):
         """
         def __post_init__ \n
@@ -51,7 +52,7 @@ class MHB:
 
     @staticmethod
     # @type_check
-    def __json(data: List[Dict[str, str | int | None]],
+    def __json(data: list[dict[str, str | int | None]],
                ordered: Annotated[bool, "Mutually exclusive with module_code_key"] = True,
                module_code_key: Annotated[bool, "Mutually exclusive with ordered"] = False, 
                name: None | str = None) -> io.StringIO:
@@ -59,7 +60,7 @@ class MHB:
         private staticmethod def __json \n
         extracts the specified data as json
         :param data: the data, that should be converted to json
-        :type data: List[Dict[str, str | int | None]]
+        :type data: list[dict[str, str | int | None]]
         :param ordered: whether the data should stay ordered; mutually exclusive with module_code_key
         :type ordered: bool
         :param module_code_key: when specified, data is saved as dict with module_code as key; mutually exclusive with ordered
@@ -89,12 +90,12 @@ class MHB:
     
     @staticmethod
     # @type_check
-    def __csv(data: List[Dict[str, str | int | None]], delimiter: Literal[";", "\t", ","], name: None | str = None) -> io.StringIO:
+    def __csv(data: list[dict[str, str | int | None]], delimiter: Literal[";", "\t", ","], name: None | str = None) -> io.StringIO:
         """
         private staticmethod def __csv \n
         extracts the specified data as csv
         :param data: the data, that should be converted to json
-        :type data: List[Dict[str, str | int | None]]
+        :type data: list[dict[str, str | int | None]]
         :param delimiter: delimiter to separate the data in each row
         :type delimiter: Literal[";", "\t", ","]
         :param name: name of the file
@@ -124,12 +125,12 @@ class MHB:
     
     @staticmethod
     # @type_check
-    def __txt(data: List[Dict[str, str | int | None]], delimiter: Literal[";", "\t", ","], name: None | str = None) -> io.StringIO:
+    def __txt(data: list[dict[str, str | int | None]], delimiter: Literal[";", "\t", ","], name: None | str = None) -> io.StringIO:
         """
         private staticmethod def __txt \n
         extracts the specified data as txt
         :param data: the data, that should be converted to txt
-        :type data: List[Dict[str, str | int | None]]
+        :type data: list[dict[str, str | int | None]]
         :param delimiter: the delimiter to use
         :type delimiter: Literal[";", "\t", ","]
         :param name: name of the file
@@ -149,12 +150,12 @@ class MHB:
     
     @staticmethod
     # @type_check
-    def __md(data: List[Dict[str, str | int | None]], name: None | str = None, return_type: Type[io.StringIO] | Type[str] = io.StringIO, borders: Annotated[bool, "True is mutually exclusive with return_type = io.StringIO"] = False) -> io.StringIO | str:
+    def __md(data: list[dict[str, str | int | None]], name: None | str = None, return_type: Type[io.StringIO] | Type[str] = io.StringIO, borders: Annotated[bool, "True is mutually exclusive with return_type = io.StringIO"] = False) -> io.StringIO | str:
         """
         private staticmethod def __md \n
         extracts the specified data as markdown
         :param data: the data, that should be converted to markdown
-        :type data: List[Dict[str, str | int | None]]
+        :type data: list[dict[str, str | int | None]]
         :param name: name of the file
         :type name: None | str
         :param return_type: specify whether to return a buffer or a string
@@ -183,12 +184,12 @@ class MHB:
     
     @staticmethod
     # @type_check
-    def __html(data: List[Dict[str, str | int | None]], name: str, borders: bool = False) -> io.StringIO:
+    def __html(data: list[dict[str, str | int | None]], name: str, borders: bool = False) -> io.StringIO:
         """
         private staticmethod def __html \n
         extracts the specified data as html
         :param data: the data, that should be converted to html
-        :type data: List[Dict[str, str | int | None]]
+        :type data: list[dict[str, str | int | None]]
         :param name: name of the file
         :type name: str
         :param borders: specifies whether the table should contain borders or not
@@ -209,8 +210,8 @@ class MHB:
 
     @staticmethod
     # @type_check
-    def export_global(file_type: Literal["json", "csv", "txt", "pdf", "md", "html"], modules: List[Dict[str, str | int | None]], name: str, file_path: str | None = None,
-               information: Optional[List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]]] = None,
+    def export_global(file_type: Literal["json", "csv", "txt", "pdf", "md", "html"], modules: list[dict[str, str | int | None]], name: str, file_path: str | None = None,
+               information: list[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]] | None = None,
                ordered: bool = True, delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"] = None, 
                borders: Annotated[bool, "True only works with file_types html"] = False) -> None | io.StringIO:
         """
@@ -218,13 +219,13 @@ class MHB:
         :param file_type: chosen filetype
         :type file_type: Literal["json", "csv", "txt", "pdf", "md", "html"]
         :param modules: if specified instead of the modules of the current MHB, the specified modules are used
-        :type modules: List[Dict[str, str | int | None]]
+        :type modules: list[dict[str, str | int | None]]
         :param name: name of the file
         :type name: str
         :param file_path: path to where to save the file to, not allowed to have file type at the end, if file_path is None, buffer will be returned
         :type file_path: str | None
         :param information: chosen list of information, data is ordered by this list
-        :type information: Optional[List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]]]
+        :type information: list[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]] | None
         :param ordered: whether the data should stay in order
         :type ordered: bool
         :param delimiter: delimiter to separate the data in each row; mutually exclusive with the values json, pdf, md, html in file_type
@@ -270,7 +271,7 @@ class MHB:
     
     # @type_check
     def export(self, file_type: Literal["json", "csv", "txt", "pdf", "md", "html"], file_path: str | None = None,
-               information: Optional[List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]]] = None,
+               information: list[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]] | None = None,
                ordered: bool = True, delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"] = None, 
                borders: Annotated[bool, "True only works with file_types html"] = False) -> None | io.StringIO:
         """
@@ -280,7 +281,7 @@ class MHB:
         :param file_path: path to where to save the file to, not allowed to have file type at the end, if file_path is None, buffer will be returned
         :type file_path: str | None
         :param information: chosen list of information, data is ordered by this list
-        :type information: Optional[List[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]]]
+        :type information: list[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]] | None
         :param ordered: whether the data should stay in order
         :type ordered: bool
         :param delimiter: delimiter to separate the data in each row; mutually exclusive with the values json, pdf, md, html in file_type

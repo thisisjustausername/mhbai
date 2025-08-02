@@ -6,13 +6,13 @@
 
 # TODO when module is found twice just use the information once, so when the information comes from two pages that aren't adjacent, handle other page differently when they're sharing the same cell like "goals"
 
+from ast import Dict
 from pdf_reader import pdf_extractor as extr
 import re
 from itertools import groupby
-from typing import Optional, List
 
 # TODO cleanly comment this code
-def find_title(split_line: str, title_search_lines: list) -> Optional[tuple]:
+def find_title(split_line: str, title_search_lines: list) -> tuple[str, int] | None:
     """
     find_title \n
     helper function to extract title from a specific search window
@@ -21,7 +21,7 @@ def find_title(split_line: str, title_search_lines: list) -> Optional[tuple]:
     :param title_search_lines: search windows split into lines
     :type title_search_lines: list
     :return: title, local index of the end of the title
-    :rtype: Optional[str, int]
+    :rtype: tuple[str, int] | None
     """
     if not any([split_line == i for i in title_search_lines]):  # false, when split_line was found
         return None
@@ -75,7 +75,7 @@ def find_title(split_line: str, title_search_lines: list) -> Optional[tuple]:
     return title, local_end_index
 
 
-def search_text_blocks(heading: str, start_info: int, matching_pages: List[bytes]) -> str:
+def search_text_blocks(heading: str, start_info: int, matching_pages: list[bytes]) -> str:
     """
     helper function search_text_blocks \n
     Can be used as inside function, then just heading is needed as parameter \n
@@ -86,7 +86,7 @@ def search_text_blocks(heading: str, start_info: int, matching_pages: List[bytes
     :param start_info: needed when using it as helper function instead of inside function
     :type start_info: int
     :matching_pages: needed when using it as helper function instead of inside function
-    :type matching_pages: List[bytes]
+    :type matching_pages: list[bytes]
     :return: the text block
     :rtype: str
     """
@@ -152,7 +152,7 @@ class Modules:
         self.pdf: extr.Pdf = extr.Pdf(pdf_path=self.path)
         self.content: list = self.pdf.extract_objects()
         self.stream_data: list = [i["data"] for i in self.content if i["information"] == "success"]
-        self.module_codes: List[str] = []
+        self.module_codes: list[str] = []
         # NOTE enable this to extract page numbers from toc, version 2.0
         # self.module_codes_detailed: list = []
 
@@ -181,7 +181,7 @@ class Modules:
         """
         def toc_module_codes \n
         :return list of module_codes
-        :rtype List[str]
+        :rtype list[str]
         """
         # this identifies every page of the toc
         # toc_identifier = "BT\n/F1 12 Tf\n1 0 0 -1 0 10.26599979 Tm [(Inhaltsverzeichnis)] TJ\nET"
@@ -275,13 +275,13 @@ class Modules:
 
 
     # TODO in order to make the program more efficient, when finding all title pages already save them for extracting ects etc. instead of searching them again
-    def data_to_module(self, module_code: str) -> Optional[dict]:
+    def data_to_module(self, module_code: str) -> dict[str, str | int | None] | None:
         """
         data_to_module \n
         :param module_code: module code of the module, that should be searched
         :type module_code: str
         :return: information to the module
-        :rtype: Optional[Dict[str, str | int | None]]
+        :rtype:dict[str, str | int | None] | None
         """
         # TODO alternative way of extracting page numbers, extract page number of every page that has the module in the head
         # if no module_codes were extracted, extract them first
