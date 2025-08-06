@@ -29,7 +29,7 @@ for index, i in enumerate(mhbs):
     except (IndexError, AssertionError, ValueError):
         error_files.append(i)
         continue
-    mhb_dict = {"title": mhb.title, "modules": mhb.modules, "module_codes": mhb.module_codes}
+    mhb_dict = {"title": mhb.title, "name": mhb.name, "modules": mhb.modules, "module_codes": mhb.module_codes}
     look_up_dict[i] = mhb_dict
     all_mhbs += mhb_dict["modules"]
 
