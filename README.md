@@ -108,6 +108,8 @@ The pdf reader was created in order to allow for more precise table recogniction
 - implementing export functions for csv, html, md, txt
 - scraping mhbs from other universities
 - testing ultimate tools to extract mhbs from all universities no matter their internal website structure (first tests successful)
+- bug-fixes in pdf_reader_toc.py making reading mhbs more resilient to "irregular" pdfs
+
 ### TODOs
 - combining web_server with backend
 - adding options for saving data in csv/xlsx/json etc.
@@ -116,3 +118,4 @@ The pdf reader was created in order to allow for more precise table recogniction
 - enable the export button in home.html just when the data is loaded
 - test exporting
 - important bug-fix. For pages always the pages of the shortest module are used. For the website and export, show the pages for all mhbs and specify which page list correlates to which mhb
+- restructure file structure to make it more intuitiv

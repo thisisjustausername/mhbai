@@ -47,7 +47,9 @@ class Pdf:
 
         # find the start of xref
         # start_xref the index of the first char after the last match
+        # print(b'xref' in self.content)
         start_xref = int(list(re.finditer(rb'startxref\s+(\d+)', self.content))[0].group(1))
+        # print([i for i in list(re.finditer(rb'startxref\s+(\d+)', self.content))if self.content[int(i.group(1)):].startswith(b'xref')])
         xref_data = self.content[start_xref:]
 
         assert xref_data.startswith(b'xref')

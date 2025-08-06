@@ -7,6 +7,7 @@
 # TODO when module is found twice just use the information once, so when the information comes from two pages that aren't adjacent, handle other page differently when they're sharing the same cell like "goals"
 
 from ast import Dict
+import sys
 from pdf_reader import pdf_extractor as extr
 import re
 from itertools import groupby
@@ -94,8 +95,8 @@ def search_text_blocks(heading: str, start_info: int, matching_pages: list[bytes
     information = [page[start_info:] for page in matching_pages]  # shrink search window
     page_numbers = []
     for e in information:
-        page_match = list(re.finditer(r' Tm \[\(\d+\)\] TJ\nET\nQ\nQ', e))[-1]
-        page_numbers.append(page_match.group(0)[6:-12] if page_match is not None else None)
+        page_match = list(re.finditer(r' Tm \[\(\d+\)\] TJ\nET\nQ\n', e))[-1]
+        page_numbers.append(page_match.group(0)[6:-11] if page_match is not None else None)
     details_list = []  # save cells with information in it in details_list
     # extracts all cells, that have the desired heading
     pages_selected = []
@@ -304,11 +305,13 @@ class Modules:
         error = True
         page_index = None
         correct_pages = [page for page in self.stream_data if re.search(r'Tm \[\(Modul ' + module_code, page) is not None]
+
         page_nr_list = []
+        # find page numbers
         for i in correct_pages:
-            # match = re.search(r' Tm \[\(\d+\)\] TJ\nET\nQ\nQ', i)
-            match = list(re.finditer(r' Tm \[\(\d+\)\] TJ\nET\nQ\nQ', i))[-1]
-            page_nr_list.append(match.group(0)[6:-12] if match is not None else None)
+            # match = re.search(r' Tm \[\(\d+\)\] TJ\nET\nQ\n', i)
+            match = list(re.finditer(r' Tm \[\(\d+\)\] TJ\nET\nQ\n', i))[-1]
+            page_nr_list.append(match.group(0)[6:-11] if match is not None else None)
         page_nr_list = [int(i) for i in page_nr_list]
         for index, match_page in enumerate(matching_pages):
             # e.g. module is not found if it was mentioned in the chapter of another module
