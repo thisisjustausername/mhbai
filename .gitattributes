@@ -1,0 +1,2 @@
+uni_augsburg_module_data.json filter=lfs diff=lfs merge=lfs -text
+web_service/uni_augsburg_look_up.json filter=lfs diff=lfs merge=lfs -text
