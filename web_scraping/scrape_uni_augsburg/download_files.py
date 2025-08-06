@@ -10,16 +10,18 @@ from bs4 import BeautifulSoup
 import time
 
 def check_url(url: str) -> bool:
-    """check_url \n
-    checks, whether the url is safe to use"""
+    """
+    checks, whether the url is safe to use
+    """
 
     if url.startswith("https://mhb.uni-augsburg.de/") and url.endswith(".pdf") and not "redirect" in url and len(url) <= 500:
         return True
     return False
 
 def fetch_valid_urls(url_list=["https://mhb.uni-augsburg.de/"], final_links=[]):
-    """fetch_valid_urls \n
-    searches for all mhb links and saves them as valid urls"""
+    """
+    searches for all mhb links and saves them as valid urls
+    """
 
     # start_url = "https://mhb.uni-augsburg.de/"
     new_urls = []
@@ -50,8 +52,9 @@ def fetch_valid_urls(url_list=["https://mhb.uni-augsburg.de/"], final_links=[]):
     return fetch_valid_urls(new_urls, final_links)
 
 def download_all_pdfs():
-    """download_all_pdfs \n
-    downloads all mhb pdfs"""
+    """
+    downloads all mhb pdfs
+    """
     with open("uni_a_all_mhbs.json", "r") as file:
         data = json.load(file)
     for index, i in enumerate(data):
@@ -65,7 +68,6 @@ def download_all_pdfs():
 if __name__ == "__main__":
     def do_everything():
         """
-        do_everything \n
         combines everything by extracting all mhb links and then downloading all mhbs
         """
         data = fetch_valid_urls()

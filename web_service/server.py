@@ -23,7 +23,6 @@ with open("web_scraping/scrape_uni_augsburg/links_information.json", "r") as fil
 @app.route("/")
 def home():
     """
-    home \n
     creates the homepage
     """
     return render_template("home.html")
@@ -85,8 +84,9 @@ def group_pages(pages: List[int]) -> str:
 @app.route("/compare", methods=["POST"])
 def compare_simple():
     global overlaps
-    """compare_simple \n
-    compares two mhbs"""
+    """
+    compares two mhbs
+    """
 
     data = request.get_json()
     file_name_1 = data.get('mhb1')
@@ -139,12 +139,12 @@ def compare_simple():
 
 def get_file_name(url: str) -> str:
     """
-    get_file_name \n
     gets the file name that fits to the url
-    :param url: url \n
-    :type url: str
-    :return: file name or link if no file name was found\n
-    :rtype: str
+
+    Parameters:
+        url (str): url \n
+    Returns:
+    str: file name or link if no file name was found\n
     """
     if url not in links_data.keys():
         return url.split("/")[-1]
@@ -152,8 +152,9 @@ def get_file_name(url: str) -> str:
 
 @app.route("/export", methods=["GET"])
 def export():
-    """def export \n
-    exports the data in a wished format and with or without detailed information"""
+    """
+    exports the data in a wished format and with or without detailed information
+    """
     
     """data_type = request.args.get("dataType")
     data_list = request.args.get("dataList")

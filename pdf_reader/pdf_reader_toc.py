@@ -15,14 +15,13 @@ from itertools import groupby
 # TODO cleanly comment this code
 def find_title(split_line: str, title_search_lines: list) -> tuple[str, int] | None:
     """
-    find_title \n
     helper function to extract title from a specific search window
-    :param split_line: the part to split, e.g. english title or end of box
-    :type split_line: str
-    :param title_search_lines: search windows split into lines
-    :type title_search_lines: list
-    :return: title, local index of the end of the title
-    :rtype: tuple[str, int] | None
+
+    Parameters:
+        split_line (str): the part to split, e.g. english title or end of box
+        title_search_lines (list): search windows split into lines
+    Returns:
+        tuple[str, int] | None: title, local index of the end of the title
     """
     if not any([split_line == i for i in title_search_lines]):  # false, when split_line was found
         return None
@@ -78,18 +77,17 @@ def find_title(split_line: str, title_search_lines: list) -> tuple[str, int] | N
 
 def search_text_blocks(heading: str, start_info: int, matching_pages: list[bytes]) -> str:
     """
-    helper function search_text_blocks \n
+    helper function \n
     Can be used as inside function, then just heading is needed as parameter \n
     This function extracts text blocks for a specific heading in a module (e.g. Inhalt in a module) \n
     This only works when the box doesn't contain any subcells from the table
-    :param heading: string to search for e.g. Inhalte:
-    :type heading: str
-    :param start_info: needed when using it as helper function instead of inside function
-    :type start_info: int
-    :matching_pages: needed when using it as helper function instead of inside function
-    :type matching_pages: list[bytes]
-    :return: the text block
-    :rtype: str
+
+    Parameters:
+        heading (str): string to search for e.g. Inhalte:
+        start_info (int): needed when using it as helper function instead of inside function
+        matching_pages (list[bytes]): needed when using it as helper function instead of inside function
+    Returns:
+        str: the text block
     """
 
     information = [page[start_info:] for page in matching_pages]  # shrink search window
@@ -146,8 +144,8 @@ def search_text_blocks(heading: str, start_info: int, matching_pages: list[bytes
 class Modules:
     def __init__(self, pdf_path: str):
         """
-        __init__ \n
-        :param pdf_path: path to pdf file
+        Parameters:
+            pdf_path: path to pdf file
         """
         self.path: str = pdf_path
         self.pdf: extr.Pdf = extr.Pdf(pdf_path=self.path)
@@ -159,9 +157,8 @@ class Modules:
 
     def title(self) -> str | None:
         """
-        def title \n
-        :return: title of the mhb extracted from the mhb
-        :rtype: str
+        Returns:
+            str: title of the mhb extracted from the mhb
         """
         
         match = None
@@ -180,9 +177,8 @@ class Modules:
 
     def toc_module_codes(self):
         """
-        def toc_module_codes \n
-        :return list of module_codes
-        :rtype list[str]
+        Returns:
+            list[str]: list of module_codes
         """
         # this identifies every page of the toc
         # toc_identifier = "BT\n/F1 12 Tf\n1 0 0 -1 0 10.26599979 Tm [(Inhaltsverzeichnis)] TJ\nET"
@@ -278,11 +274,11 @@ class Modules:
     # TODO in order to make the program more efficient, when finding all title pages already save them for extracting ects etc. instead of searching them again
     def data_to_module(self, module_code: str) -> dict[str, str | int | None] | None:
         """
-        data_to_module \n
-        :param module_code: module code of the module, that should be searched
-        :type module_code: str
-        :return: information to the module
-        :rtype:dict[str, str | int | None] | None
+        Parameters:
+            module_code (str): module code of the module, that should be searched
+        Returns:
+            dict[str, str | int | None] | None: information to the module
+        
         """
         # TODO alternative way of extracting page numbers, extract page number of every page that has the module in the head
         # if no module_codes were extracted, extract them first

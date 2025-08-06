@@ -59,19 +59,23 @@ for i in range(count):
 
 def replace_heading(match):
     """
-    replace_heading \n
     used to replace all headings in pdf so e.g. Inhalt will be marked with __heading__
-    :param match:
-    :return:
+    
+    Parameters:
+    match
+    Returns:
+    bytes: the match with __heading__ added
     """
     return match.group(0) + rb' __heading__'
 
 def text_continuing(match):
     """
-    text_continuing \n
     adds __continuing_on_new_page__ when a new page begins after text
-    :param match:
-    :return:
+    
+    Parameters:
+    match
+    Returns:
+    bytes: the match with __continuing_on_new_page__ added
     """
     return match.group(0) + rb'__continuing_on_new_page__'
 

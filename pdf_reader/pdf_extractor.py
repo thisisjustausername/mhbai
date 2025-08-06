@@ -10,26 +10,23 @@ import zlib
 
 class Pdf:
     """
-    class Pdf \n
     reads pdfs and extracts information
     """
 
     def __init__(self, pdf_path: str):
         """
-        def __init__ \n
         initializes class variables
-        :param pdf_path: path to pdf file
-        :type pdf_path: str
+        Parameters:
+            pdf_path (str): path to pdf file
         """
         self.path: str = pdf_path
         self.content: bytes = self.read_content()
 
     def read_content(self) -> bytes:
         """
-        read_content \n
         reads a pdf
-        :return: the content of the pdf
-        :rtype: bytes
+        Returns: 
+            bytes: the content of the pdf
         """
         with open(self.path, 'rb') as file:
             data = file.read()
@@ -37,12 +34,11 @@ class Pdf:
 
     def extract_objects(self, additional_bytes: int=100000) -> list:
         """
-        extract_objects \n
         finds the xref to each object and then extracts that object
-        :additional_bytes: how many bytes to read ahead of start of object in order to select the whole object
-        :type additional_bytes: int
-        :return: list of objects
-        :rtype: List[Dict[str, str | bytes | int]]
+        Parameters: 
+            dditional_bytes (int): how many bytes to read ahead of start of object in order to select the whole object
+        Returns: 
+            List[Dict[str, str | bytes | int]]: list of objects
         """
 
         # find the start of xref

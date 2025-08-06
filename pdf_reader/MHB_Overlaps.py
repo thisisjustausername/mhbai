@@ -13,10 +13,10 @@ import numpy as np
 @dataclass(frozen=True)
 class Overlaps:
     """
-    class Overlaps \n
     dataclass to store the overlaps of all passed in MHBs
-    :param mbhs: list of MHBs
-    :type mhbs: list[MHB]
+    
+    Parameters:
+        mbhs (list[MHB]): list of MHBs
     """
     # this list is also used as priority list for the order of the mhbs
     # ordered by the first MHB in the list
@@ -24,22 +24,21 @@ class Overlaps:
     mhbs: list[MHB]
 
     ovl_module_codes: list[str] = field(init=False)
-    ovl_modules: list[dict[str, str | None]] = field(init=False)
+    ovl_modules: list[dict[str, str | int | None]] = field(init=False)
 
     @classmethod
     def input_paths(cls, paths_list: list[str]):
         """
-        def input_paths \n
         alternative __init__ for passing in paths instead of MHBs
-        :param paths_list: list of paths
-        :type paths_list: list[str]
+
+        Parameters:
+            paths_list (list[str]): list of paths
         """
 
         return cls([MHB(path=path) for path in paths_list])
 
     def __post_init__(self):
         """
-        def __post_init__ \n
         initializes the rest of the class variables automatically
         """
         # comparing module_codes, not content (since not well cleaned, info might contain linebreaks during words adding -
@@ -56,22 +55,15 @@ class Overlaps:
                ordered: bool = True, delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"] = None, 
                borders: Annotated[bool, "True only works with file_types html"] = False) -> None | io.StringIO:
         """
-        def export \n
-        export \n
-        :param file_type: chosen filetype
-        :type file_type: Literal["json", "csv", "txt", "pdf", "md", "html"]
-        :param file_path: path to where to save the file to, not allowed to have file type at the end, if file_path is None, buffer will be returned
-        :type file_path: str | None
-        :param information: chosen list of information, data is ordered by this list
-        :type information: list[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]] | None
-        :param ordered: whether the data should stay in order
-        :type ordered: bool
-        :param delimiter: delimiter to separate the data in each row; mutually exclusive with the values json, pdf, md, html in file_type
-        :type delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"]
-        :param borders: specifies whether the table should contain borders or not
-        :type: Annotated[False | True, "Only works with file_types html"]
-        :return: buffer of the data in the correct format
-        :rtype: buffer
+        Parameters:
+            file_type (Literal["json", "csv", "txt", "pdf", "md", "html"]): chosen filetype
+            file_path (str | None): path to where to save the file to, not allowed to have file type at the end, if file_path is None, buffer will be returned
+            information (list[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]] | None): chosen list of information, data is ordered by this list
+            ordered (bool): whether the data should stay in order
+            delimiter (Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"]): delimiter to separate the data in each row; mutually exclusive with the values json, pdf, md, html in file_type
+            borders (Annotated[False | True, "Only works with file_types html"]): specifies whether the table should contain borders or not
+        Returns:
+            buffer: buffer of the data in the correct format
         """
         
         # TODO remove this when pdf is working
@@ -84,7 +76,6 @@ class Overlaps:
 
     def __repr__(self):
         """
-        __repr__ \n
         overwrite the pretty_print function
         """
 
