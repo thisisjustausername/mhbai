@@ -16,6 +16,11 @@ from itertools import groupby
 app = Flask(__name__)
 
 global overlaps
+global mhb_data
+
+with open("web_service/uni_augsburg_look_up.json", "r") as file:
+    mhb_data = json.load(file)
+
 
 with open("web_scraping/scrape_uni_augsburg/links_information.json", "r") as file:
     links_data =  json.load(file)
@@ -79,6 +84,36 @@ def group_pages(pages: List[int]) -> str:
         group = list(g)
         grouped_pages.append(f"{group[0]} - {group[-1]}" if len(group) > 1 else str(group[0]))
     return ", ".join(grouped_pages)
+
+@app.route("/compareEfficient", methods=["POST"])
+def compare_efficient():
+    global overlaps
+    global mhb_data
+
+    data = request.get_json()
+    file_name_1 = data.get('mhb1')
+    file_name_2 = data.get('mhb2')
+
+    file_names = [file_name_1, file_name_2]
+
+    # allows to input either filenames (with or without .pdf at the end) or urls
+    file_names = [get_file_name(i) if "/" in i else i for i in file_names]
+    file_names = [i + ".pdf" if not ".pdf" in i else i for i in file_names]
+    if any([False if i in os.listdir("pdfs") else True for i in file_names]):
+        Exception("No valid pdf files")
+
+    if len(set(file_names)) == 1:
+        mhb = mhb_data[file_names[0]]
+        overlaps = MHB.init_manually(path=file_names[0], title=mhb["title"], name=mhb["name"], module_codes=mhb["module_codes"], modules=mhb["modules"])
+        print()
+        ovl_modules = overlaps.modules
+        ovl_modules = [{k: v if k != "pages" else group_pages(v) for k, v in i.items()} for i in ovl_modules]
+    else:
+        mhbs = [mhb_data[i] for i in file_names]
+        overlaps = Overlaps([MHB.init_manually(path=i, title=i["title"], name=i["name"], module_codes=i["module_codes"], modules=i["modules"]) for i in mhbs])
+        ovl_modules = overlaps.ovl_modules
+    return jsonify({"data": ovl_modules})
+
 
 # TODO when both links / pdfs are identical don't do Overlaps but MHB and don't display Überschneidungen but Informationen
 @app.route("/compare", methods=["POST"])

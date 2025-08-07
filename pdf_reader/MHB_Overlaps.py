@@ -45,8 +45,6 @@ class Overlaps:
         all_modules_separated = [mhb.module_codes for mhb in self.mhbs[1:]]
         shortest_mhb = np.argmin(all_modules_separated.insert(0, self.mhbs[0].module_codes))
         shortest_modules = self.mhbs[shortest_mhb].modules
-        with open("mhb_overlaps.json", "w") as file:
-            file.write(str(self.mhbs[shortest_mhb].content))
         object.__setattr__(self, "ovl_module_codes", [module_code for module_code in self.mhbs[0].module_codes if all(module_code in mhb for mhb in all_modules_separated)])
         object.__setattr__(self, "ovl_modules", [next(({k: v for k, v in module.items() if k != "pages"} for module in shortest_modules if module["module_code"] == module_code), None) for module_code in self.ovl_module_codes])
 
@@ -70,7 +68,10 @@ class Overlaps:
         if file_type in ["pdf"]:
             raise NotImplementedError(f"{file_type} is not implemented yet.")
         
-        name = ", ".join([i.title for i in self.mhbs])
+        if file_type in ["md", "html"]:
+            name = "<br>".join([i.title for i in self.mhbs])
+        else:
+            name = ", ".join([i.name for i in self.mhbs])
 
         return MHB.export_global(file_type=file_type, file_path=file_path, information=information, ordered=ordered, delimiter=delimiter, modules=self.ovl_modules, name=name, borders=borders)
 
