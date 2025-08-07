@@ -119,3 +119,4 @@ The pdf reader was created in order to allow for more precise table recogniction
 - test exporting
 - important bug-fix. For pages always the pages of the shortest module are used. For the website and export, show the pages for all mhbs and specify which page list correlates to which mhb
 - restructure file structure to make it more intuitiv
+- in MHB_Overlaps instead of choosing name, choose title and mention date of MHB
