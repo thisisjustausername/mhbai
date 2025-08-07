@@ -7,7 +7,7 @@
 # TODO add title to mhb, optionally other information like year etc.
 
 import json
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Literal, Annotated, Type
 from typing import get_type_hints
 import csv
@@ -50,7 +50,7 @@ class MHB:
         del modules_data # delete modules_data, so it can't alter data of immutable dataclass MHB
 
     @classmethod
-    @type_check
+    # @type_check
     def init_manually(cls, path: str, title: str, name: str, module_codes: list[str], modules: list[dict[str, str | int | None]]):
         """
         initializes MHB manually, used for creating an MHB from saved data
@@ -62,11 +62,15 @@ class MHB:
             module_codes (list[str]): the module codes of the MHB
             modules (list[dict[str, str | int | None]]): the modules of the MHB
         """
-        cls.path = path
-        cls.title = title
-        cls.name = name
-        cls.module_codes = module_codes
-        cls.modules = modules
+        obj = cls.__new__(cls)
+
+        object.__setattr__(obj, "path", path)
+        object.__setattr__(obj, "title", title)
+        object.__setattr__(obj, "name", name)
+        object.__setattr__(obj, "module_codes", module_codes)
+        object.__setattr__(obj, "modules", modules)
+
+        return obj
 
     @staticmethod
     # @type_check
