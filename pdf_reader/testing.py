@@ -13,6 +13,7 @@ modules_data = prt.Modules(pdf_path=name) # temporary variable used to retrieve 
 modules = modules_data.toc_module_codes()
 print(f"Module {modules[0]}")
 data = modules_data.data_to_module(modules[0])
+print(data)
 
 # print(mhb.name, mhb.title)
 # mhb.export("md", file_path=mhb.name, borders=False)

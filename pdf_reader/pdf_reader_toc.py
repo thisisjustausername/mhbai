@@ -14,6 +14,17 @@ from pdf_reader import pdf_extractor as extr
 import re
 from itertools import groupby
 
+def decode(text: str) -> str:
+        """
+        decodes text appropriately
+
+        Parameters:
+            text (str): text to decode
+        Returns:
+            str: decoded text
+        """
+        return text.encode('latin-1').decode('unicode_escape').encode("latin-1").decode('cp1252').encode("utf-8").decode("utf-8").replace("\\", "")
+
 # TODO cleanly comment this code
 def find_title(split_line: str, title_search_lines: list) -> tuple[str, int] | None:
     """
@@ -113,7 +124,55 @@ def search_text_blocks(heading: str, start_info: int, matching_pages: list[bytes
         details_list.append(page[start:start + end])
         pages_selected.append(page_numbers[indexer])
         if heading == "Modulteile":
-            print(details_list)
+            module_parts = [] # combine all module parts for from all module blocks
+            for i in details_list:
+                parts = list(re.finditer(r' Tm \[\(Modulteil:', i)) # each block Modulteile is split up into the parts Modulteil, extract all of them
+                module_parts.extend([i[part.end()+2: (parts[index+1].start() if len(parts) > index+1 else len(i))] for index, part in enumerate(parts)])
+            module_parts_dict = [] # module parts but with extracted information
+            for i in module_parts:
+                part_heading = re.search(r' Tm \[\(', i)
+                part_dict = {}
+
+                # find title
+                title = None
+                if part_heading is not None and i[part_heading.end():part_heading.end()+len("Lehrformen:")] != "Lehrformen:":
+                    end = re.search(r'\)\] TJ', i)
+                    if end is not None:
+                        title = i[part_heading.end():end.start()]
+                        title = decode(title)
+                part_dict["name"] = title
+
+                # not fast to create a method in a for-loop
+                def find_in_module_part(name: str) -> str | None:
+                    """
+                    finds data in a module part
+
+                    Parameters:
+                        name: name of the data to find
+                    Returns:
+                        str | None: the found data or None
+                    """
+                    name_index = re.search(rf' Tm \[\({name}: \)\] TJ', i)
+                    found = None
+                    if name_index is not None:
+                        found = re.search(r' Tm \[\([^\n\r]*?\)\] TJ', i[name_index.end():])
+                        if found is not None:
+                            found = found.group(0)[6:-5]
+                            found = decode(found)
+                    return found
+
+                # find type_of_study (Lehrformen)
+                part_dict["type_of_study"] = find_in_module_part("Lehrformen")
+
+                # find the language
+                part_dict["language"] = find_in_module_part("Sprache")
+
+                # find the hours needed per week
+                part_dict["weekly_hours"] = find_in_module_part("SWS")
+
+                # TODO not finished yet, not all information extracted
+                module_parts_dict.append(part_dict)
+            return module_parts_dict
     # extract the text out of each block
     texts_raw = []
     for block, page_nr in zip(details_list, page_numbers):
@@ -420,8 +479,9 @@ class Modules:
         detailed_dict = {"title": title,
                         "module_code": module_code.encode('utf-8').decode('unicode_escape'),
                         "ects": ects,
-                        "content": content.encode('latin-1').decode('unicode_escape').encode("latin-1").decode('cp1252').encode("utf-8").decode("utf-8").replace("\\", "") if content is not None else None,
-                        "goals": goals.encode('latin-1').decode('unicode_escape').encode("latin-1").decode('cp1252').encode("utf-8").decode("utf-8").replace("\\", "") if goals is not None else None,
+                        "content": decode(content) if content is not None else None,
+                        "goals": decode(goals) if goals is not None else None,
+                        "module_parts": module_parts,
                         "pages": page_nr_list,
                         "mhbai_hints": None}
 
@@ -432,4 +492,3 @@ class Modules:
         detailed_dict["mhbai_hints"] = f"Pages of module information ({', '.join([str(i) for i in page_nr_list])}) don't match page number ({str(toc_page_nr)}) in table of content "
         """
         return detailed_dict
-

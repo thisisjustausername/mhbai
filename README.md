@@ -3,7 +3,6 @@
 ## Important licensing details
 This code is licensed. For commercial usage please contact the developer (the owner of this github).
 
-
 This code further contains a pdf reader developed by the developer before the 15th of July 2025
 Note, that all files containing code of the pdf-reader or read pdfs aren't Open-Source and can't freely be used commercially. 
 In case of commercial use, contact the developer.
@@ -214,3 +213,4 @@ The pdf reader was created in order to allow for more precise table recogniction
 - important bug-fix. For pages always the pages of the shortest module are used. For the website and export, show the pages for all mhbs and specify which page list correlates to which mhb
 - restructure file structure to make it more intuitiv
 - in MHB_Overlaps instead of choosing name, choose title and mention date of MHB
+- In the future, the file structure will be radically restructured. This is due to the split between software taylored for the University of Augsburg and software made for all universities.
