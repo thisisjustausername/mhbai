@@ -133,9 +133,9 @@ mhbai <br>
 ├──📁 pdfs/                                      MHBs of the University of Augsburg
 │   └── ...
 ├──📁 universities/                              MHBs from different universities
-│   └──📁 rwth_aachen                            MHBs of the Univeristy of Applied Siences of Aachen
+│   └──📁 rwth_aachen                            MHBs of the University of Applied Siences of Aachen
 │   │   └── ...
-│   └──📁 university_of_hamburg                  MHBs of the Univeristy of Hamburg
+│   └──📁 university_of_hamburg                  MHBs of the University of Hamburg
 │   │   └── ...
 
 </pre>
