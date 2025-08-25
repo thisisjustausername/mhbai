@@ -46,6 +46,94 @@ mhbai <br>
     └──📄 get_books.py                     extract the url for the pdfs from all links that link to a bachelors degree course of study - not finished yet
     └──📄 get_final_books                  not finished yet
 └──📄 pdf_extractor.py                     decoding pdfs by reading them as bytes and decoding and decompressing them
+
+├──📁 pdfs/                                       contains all mhb pdfs
+└── ...
+└──📄 uni_a_all_mhbs.json
+└──📄 uni_augsburg_module_data.json
+└──📄 university_of_hamburg.json
+├──📁 vm/
+└──📄 .gitattributes
+└──📄 LICENSE
+└──📄 README.md
+└──📄 test.csv (local file)
+└──📄 .gitignore
+└──📄 uni_augsburg_error_files.json
+└──📄 mhb_overlaps.json
+├──📁 extract_info/
+│   └──📄 extract_info_augsburg.py
+│   └──📄 __init__.py
+│   └──📄 check_errors.py
+└──📄 test.md (local file)
+└──📄 main.py
+└──📄 university_of_hamburg_errors.json
+└──📄 local_setup.md
+├──📁 pdf_reader/
+│   └──📄 pdf_reader_toc.py                       extracts the module codes from the toc of the mhb, as well as information to the modules
+│   └──📄 Type_Checker.py
+│   └──📄 testing.py
+│   └──📄 MHB.py
+│   └──📄 MHB_Overlaps.py
+│   └──📄 __init__.py
+│   └──📄 pdf_extractor.py
+└──📄 license_header.txt
+├──📁 web_scraping/                               contains all files to scrape the mhb pdfs from the universities
+│   └──📄 get_final_books.py
+│   ├──📁 university_of_hamburg/
+│   │   └──📄 university_of_hamburg.json
+│   │   └──📄 download_mhbs.py
+│   │   └──📄 university_of_hamburg_errors.json
+│   │   └──📄 courses_of_study.json
+│   │   └──📄 search_mhbs.py
+│   │   └──📄 cleaning.py
+│   │   └──📄 scrape_mhbs_hamburg.py
+│   │   └──📄 table_data_all_courses.txt
+│   ├──📁 scrape_uni_augsburg/                    contains all files to scrape the mhbs of the University of Augsburg
+│   │   └──📄 uni_a_all_mhbs.json                 contains all links of the mhbs extracted by download_files.py
+│   │   └──📄 data_processing.py                  extracts the important data from all mhbs
+│   │   └──📄 download_files.py                   file to recursively find all mhbs from 2018 and newer and download them to ../../pdfs/ (in the code just /pdf since executed via ssh on pi5)
+│   │   └──📄 links_information.json
+│   │   └──📄 cleaning_data.py                    cleans the data from data_processing.py
+│   │   └──📄 retrieve_link_info.py
+│   └──📄 get_books.py
+│   └──📄 get_unis_fhs_courses_of_study.py
+│   ├──📁 rwth_aachen/
+│   │   └──📄 download_mhbs.py
+│   │   └──📄 rwth_aachen_errors.json
+│   │   └──📄 scrape_uni.py
+│   │   └──📄 rwth_aachen.json
+│   └──📄 data.json                               holds all the links, that redirect to a course of study
+├──📁 documentation/
+│   └──📄 visualize_file_structure.py
+└──📄 mhb.json
+├──📁 web_service/                                webservice, that allows users to interact with the program through a webpage
+│   └──📄 server.py                               the web api, which interacts with the requests sent from the user
+│   ├──📁 backend/                                contains the web_service specific backend
+│   │   └──📄 test_pdf.pdf
+│   │   └──📄 geo_test.pdf
+│   │   ├──📁 prototyping_pdf_reader/             prototypes for a pdf reader -> might be moved out of web_service folder
+│   │   │   └──📄 recreate_pdf.py
+│   │   │   └──📄 part_of_pdf.txt
+│   │   │   └──📄 pdf_part1.txt
+│   │   │   └──📄 test.py
+│   │   │   └──📄 pdf_test.py
+│   │   │   └──📄 stream_to_pdf.py
+│   │   │   └──📄 output.pdf
+│   │   │   └──📄 rendered_pdf_page.pdf
+│   │   │   └──📄 pdf_reader_prototype.py
+│   └──📄 testing.py                               tests the .py files in web_service
+│   └──📄 __init__.py
+│   ├──📁 static/
+│   │   └──📄 favicon.ico
+│   │   └──📄 styles.css
+│   └──📄 uni_augsburg_look_up.json
+│   ├──📁 templates/
+│   │   └──📄 home.html
+│   │   └──📄 test.html (local file)
+
+
+
+
 </pre>
 ## Abbreviations
 In order to save time and tremendous amounts of energy, some abbreviations are used in this project. <br>
