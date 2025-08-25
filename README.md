@@ -47,7 +47,7 @@ mhbai <br>
     └──📄 get_final_books                  not finished yet
 └──📄 pdf_extractor.py                     decoding pdfs by reading them as bytes and decoding and decompressing them
 </pre>
-### long variant (new)
+### long variant (new, automatically generated)
 <pre>
 └──📄 LICENSE                                    
 └──📄 uni_augsburg_error_files.json              
