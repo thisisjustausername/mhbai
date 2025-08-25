@@ -4,6 +4,8 @@
 #
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
+# Description: website for comparing MHBs or seeing MHB information for MBS of the University of Augsburg
+
 from typing import List
 from flask import Flask, render_template, request, jsonify, session, Response
 from pdf_reader import pdf_reader_toc as prt

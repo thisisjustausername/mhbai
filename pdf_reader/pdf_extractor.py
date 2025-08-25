@@ -4,6 +4,8 @@
 #
 # For usage please contact the developer.
 
+# Description: read content and extract objects from pdfs
+
 import json
 import re
 import zlib

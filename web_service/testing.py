@@ -4,6 +4,8 @@
 #
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
+# Description: used for testing the website in server.py
+
 from pdf_reader import pdf_reader_toc as prt
 from pdf_reader.MHB_Overlaps import Overlaps
 from pdf_reader.MHB import MHB

@@ -4,6 +4,8 @@
 #
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
+# Description: clean data, execute after data_processing.py
+
 import json
 
 # load the data to all modules

@@ -4,7 +4,9 @@
 #
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
-# run this code on remote host
+# Description: extract data from pdfs and save them in json, clean data afterwards using cleaning_data.py
+
+# IMPORTANT NOTE: run this code on remote host
 
 from pdf_reader import pdf_reader_toc as prt
 import os

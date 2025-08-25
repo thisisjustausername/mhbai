@@ -4,6 +4,9 @@
 #
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
+# Description: extract urls for MHBs from Univeristy of Hamburg using search engine
+# Status: IN DEVELOPMENT
+
 import requests
 import json
 import urllib.parse

@@ -4,6 +4,8 @@
 #
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
+# Description: download mhbs from University of Augsburg
+
 import requests
 import json
 from bs4 import BeautifulSoup

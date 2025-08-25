@@ -4,6 +4,8 @@
 #
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
+# Description: find the urls to the mhbs for university of aachen
+
 import time
 import urllib.parse
 from selenium import webdriver

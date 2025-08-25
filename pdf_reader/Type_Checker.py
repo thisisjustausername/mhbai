@@ -4,6 +4,9 @@
 #
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
+# Description: type checker
+# Status: IN DEVELOPMENT
+
 import inspect
 import types
 from typing_extensions import get_args, get_origin

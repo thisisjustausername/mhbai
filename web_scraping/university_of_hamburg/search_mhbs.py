@@ -4,7 +4,7 @@
 #
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
-# IMPORTANT note: this code isn't made for vm, since it can't run on headless computer (due to google's bot blocking), there are ways to avoid this, but since this is just simple experimental code, it'd be overkill
+# IMPORTANT NOTE: this code isn't made for vm, since it can't run on headless computer (due to google's bot blocking), there are ways to avoid this, but since this is just simple experimental code, it'd be overkill
 # since i can use a vpn from the university i use it do avoid duckduckgo's bot tracker
 # if being bot blocked, add 5 seconds delay after loading page, reconnect to vpn, solve captcha and restart program
 

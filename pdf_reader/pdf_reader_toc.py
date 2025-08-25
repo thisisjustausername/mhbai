@@ -4,6 +4,8 @@
 #
 # For usage please contact the developer.
 
+# Description: extracts information from MHBs, specifically taylored for MHBs from the University of Augsburg
+
 # TODO when module is found twice just use the information once, so when the information comes from two pages that aren't adjacent, handle other page differently when they're sharing the same cell like "goals"
 
 from ast import Dict
@@ -93,7 +95,7 @@ def search_text_blocks(heading: str, start_info: int, matching_pages: list[bytes
     information = [page[start_info:] for page in matching_pages]  # shrink search window
     page_numbers = []
     for e in information:
-        page_match = list(re.finditer(r' Tm \[\(\d+\)\] TJ\nET\nQ\n', e))[-1]
+        page_match = list(re.finditer(r' Tm \[\(\d+\)\] TJ\nET\nQ\n', e))[-1] # find pages with module data by searching for the required module code at the top of each page
         page_numbers.append(page_match.group(0)[6:-11] if page_match is not None else None)
     details_list = []  # save cells with information in it in details_list
     # extracts all cells, that have the desired heading
@@ -105,8 +107,13 @@ def search_text_blocks(heading: str, start_info: int, matching_pages: list[bytes
             continue
         start = start.start()
         end = re.search(r'\nET\nQ', page[start:]).start()  # end of the cell
+        # since Modulteile sometimes is splitted into many blocks, treat it differently
+        if heading == "Modulteile":
+            end = re.search(r' Tm \[\(G\\374ltig \) ', page[start:]).start()
         details_list.append(page[start:start + end])
         pages_selected.append(page_numbers[indexer])
+        if heading == "Modulteile":
+            print(details_list)
     # extract the text out of each block
     texts_raw = []
     for block, page_nr in zip(details_list, page_numbers):
@@ -400,6 +407,10 @@ class Modules:
             goals = search_text_blocks("Lernziele/Kompetenzen:", start_info, matching_pages)
         except:
             goals = None
+
+        # extract module parts
+        module_parts = search_text_blocks("Modulteile", start_info, matching_pages)
+        
 
         # Hi, is someone reading me?
         # Will anyone ever read this? (yes|no|maybe) (probably me when making that whole piece of code pretty)

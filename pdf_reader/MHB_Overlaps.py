@@ -4,6 +4,9 @@
 #
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
+# Description: dataclass for MHB overlaps
+
+
 from dataclasses import dataclass, field
 import io
 from typing import Annotated, Literal

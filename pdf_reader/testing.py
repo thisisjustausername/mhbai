@@ -8,9 +8,14 @@ from pdf_reader.MHB import MHB
 import pdf_reader.pdf_reader_toc as prt
 
 name = "pdfs/Modulhandbuch_Bachelor_of_Music_PO_2023_ID48735_5_de_20250414_1754.pdf"
-mhb = MHB(name)
-print(mhb.name, mhb.title)
-mhb.export("md", file_path=mhb.name, borders=False)
+name = "pdfs/BA_Frankoromanistik_im_Austausch_Frankocom_PO_2014_ID22838_2_de_20181008_1434.pdf"
+modules_data = prt.Modules(pdf_path=name) # temporary variable used to retrieve all necessary data
+modules = modules_data.toc_module_codes()
+print(f"Module {modules[0]}")
+data = modules_data.data_to_module(modules[0])
+
+# print(mhb.name, mhb.title)
+# mhb.export("md", file_path=mhb.name, borders=False)
 """mhb = prt.Modules(name)
 modules = mhb.toc_module_codes()
 module_code = "MUS-5113"

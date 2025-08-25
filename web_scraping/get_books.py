@@ -4,6 +4,9 @@
 #
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
+# Description: create search string for search engine from course information, code works but needs to be polished, use lxml
+# Status: IN DEVELOPMENT
+
 import json
 import requests
 from multiprocessing import Process, Queue
