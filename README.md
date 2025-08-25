@@ -131,6 +131,7 @@ mhbai <br>
 │   └──📄 extract_info_augsburg.py               save data from MHB to json
 └──📄 main.py                                    
 └──📄 mhb.json
+</pre>
 
 ## Python documentation
 Each python file starts with a License header.<br>
@@ -140,7 +141,6 @@ Important notes follow afterwards indicated by: IMPORTANT NOTE:<br>
 After that important TODOs follow.<br>
 For docstrings the numpy format is used
 
-</pre>
 ## Abbreviations
 In order to save time and tremendous amounts of energy, some abbreviations are used in this project. <br>
 The following table lists all of them. <br>
