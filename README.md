@@ -47,7 +47,7 @@ mhbai <br>
     └──📄 get_final_books                  not finished yet
 └──📄 pdf_extractor.py                     decoding pdfs by reading them as bytes and decoding and decompressing them
 </pre>
-### long variant (new, automatically generated)
+### long variant (new, mainly automatically generated)
 <pre>
 └──📄 LICENSE                                    
 └──📄 uni_augsburg_error_files.json              
@@ -130,6 +130,14 @@ mhbai <br>
 │   └──📄 extract_info_augsburg.py               save data from MHB to json
 └──📄 main.py                                    
 └──📄 mhb.json
+├──📁 pdfs/                                      MHBs of the University of Augsburg
+│   └── ...
+├──📁 universities/                              MHBs from different universities
+│   └──📁 rwth_aachen                            MHBs of the Univeristy of Applied Siences of Aachen
+│   │   └── ...
+│   └──📁 university_of_hamburg                  MHBs of the Univeristy of Hamburg
+│   │   └── ...
+
 </pre>
 
 ## Python documentation
