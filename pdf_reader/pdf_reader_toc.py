@@ -5,25 +5,24 @@
 # For usage please contact the developer.
 
 # Description: extracts information from MHBs, specifically taylored for MHBs from the University of Augsburg
-
-# TODO when module is found twice just use the information once, so when the information comes from two pages that aren't adjacent, handle other page differently when they're sharing the same cell like "goals"
+# Status: IN DEVELOPMENT
 
 from ast import Dict
-import sys
+import sys # only used for testing
 from pdf_reader import pdf_extractor as extr
 import re
 from itertools import groupby
 
 def decode(text: str) -> str:
-        """
-        decodes text appropriately
+    """
+    decodes text appropriately
 
-        Parameters:
-            text (str): text to decode
-        Returns:
-            str: decoded text
-        """
-        return text.encode('latin-1').decode('unicode_escape').encode("latin-1").decode('cp1252').encode("utf-8").decode("utf-8").replace("\\", "")
+    Parameters:
+        text (str): text to decode
+    Returns:
+        str: decoded text
+    """
+    return text.encode('latin-1').decode('unicode_escape').encode("latin-1").decode('cp1252').encode("utf-8").decode("utf-8").replace("\\", "")
 
 # TODO cleanly comment this code
 def find_title(split_line: str, title_search_lines: list) -> tuple[str, int] | None:
@@ -170,6 +169,24 @@ def search_text_blocks(heading: str, start_info: int, matching_pages: list[bytes
                 # find the hours needed per week
                 part_dict["weekly_hours"] = find_in_module_part("SWS")
 
+                # add type of exam
+                exams = list(re.finditer(r' Tm \[\(Pr\\374fung\)\] TJ', i))
+                if len(exams) > 1:
+                    # TODO implement it for more than one exam
+                    # is able to find one or less exams for each module block
+                    raise NotImplementedError("More than one exam have been found. Due to a lack of fitting MHBs this issue couldn't be tested enough yet.")
+                # NOTE for more precision just search for the last found match
+                exam = None
+                if len(exams) == 1 and exams is not None:
+                    exam_index = exams[-1].end()+1
+                    end = re.search(r'\nQ\nQ\n', i[exam_index:])
+                    if end is not None:
+                        end = end.start() + exam_index
+                        exam_texts = re.findall(r' Tm \[\([^\n\r]*?\)\] TJ', i[exam_index:end])
+                        exam_texts = [i[6:-5] for i in exam_texts]
+                        exam = "\n".join(exam_texts)
+                part_dict["exam"] = decode(exam) if exam is not None else None
+            
                 # TODO not finished yet, not all information extracted
                 module_parts_dict.append(part_dict)
             return module_parts_dict
