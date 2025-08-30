@@ -38,7 +38,7 @@ class Pdf:
         """
         finds the xref to each object and then extracts that object
         Parameters: 
-            dditional_bytes (int): how many bytes to read ahead of start of object in order to select the whole object
+            additional_bytes (int): how many bytes to read ahead of start of object in order to select the whole object
         Returns: 
             List[Dict[str, str | bytes | int]]: list of objects
         """
