@@ -205,6 +205,10 @@ The pdf reader was created in order to allow for more precise table recogniction
     - ECTS
     - Content (Inhalte)
     - Goals (Lernziele und Kompetenzen)
+    - Module parts (Modulteile)
+      - exam type
+      - language
+      - module part name
 - testing the speed of data extraction from pdfs in testing.py (partly already removed)
   - time to extract module codes from toc of mhb: < 20ms
   - time to extract title, ects, content, goals module: < 1ms
@@ -216,12 +220,8 @@ The pdf reader was created in order to allow for more precise table recogniction
 - bug-fixes in pdf_reader_toc.py making reading mhbs more resilient to "irregular" pdfs
 
 ### TODOs
-- combining web_server with backend
 - adding options for saving data in csv/xlsx/json etc.
-- update file structure in README for web_service
 - finish commenting pdf_reader_toc.py
-- enable the export button in home.html just when the data is loaded
-- test exporting
 - important bug-fix. For pages always the pages of the shortest module are used. For the website and export, show the pages for all mhbs and specify which page list correlates to which mhb
 - restructure file structure to make it more intuitiv
 - in MHB_Overlaps instead of choosing name, choose title and mention date of MHB
