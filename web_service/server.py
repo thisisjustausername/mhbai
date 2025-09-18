@@ -36,6 +36,9 @@ def home():
 
 @app.route("/compareFast", methods=["POST"])
 def compareFast():
+    """
+    compares without using datatypes MHB or Overlaps
+    """
     data = request.get_json()
     file_name_1 = data.get('mhb1')
     file_name_2 = data.get('mhb2')
@@ -89,6 +92,9 @@ def group_pages(pages: List[int]) -> str:
 
 @app.route("/compareEfficient", methods=["POST"])
 def compare_efficient():
+    """
+    compares two pdfs with already presaved data
+    """
     global overlaps
     global mhb_data
 

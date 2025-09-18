@@ -1,2 +1,6 @@
 bs4
 lxml
+flask
+numpy
+selenium
+requests

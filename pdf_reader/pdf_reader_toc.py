@@ -484,9 +484,10 @@ class Modules:
         except:
             goals = None
 
-        # extract module parts
+        # extract module_exam_parts
+        # TODO: watch out, since this ignores some page breaks
         module_parts = search_text_blocks("Modulteile", start_info, matching_pages)
-        
+        module_exam = "\n".join(i["exam"] for i in module_parts if i["exam"] is not None)
 
         # Hi, is someone reading me?
         # Will anyone ever read this? (yes|no|maybe) (probably me when making that whole piece of code pretty)
@@ -499,6 +500,7 @@ class Modules:
                         "content": decode(content) if content is not None else None,
                         "goals": decode(goals) if goals is not None else None,
                         "module_parts": module_parts,
+                        "module_exam": module_exam, 
                         "pages": page_nr_list,
                         "mhbai_hints": None}
 

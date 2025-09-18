@@ -14,8 +14,11 @@ name = "pdfs/Modulhandbuch_Bachelor_of_Music_PO_2023_ID48735_5_de_20250414_1754.
 name = "pdfs/BA_Frankoromanistik_im_Austausch_Frankocom_PO_2014_ID22838_2_de_20181008_1434.pdf"
 modules_data = prt.Modules(pdf_path=name) # temporary variable used to retrieve all necessary data
 modules = modules_data.toc_module_codes()
-data = modules_data.data_to_module(modules[0])
-print(json.dumps(data, indent=3, ensure_ascii=False))
+for i in modules:
+    result = modules_data.data_to_module(i)
+    if all(i["exam"] is None for i in result["module_parts"]):
+        print(result["module_code"])
+        print("     " + json.dumps(result["module_parts"]))
 
 # print(mhb.name, mhb.title)
 # mhb.export("md", file_path=mhb.name, borders=False)

@@ -61,34 +61,38 @@ mhbai <br>
 └──📄 README.md                                  
 └──📄 test.html (local file)                     
 └──📄 test.csv (local file)                      
-├──📁 web_scraping/                              
-│   ├──📁 rwth_aachen/                           
-│   │   └──📄 rwth_aachen_errors.json            
-│   │   └──📄 scrape_uni.py                      find the urls to the mhbs for university of aachen
-│   │   └──📄 download_mhbs.py                   dowload mhbs from urls and save them as pdfs
-│   │   └──📄 rwth_aachen.json                   
-│   └──📄 data.json                              
-│   └──📄 get_final_books.py                     
-│   ├──📁 scrape_uni_augsburg/                   
-│   │   └──📄 data_processing.py                 extract data from pdfs and save them in json, clean data afterwards using cleaning_data.py
-│   │   └──📄 download_files.py                  download mhbs from University of Augsburg
-│   │   └──📄 uni_a_all_mhbs.json                
-│   │   └──📄 links_information.json             
-│   │   └──📄 retrieve_link_info.py              retrieve links for downloading the pdfs since they are different from the ones copied by the user
-│   │   └──📄 cleaning_data.py                   clean data, execute after data_processing.py
-│   └──📄 get_books.py                           create search string for search engine from course information, code works but needs to be polished, use lxml
-│   ├──📁 university_of_hamburg/                 
-│   │   └──📄 courses_of_study.json              
-│   │   └──📄 search_mhbs.py                     
-│   │   └──📄 scrape_mhbs_hamburg.py             find all courses of study of the University of Hamburg
-│   │   └──📄 university_of_hamburg.json         
-│   │   └──📄 download_mhbs.py                   extract urls for MHBs from Univeristy of Hamburg using search engine
-│   │   └──📄 cleaning.py                        
-│   │   └──📄 university_of_hamburg_errors.json  
-│   │   └──📄 table_data_all_courses.txt         
-│   └──📄 get_unis_fhs_courses_of_study.py       get the base urls for all courses of study
-└──📄 university_of_hamburg_errors.json          
-└──📄 pyvenv.cfg (local file)                    
+├──📁 web_scraping/                                                                          
+│   ├──📁 rwth_aachen/                                                                       
+│   │   └──📄 rwth_aachen_errors.json                                                        
+│   │   └──📄 scrape_uni.py                                                                  find the urls to the mhbs for university of aachen
+│   │   └──📄 download_mhbs.py                                                               dowload mhbs from urls and save them as pdfs
+│   │   └──📄 rwth_aachen.json                                                               
+│   └──📄 data.json                                                                          
+│   └──📄 get_final_books.py                                                                 
+│   ├──📁 universal/                                                                         
+│   │   └──📄 get_books.py                                                                   create search string for search engine from course information, code works but needs to be polished, use lxml
+│   │   └──📄 get_unis_fhs_courses_of_study.py                                               get the base urls for all courses of study
+│   │   ├──📁 files/                                                                         
+│   │   │   └──📄 data.json                                                                  
+│   │   │   └──📄 error_list.json                                                            
+│   ├──📁 scrape_uni_augsburg/                                                               
+│   │   └──📄 data_processing.py                                                             extract data from pdfs and save them in json, clean data afterwards using cleaning_data.py
+│   │   └──📄 download_files.py                                                              download mhbs from University of Augsburg
+│   │   └──📄 uni_a_all_mhbs.json                                                            
+│   │   └──📄 links_information.json                                                         
+│   │   └──📄 retrieve_link_info.py                                                          retrieve links for downloading the pdfs since they are different from the ones copied by the user
+│   │   └──📄 cleaning_data.py                                                               clean data, execute after data_processing.py
+│   ├──📁 university_of_hamburg/                                                             
+│   │   └──📄 courses_of_study.json                                                          
+│   │   └──📄 search_mhbs.py                                                                 
+│   │   └──📄 scrape_mhbs_hamburg.py                                                         find all courses of study of the University of Hamburg
+│   │   └──📄 university_of_hamburg.json                                                     
+│   │   └──📄 download_mhbs.py                                                               extract urls for MHBs from Univeristy of Hamburg using search engine
+│   │   └──📄 cleaning.py                                                                    
+│   │   └──📄 university_of_hamburg_errors.json                                              
+│   │   └──📄 table_data_all_courses.txt                                                     
+└──📄 university_of_hamburg_errors.json                                                      
+└──📄 pyvenv.cfg (local file)                  
 ├──📁 pdf_reader/                                
 │   └──📄 pdf_extractor.py                       read content and extract objects from pdfs
 │   └──📄 pdf_reader_toc.py                      extracts information from MHBs, specifically taylored for MHBs from the University of Augsburg
@@ -222,3 +226,4 @@ The pdf reader was created in order to allow for more precise table recogniction
 - restructure file structure to make it more intuitiv
 - in MHB_Overlaps instead of choosing name, choose title and mention date of MHB
 - In the future, the file structure will be radically restructured. This is due to the split between software taylored for the University of Augsburg and software made for all universities.
+- run screen python3 -m web_scraping.universal.get_unis_fhs_courses_of_study at night for faster internet connection
