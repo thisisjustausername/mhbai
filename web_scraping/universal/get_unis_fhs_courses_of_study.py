@@ -24,11 +24,15 @@ def process_urls(urls: list, offset: int=0):
         urls (list): List of URLs to be processed.
         offset (int): Where to start counting in order to show a readable output to the user
     """
-    options = Options()
-    options.add_argument("--headless=new")
-    driver = webdriver.Chrome(options=options)
+    try:
+        options = Options()
+        options.add_argument("--headless=new")
+        driver = webdriver.Chrome(options=options)
+        wait = WebDriverWait(driver, 1)
+    except:
+        print("Error occurred for whole url list")
+        return [], urls
     elements = []
-    wait = WebDriverWait(driver, 1)
     error_list = []
     for index, i in enumerate(urls):
         print(index+offset)
@@ -65,7 +69,7 @@ def process_urls(urls: list, offset: int=0):
     return elements, error_list
 
 
-def get_base_links(urls_per_job: int = 5):
+def get_base_links(urls_per_job: int = 1):
     """
     Get the base links for all courses of study from studieren.de
     
@@ -89,8 +93,34 @@ def get_base_links(urls_per_job: int = 5):
     with open("web_scraping/universal/files/error_list.json", "w") as file:
         json.dump(all_errors, file, indent=4)
 
+def get_error_base_links(urls_per_job: int = 1):
+    """
+    Get the base links for all courses of study from studieren.de where errors occurred.
+    
+    Parameters:
+        urls_per_job (int): Number of URLs to be processed per job in the multiprocessing pool.
+    """
+    multiprocessing.set_start_method("spawn")
+    with open("web_scraping/universal/files/data.json", "r") as file:
+        all_elements = json.load(file)
+    with open("web_scraping/universal/files/error_list.json", "r") as file:
+        list_urls = json.load(file)
+    processes = math.ceil(len(list_urls) / urls_per_job)
+    with multiprocessing.Pool(processes=processes) as pool:
+        all_errors = [] # initializing all_errors new, but not all_elements
+        results = [pool.apply_async(process_urls, args=(list_urls[i:i + urls_per_job],i,)) for i in range(0, len(list_urls), urls_per_job)]
+        for result in results:
+            elements, error_list = result.get()
+            all_elements += elements
+            all_errors += error_list
+    with open("web_scraping/universal/files/data.json", "w") as file:
+        json.dump(all_elements, file, indent=4)
+    with open("web_scraping/universal/files/error_list.json", "w") as file:
+        json.dump(all_errors, file, indent=4)   
+
 if __name__ == "__main__":
-    get_base_links()
+    get_base_links(urls_per_job=5)
+    print("-----------------------------------------------\nstep 2\n-----------------------------------------------")
     with open("web_scraping/universal/files/data.json", "r") as file:
         data = json.load(file)
     print(len(data))
