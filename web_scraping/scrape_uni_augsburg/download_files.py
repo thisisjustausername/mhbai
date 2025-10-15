@@ -65,7 +65,18 @@ def download_all_pdfs():
             file.write(pdf.content)
         print(index)
 
+def download_new_pdfs(new_links: list):
+    """
+    downloads only new mhb pdfs
 
+    Parameters:
+        new_links (list): list of new mhb links
+    """
+    for index, i in enumerate(new_links):
+        pdf = requests.get(i)
+        with open(f"pdfs/{pdf.headers.get('Content-Disposition').split('filename=',1)[1]}", "wb") as file:
+            file.write(pdf.content)
+        print(index)
 
 if __name__ == "__main__":
     def do_everything():
@@ -73,13 +84,36 @@ if __name__ == "__main__":
         combines everything by extracting all mhb links and then downloading all mhbs
         """
         data = fetch_valid_urls()
-        print(f"It took approximately {time.time() - start} seconds to fetch all mhbs of the Uni Augsburg.")
+        # print(f"It took approximately {time.time() - start} seconds to fetch all mhbs of the Uni Augsburg.")
         with open("uni_a_all_mhbs.json", "w") as file:
             json.dump(data, file)
 
         download_all_pdfs()
+    
+    def add_new_pdfs():
+        """
+        fetches all mhb links and downloads only the new ones
+        """
+        data = fetch_valid_urls()
+        with open("uni_a_all_mhbs.json", "r") as file:
+            old_data = json.load(file)
 
-    start = time.time()
+        with open("uni_a_all_mhbs.json", "w") as file:
+            json.dump(data, file)
+        
+        new_links = [i for i in data if i not in old_data]
+
+        download_new_pdfs(new_links)
+
+    
+    # use this to download all mhb pdfs for university of augsburg timed with the pdf urls already fetched
+    """start = time.time()
     download_all_pdfs()
     end = time.time()
-    print(end - start)
+    print(end - start)"""
+
+    # use this to fetch and download all mhb pdfs for university of augsburg
+    # do_everything()
+
+    # use this to only download new mhb pdfs for university of augsburg
+    add_new_pdfs()
