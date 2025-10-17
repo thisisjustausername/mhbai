@@ -14,20 +14,27 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 import multiprocessing
 
-def process_urls(urls: list, offset: int=0):
+def process_urls(urls: list, offset: int=0, raspi=False):
     """
     Process a list of URLs to scrape course information.
 
     Parameters:
         urls (list): List of URLs to be processed.
         offset (int): Where to start counting in order to show a readable output to the user
+        raspi (bool): Whether the program is running on a Raspberry Pi
     """
     try:
         options = Options()
         options.add_argument("--headless=new")
-        driver = webdriver.Chrome(options=options)
+        if raspi:
+            options.add_argument("--disable-dev-shm-usage")
+            service = Service("/usr/bin/chromedriver")
+            driver = webdriver.Chrome(service=service, options=options)
+        else:
+            driver = webdriver.Chrome(options=options)
         wait = WebDriverWait(driver, 1)
     except:
         print("Error occurred for whole url list")
@@ -69,12 +76,13 @@ def process_urls(urls: list, offset: int=0):
     return elements, error_list
 
 
-def get_base_links(urls_per_job: int = 1):
+def get_base_links(urls_per_job: int = 1, raspi: bool=False):
     """
     Get the base links for all courses of study from studieren.de
     
     Parameters:
         urls_per_job (int): Number of URLs to be processed per job in the multiprocessing pool.
+        raspi (bool): Whether the program is running on a Raspberry Pi
     """
     multiprocessing.set_start_method("spawn")
     list_urls = [f"https://studieren.de/suche.0.html?lt=course&rs=list&sort=alphabetical&start={i*23}" for i in range(410)]
@@ -82,7 +90,7 @@ def get_base_links(urls_per_job: int = 1):
     with multiprocessing.Pool(processes=processes) as pool:
         all_elements = []
         all_errors = []
-        results = [pool.apply_async(process_urls, args=(list_urls[i:i + urls_per_job],i,)) for i in range(0, len(list_urls), urls_per_job)]
+        results = [pool.apply_async(process_urls, args=(list_urls[i:i + urls_per_job],i,raspi)) for i in range(0, len(list_urls), urls_per_job)]
         for result in results:
             elements, error_list = result.get()
             all_elements += elements
@@ -119,7 +127,8 @@ def get_error_base_links(urls_per_job: int = 1):
         json.dump(all_errors, file, indent=4)   
 
 if __name__ == "__main__":
-    get_base_links(urls_per_job=5)
+    raspi = True
+    get_base_links(urls_per_job=5, raspi=raspi)
     print("-----------------------------------------------\nstep 2\n-----------------------------------------------")
     with open("web_scraping/universal/files/data.json", "r") as file:
         data = json.load(file)
