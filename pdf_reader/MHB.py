@@ -104,7 +104,7 @@ class MHB:
         json_data = dict((i["module_code"], {k: v for k, v in i.items() if k != "module_code"} )for i in data) if module_code_key else data
         json_data = {"name": name, "modules": json_data}
 
-        json.dump(json_data, buffer, indent=3)
+        json.dump(json_data, buffer, indent=4)
         
         buffer.seek(0)
 

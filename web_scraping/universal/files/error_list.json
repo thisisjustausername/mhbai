@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [
     "https://studieren.de/suche.0.html?lt=course&rs=list&sort=alphabetical&start=0",
     "https://studieren.de/suche.0.html?lt=course&rs=list&sort=alphabetical&start=23",
@@ -410,3 +411,6 @@
     "https://studieren.de/suche.0.html?lt=course&rs=list&sort=alphabetical&start=9384",
     "https://studieren.de/suche.0.html?lt=course&rs=list&sort=alphabetical&start=9407"
 ]
+=======
+[]
+>>>>>>> 406dda7 (add indents for dump json)

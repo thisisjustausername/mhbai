@@ -27,4 +27,4 @@ data = list(set(info_list))
 data = [{"name": i[0], "url": i[1]} for i in data]
 
 with open("web_scraping/university_of_hamburg/courses_of_study.json", "w") as file:
-    json.dump(data, file)
+    json.dump(data, file, indent=4)

@@ -62,7 +62,7 @@ for i in errors:
 old_data += urls
 
 with open("rwth_aachen.json", "w") as file:
-    json.dump(old_data, file)
+    json.dump(old_data, file, indent=4)
 sys.exit()"""
 
 # between 1770 and 2074
@@ -89,7 +89,7 @@ while number <= 2074:
 
 
 with open("rwth_aachen.json", "w") as file:
-    json.dump(urls, file)
+    json.dump(urls, file, indent=4)
 
 with open("rwth_aachen_errors.json", "w") as file:
-    json.dump(error_list, file)
+    json.dump(error_list, file, indent=4)

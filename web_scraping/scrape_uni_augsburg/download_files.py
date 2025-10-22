@@ -86,7 +86,7 @@ if __name__ == "__main__":
         data = fetch_valid_urls()
         # print(f"It took approximately {time.time() - start} seconds to fetch all mhbs of the Uni Augsburg.")
         with open("uni_a_all_mhbs.json", "w") as file:
-            json.dump(data, file)
+            json.dump(data, file, indent=4)
 
         download_all_pdfs()
     
@@ -99,7 +99,7 @@ if __name__ == "__main__":
             old_data = json.load(file)
 
         with open("uni_a_all_mhbs.json", "w") as file:
-            json.dump(data, file)
+            json.dump(data, file, indent=4)
         
         new_links = [i for i in data if i not in old_data]
 

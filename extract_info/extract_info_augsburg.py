@@ -48,10 +48,10 @@ clean_modules = list(set(tupled_data))
 mhbs = [tupleToDict(i) for i in clean_modules] # type: ignore
 
 with open("uni_augsburg_module_data.json", "w") as file:
-    json.dump(mhbs, file, indent=3)
+    json.dump(mhbs, file, indent=4)
 
 with open("web_service/uni_augsburg_look_up.json", "w") as file:
-    json.dump(look_up_dict, file, indent=3)
+    json.dump(look_up_dict, file, indent=4)
 
 with open("uni_augsburg_error_files.json", "w") as file:
-    json.dump(error_files, file, indent=3)
+    json.dump(error_files, file, indent=4)

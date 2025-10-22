@@ -27,7 +27,7 @@ clean_dicts = [dict(i) for i in clean_data] # convert tuples back to dicts
 
 # save data
 with open("clean_module_infos.json", "w") as file:
-    json.dump(clean_dicts, file)
+    json.dump(clean_dicts, file, indent=4)
 
 # remove all modules, where either, tile, content or goals is missing
 complete_information = [i for i in clean_data if all([True if e != "" else False for e in i.values()])]
@@ -35,4 +35,4 @@ print(len(complete_information))
 
 # save data
 with open("complete_information.json", "w") as file:
-    json.dump(complete_information, file)
+    json.dump(complete_information, file, indent=4)

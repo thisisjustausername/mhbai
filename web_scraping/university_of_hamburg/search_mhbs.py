@@ -59,7 +59,7 @@ error_data = [i[0] for i in url_list if "ad_domain" in i[1]]
 error_list += error_data
 
 with open("university_of_hamburg.json", "w") as file:
-    json.dump(url_list, file)
+    json.dump(url_list, file, indent=4)
 
 with open("university_of_hamburg_errors.json", "w") as file:
-    json.dump(error_list, file)
+    json.dump(error_list, file, indent=4)

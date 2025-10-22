@@ -52,4 +52,4 @@ for index, i in enumerate(all_pdfs):
 
 # save data
 with open("pdf_data.json", "w") as file:
-    json.dump(successful_data, file)
+    json.dump(successful_data, file, indent=4)
