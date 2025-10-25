@@ -4,3 +4,5 @@ flask
 numpy
 selenium
 requests
+psycopg2-binary
+dotenv
