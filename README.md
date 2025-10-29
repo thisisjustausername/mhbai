@@ -196,6 +196,23 @@ The following table lists all of them. <br>
 ## Information about the pdf reader
 The pdf reader was created in order to allow for more precise table recogniction and faster extraction of document data as well as all the other stuff.
 
+## File buildup
+```python
+# Copyright (c) 2025 Leon Gattermeyer         <- Copyright or License
+#
+# This file is part of mhbai.                 <- Part of project
+#
+# For usage please contact the developer.     <- How to handle usage
+#
+# This file is Copyright-protected.           <- Protection status
+
+# Description: brief description              <- brief description
+# Status: TESTING                             <- status: IN DEVELOPMENT, TESTING, VERSION x.x
+```
+
+* Additional protection status: 
+Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
+
 ## Status quo
 ### Latest changes
 - adding new features to pdf_reader_toc.py

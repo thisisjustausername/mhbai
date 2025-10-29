@@ -6,3 +6,6 @@ selenium
 requests
 psycopg2-binary
 dotenv
+aiohttp
+selectolax
+tldextract
