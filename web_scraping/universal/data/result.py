@@ -6,17 +6,10 @@
 #
 # This file is Copyright-protected.
 
-<<<<<<< Updated upstream
-# Description: connect to postgresql database and perform basic operations
-# Status: IN DEVELOPMENT
-
-from typing import Generic, TypeVar, Union, Optional
-=======
 # Description: database result type
 # Status: TESTING
 
 from typing import Generic, TypeVar, Optional
->>>>>>> Stashed changes
 
 Data = TypeVar("Data") # success type
 Error = TypeVar("Error") # error type

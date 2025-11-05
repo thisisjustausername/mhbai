@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS universal_mhbs (
     city TEXT, 
     university TEXT, 
     degree TEXT, 
-    uni_url TEXT UNIQUE,
+    uni_url TEXT,
     search_string TEXT
 );
 

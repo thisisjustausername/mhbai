@@ -1,7 +1,3 @@
-<<<<<<< Updated upstream
-from dotenv import load_dotenv, set_key
-import os
-=======
 # Copyright (c) 2025 Leon Gattermeyer
 #
 # This file is part of mhbai.
@@ -12,7 +8,6 @@ import os
 # Status: VERSION 1.0
 
 from dotenv import load_dotenv, set_key
->>>>>>> Stashed changes
 
 """
 # Set path for .env file
