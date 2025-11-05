@@ -5,6 +5,8 @@
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
 # Description: turns the filestructure into a markdown representation with added descriptions
+# Status: VERSION 1.0
+# FileID: D-x-0001
 
 from pathlib import Path
 

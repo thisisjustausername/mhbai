@@ -5,6 +5,7 @@
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
 # Description: save data from MHB to json
+# Status: FINISHED
 
 from pdf_reader.MHB_Overlaps import Overlaps
 from pdf_reader.MHB import MHB
