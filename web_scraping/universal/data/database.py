@@ -7,27 +7,18 @@
 # This file is Copyright-protected.
 
 # Description: connect to postgresql database and perform basic operations
-<<<<<<< Updated upstream
-# Status: IN DEVELOPMENT
-=======
 # Status: TESTING
->>>>>>> Stashed changes
 
 from collections.abc import Callable
 from enum import Enum
 from functools import wraps
 import os
-<<<<<<< Updated upstream
-from typing import Any, Literal, overload
-from result import DB_Result
-=======
 from typing import Any
 from web_scraping.universal.data.result import DB_Result
->>>>>>> Stashed changes
 
 from dotenv import load_dotenv
 import psycopg2 as pg
-from psycopg2.extensions import connection, cursor
+from psycopg2.extensions import cursor
 
 load_dotenv()
 
@@ -37,17 +28,10 @@ HOST = os.getenv("HOST") # localhost
 PORT = os.getenv("PORT") # 5432
 DBNAME = os.getenv("DBNAME") # mhbs
 
-<<<<<<< Updated upstream
-class ANSWER_TYPE(Enum):
-    NO_ANSWER = -1
-    SINGLE_ANSWER = 0
-    LIST_ANSWER = 1
-=======
 class ANSWER_TYPE(str, Enum):
     NO_ANSWER = "NO_ANSWER"
     SINGLE_ANSWER = "SINGLE_ANSWER"
     LIST_ANSWER = "LIST_ANSWER"
->>>>>>> Stashed changes
 
 def is_valid_answer_type(value):
     return value in ANSWER_TYPE._value2member_map_
@@ -115,11 +99,7 @@ def connect(**kwargs):
 # @catch_exception
 def select(
         cursor: cursor, 
-<<<<<<< Updated upstream
-        table_name: str, 
-=======
         table: str, 
->>>>>>> Stashed changes
         answer_type: ANSWER_TYPE = ANSWER_TYPE.LIST_ANSWER, 
         keywords: tuple[str] | list[str] = ("*",), 
         conditions: dict[str, Any] | None = None, 
@@ -148,11 +128,7 @@ def select(
 
     # check, whether answer_type is valid
     if not is_valid_answer_type(answer_type) or answer_type == ANSWER_TYPE.NO_ANSWER:
-<<<<<<< Updated upstream
-        raise ValueError("parameter answer_type of the function must be of enum type ANSWER_TYPE and not NO_ANSWER")
-=======
         raise ValueError("parameter answer_type of the function must be of enum type LIST_ANSWER and not SINGLE_ANSWER")
->>>>>>> Stashed changes
 
     # specific_where and variables can't be used together
     if specific_where == "" and variables is not None:
@@ -166,11 +142,7 @@ def select(
 
     # build query
     all_conditions = {key: {"value": value, "negated": False} for key, value in conditions.items()} | {key: {"value": value, "negated": True} for key, value in negated_conditions.items()}
-<<<<<<< Updated upstream
-    query = f"""SELECT {', '.join(keywords)} FROM {table_name}"""
-=======
     query = f"""SELECT {', '.join(keywords)} FROM {table}"""
->>>>>>> Stashed changes
 
     # add conditions if any
     if len(all_conditions) > 0:
@@ -186,11 +158,7 @@ def select(
 
     # add select max of key condition
     elif select_max_of_key != "":
-<<<<<<< Updated upstream
-        query += f" WHERE {select_max_of_key} = (SELECT MAX({select_max_of_key}) FROM {table_name}) LIMIT 1"
-=======
         query += f" WHERE {select_max_of_key} = (SELECT MAX({select_max_of_key}) FROM {table}) LIMIT 1"
->>>>>>> Stashed changes
         if order_by is not None:
             query += f" ORDER BY {order_by[0]} {order_by[1].value}"
 
@@ -215,21 +183,13 @@ def select(
     # map the data to the keywords if keywords are explicitly specified
     if keywords is not None and "*" not in keywords:
         result = {key: value for key, value in zip(keywords, data)} if answer_type == ANSWER_TYPE.SINGLE_ANSWER else [{key: value for key, value in zip(keywords, vals)} for vals in data]
-<<<<<<< Updated upstream
-    return result
-=======
     return DB_Result(data=result)
->>>>>>> Stashed changes
 
 # NOTE arguments is either of type dict or of type list
 # @catch_exception
 def insert(
     cursor: cursor, 
-<<<<<<< Updated upstream
-    table_name: str, 
-=======
     table: str, 
->>>>>>> Stashed changes
     returning_column: str | None = None, 
     arguments: dict[str, Any] | list[str] | None = None) -> DB_Result[Any, Exception]:
     """
@@ -237,11 +197,7 @@ def insert(
 
     Parameters:
         cursor (cursor): cursor for interaction with db
-<<<<<<< Updated upstream
-        table_name (str): table to insert into, if empty set all
-=======
         table (str): table to insert into, if empty set all
->>>>>>> Stashed changes
         arguments (dict | None): values that should be entered (key: column, value: value), if empty, no conditions, if arguments is of type list, then list has to contain all values that have to be entered
         returning_column (int): returns the column
     Returns:
@@ -260,19 +216,11 @@ def insert(
     try:
         # build parametrized query
         if type(arguments) == list:
-<<<<<<< Updated upstream
-            query = f"""INSERT INTO {table_name}
-                        VALUES ({', '.join('%s' for _ in range(len(arguments)))})"""
-            vals = arguments
-        elif type(arguments) == dict:
-            query = f"""INSERT INTO {table_name} ({', '.join(arguments.keys())})
-=======
             query = f"""INSERT INTO {table}
                         VALUES ({', '.join('%s' for _ in range(len(arguments)))})"""
             vals = arguments
         elif type(arguments) == dict:
             query = f"""INSERT INTO {table} ({', '.join(arguments.keys())})
->>>>>>> Stashed changes
                     VALUES ({', '.join('%s' for _, _ in enumerate(arguments.keys()))})"""
             vals = list(arguments.values())
 
@@ -298,11 +246,7 @@ def insert(
 # for specific_where conditions must be empty, otherwise conditions will be ignored IMPORTANT what is being ignored differs from the other functions
 def update(
     cursor: cursor, 
-<<<<<<< Updated upstream
-    table_name: str, 
-=======
     table: str, 
->>>>>>> Stashed changes
     returning_column: str | None = None, 
     arguments: dict[str, Any] | None = None,
     conditions: dict[str, Any] | None = None, 
@@ -314,11 +258,7 @@ def update(
 
     Parameters:
         cursor (cursor): cursor to interact with db
-<<<<<<< Updated upstream
-        table_name (str): table to insert into, if empty set all
-=======
         table (str): table to insert into, if empty set all
->>>>>>> Stashed changes
         arguments (dict | None): values that should be entered (key: column, value: value)
         conditions (dict | None): specify to insert into the correct row
         specific_where (str): conditions must be empty, otherwise conditions will be ignored, specifies where should be set, IMPORTANT what is being ignored differs from the other functions
@@ -339,11 +279,7 @@ def update(
     # try update
     try:
         # build query
-<<<<<<< Updated upstream
-        query = f"""UPDATE {table_name}"""
-=======
         query = f"""UPDATE {table}"""
->>>>>>> Stashed changes
 
         # set part
         if specific_set != "":
@@ -378,11 +314,7 @@ def update(
 
 def remove(
         cursor: cursor, 
-<<<<<<< Updated upstream
-        table_name: str, 
-=======
         table: str, 
->>>>>>> Stashed changes
         conditions: dict[str, Any],
         returning_column: str | None = None) -> DB_Result[Any, Exception]:
     """
@@ -391,11 +323,7 @@ def remove(
 
     Parameters:
         cursor (cursor): cursor to interact with db
-<<<<<<< Updated upstream
-        table_name (str): table to insert into, if empty set all
-=======
         table (str): table to insert into, if empty set all
->>>>>>> Stashed changes
         conditions (dict): specify from which row to remove the data
         returning_column (str): returns the specified column, returns just a single value
     Returns:
@@ -409,11 +337,7 @@ def remove(
     # try remove
     try:
         # build query
-<<<<<<< Updated upstream
-        query = f"""DELETE FROM {table_name}
-=======
         query = f"""DELETE FROM {table}
->>>>>>> Stashed changes
                     WHERE {' AND '.join(key + " = %s" for _, key in enumerate(conditions))}"""
 
         # returning part
@@ -501,12 +425,9 @@ def close(cursor: cursor | None = None):
         cursor: cursor that should be closed
     """
     cursor.close()
-<<<<<<< Updated upstream
-=======
     conn = getattr(cursor, 'connection', None)
     if conn is not None:
         conn.close()
->>>>>>> Stashed changes
 
 if __name__ == "__main__":
     connect()
