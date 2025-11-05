@@ -208,10 +208,42 @@ The pdf reader was created in order to allow for more precise table recogniction
 
 # Description: brief description              <- brief description
 # Status: TESTING                             <- status: IN DEVELOPMENT, TESTING, VERSION x.x
+# FileID: D-01                                <- file_id: each file has an ID
 ```
+For further information on file ids go to [File IDs](#file-ids)
 
 * Additional protection status: 
 Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
+
+### File IDs
+Each file has a unique id to keep track of it when moving files. 
+A program checks the uniqueness of each ID as well as creates them.
+
+Example ID:   D-x-0001 </br>
+&emsp;&emsp;&emsp;&nbsp;&emsp;&emsp;&nbsp;&#8593;&nbsp;&emsp;&#8593;</br>
+&emsp;&emsp;&emsp;&emsp; Field&emsp;Number
+
+The field specifies in which subproject of the project the file is from, e.g. Do for Documentation. </br>
+The middle letter (subfield) is optional (if nonexistent, use x as placeholder). It dictates the role in the subproject and is not unique inside the subproject. E.g. sp for setup
+
+| Field | Meaning | 
+| ------ | ------- |
+| Do | Documentation |
+| Re | PDF-Reader |
+| Db | Data (Database) |
+| Sc | Web-Scraping |
+| Ws | Web-Service |
+
+| Subfield | Meaning |
+| -------- | ------- |
+| sp | Setup |
+| mn | main |
+| in | init |
+
+
+## Use case
+Add information of how a file should have to interact with other files (for files, that aren't bundled in a main.py).
+E.g. for data fetching: Execute file x (FileID) after file y (FileID)
 
 ## Status quo
 ### Latest changes
