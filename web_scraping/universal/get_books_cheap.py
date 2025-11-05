@@ -29,7 +29,7 @@ universities = result.data
 
 # processing data
 # TODO: handle error when only one value exists
-universities = [i[0].split(',"') if ',"' in i[0] else i[0].split(',') if ',' in i[0] else i[0] for i in universities]
+universities = [i[0].split(',"') if ',"' in i[0] else i[0].split(',') if ',' in i[0] else i[0] for i in universities if len(i) > 0]
 universities = [(i[0][1:], i[1][:-2] if i[1].endswith('")') else i[1][:-1]) for i in universities if len(i) == 2]
 universities = [{"university": i[1], "city": i[0]} for i in universities]
 
