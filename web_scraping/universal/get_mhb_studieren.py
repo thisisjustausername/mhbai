@@ -1,5 +1,3 @@
-import math
-import multiprocessing
 import time
 
 from bs4 import BeautifulSoup
@@ -65,6 +63,7 @@ def main():
 
     # fetch all universities
     result = db.select(cursor=cursor, table="universal_mhbs", keywords=["university", "city"], specific_where="uni_url IS NULL")
+    db.close(cursor)
 
     # handle possible error
     if result.is_error:
