@@ -1,3 +1,13 @@
+# Copyright (c) 2025 Leon Gattermeyer
+#
+# This file is part of mhbai.
+#
+# Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
+
+# Description: get the url to the mhb pdf for each course of study
+# Status: PROTOTYPING
+# FileID: Sc-ge-0006
+
 from datetime import datetime, timedelta
 import time
 
@@ -26,7 +36,11 @@ def fetch_search_strings(search_strings: list[dict[str, str]]) -> None | Excepti
             print(f"Error for query {search_string}: {response.status_code}")
             continue
         soup = BeautifulSoup(response.text, 'lxml')
-        mhb_url = soup.find("div", {"id": "results"}).find("div").find("a").get("href")
+        try:
+            mhb_url = soup.find("div", {"id": "results"}).find("div").find("a").get("href")
+        except Exception as e:
+            print("Error for query: {search_string}: No url found")
+            continue
         # mhb_url = response.json().get("OfficialDomain", None)
         if mhb_url is None:
             print(f"Error for query {search_string}: No OfficialDomain found")
@@ -47,7 +61,7 @@ def main():
     cursor = db.connect()
 
     # fetch all universities
-    result = db.select(cursor=cursor, table="universal_mhbs", keywords=["search_string"])
+    result = db.select(cursor=cursor, table="universal_mhbs", keywords=["search_string"], specific_where="mhb_url IS NULL")
     db.close(cursor)
     # handle possible error
     if result.is_error:
@@ -61,7 +75,7 @@ def main():
 
 if __name__ == "__main__":
     retry = True
-    minutes = 5
+    minutes = 10
 
     while retry:
         try:

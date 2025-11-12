@@ -4,6 +4,10 @@
 #
 # For usage please contact the developer.
 
+# Description: Tests writing a PDF
+# Status: PROTOTYPING
+# FileID: Re-te-0006
+
 from pdfrw import PdfWriter, PdfDict, PdfName, PdfObject
 
 # creating pdf out of the string

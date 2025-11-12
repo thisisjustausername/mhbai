@@ -4,6 +4,10 @@
 #
 # For usage please contact the developer.
 
+# Description: Tests functions for extracting text from PDF streams
+# Status: PROTOTYPING
+# FileID: Re-te-0001
+
 import re
 import zlib
 import json

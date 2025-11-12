@@ -4,6 +4,10 @@
 #
 # For usage please contact the developer.
 
+# Description: Tests extracting data from MHBs from University of Augsburg
+# Status: PROTOTYPING
+# FileID: Re-te-0005
+
 import json
 import re
 import zlib

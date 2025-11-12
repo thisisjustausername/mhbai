@@ -5,6 +5,8 @@
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
 # Description: clean data, execute after data_processing.py
+# Status: FUNCTIONAL-TEMPORARY
+# FileID: Sc-au-0003
 
 import json
 

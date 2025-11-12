@@ -5,6 +5,8 @@
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
 # Description: get the base urls for all courses of study
+# Status: VERSION 1.0
+# FileID: Sc-ge-0001
 
 import json
 import math
@@ -16,7 +18,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
-from selenium.common.exceptions import StaleElementReferenceException
 import multiprocessing
 
 from web_scraping.universal.data import database as db
@@ -197,16 +198,20 @@ def get_error_base_links(urls_per_job: int = 1):
             elements, error_list = result.get()
             all_elements += elements
             all_errors += error_list
+    """
     with open("web_scraping/universal/files/data.json", "w") as file:
         json.dump(all_elements, file, indent=4)
     with open("web_scraping/universal/files/error_list.json", "w") as file:
-        json.dump(all_errors, file, indent=4)   
+        json.dump(all_errors, file, indent=4)
+    """
 
 if __name__ == "__main__":
     raspi = True
     # get_base_links(urls_per_job=2, raspi=raspi)
     get_base_links_synchronous(raspi=False)
+    """
     print("-----------------------------------------------\nstep 2\n-----------------------------------------------")
     with open("web_scraping/universal/files/data.json", "r") as file:
         data = json.load(file)
     print(len(data))
+    """

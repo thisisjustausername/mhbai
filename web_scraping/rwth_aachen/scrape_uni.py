@@ -5,6 +5,8 @@
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
 # Description: find the urls to the mhbs for university of aachen
+# Status: FUNCTIONAL-TEMPORARY
+# FileID: Sc-aa-0002
 
 import time
 import urllib.parse

@@ -4,8 +4,9 @@
 #
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
-# Description: get the general mhb page for each university
-# STATUS: TESTING
+# Description: get the general uni page for each university
+# Status: TESTING
+# FileID: Sc-ge-0004
 
 # USE THIS FILE TO AUTOMATE THE PROCESS OF FETCHING THE GENERAL MHB PAGE FOR EACH UNIVERSITY
 import time

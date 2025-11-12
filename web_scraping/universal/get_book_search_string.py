@@ -4,8 +4,11 @@
 #
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
-# Description: create search string for search engine from course information, code works but needs to be polished, use lxml
-# Status: IN DEVELOPMENT
+# Description: Deprecated way of creating search strings for mhbs, slow
+# Status: DEPRECATED
+# FileID: Sc-ge-0010
+
+
 # TODO: instead of single process for each link fetch, use multiple link fetch
 # TODO: save error links
 

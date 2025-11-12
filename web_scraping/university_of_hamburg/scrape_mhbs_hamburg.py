@@ -5,6 +5,8 @@
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
 # Description: find all courses of study of the University of Hamburg
+# Status: FINISHED
+# FileID: Sc-ha-0002
 
 import requests
 from bs4 import BeautifulSoup

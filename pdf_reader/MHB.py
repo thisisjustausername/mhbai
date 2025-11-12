@@ -5,7 +5,8 @@
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
 # Description: dataclass for MHB
-
+# Status: IN DEVELOPMENT
+# FileID: Re-dt-0001
 
 # TODO add title to mhb, optionally other information like year etc.
 

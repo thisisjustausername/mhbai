@@ -207,13 +207,22 @@ The pdf reader was created in order to allow for more precise table recogniction
 # This file is Copyright-protected.           <- Protection status
 
 # Description: brief description              <- brief description
-# Status: TESTING                             <- status: IN DEVELOPMENT, TESTING, VERSION x.x
+# Status: TESTING                             <- status of development
 # FileID: D-01                                <- file_id: each file has an ID
 ```
 For further information on file ids go to [File IDs](#file-ids)
 
 * Additional protection status: 
 Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
+
+### Status
+* PROTOTYPING: This file is used to develop first ideas and try to implement the,
+* IN DEVELOPMENT: This file should be used for a phase of the project or the final version and is currently in development
+* TESTING: This file is done, but still undergoes testing
+* FUNCTIONAL-TEMPORARY: This file is still used, but it is planned to terminate its usage or replace it with another file or program
+* FINISHED: File is finished, but won't be used for a final version
+* VERSION x.x: This file is in the final Version x.x
+* DEPRECATED: This file is no longer used and marked for deletion
 
 ### File IDs
 Each file has a unique id to keep track of it when moving files. 
@@ -239,6 +248,10 @@ The middle letter (subfield) is optional (if nonexistent, use x as placeholder).
 | sp | Setup |
 | mn | main |
 | in | init |
+| dt | datatype |
+| ex | extraction |
+| te | testing |
+| ge | general |
 
 
 ## Use case
@@ -247,6 +260,9 @@ E.g. for data fetching: Execute file x (FileID) after file y (FileID)
 
 ## Status quo
 ### Latest changes
+- adding file-ids
+- setting up database
+- scraping mhbs from many universities in Germany
 - adding new features to pdf_reader_toc.py
   - extracting all module codes from the toc of a mhb
   - extracting information from each module (still in development); already implemented:
@@ -276,3 +292,4 @@ E.g. for data fetching: Execute file x (FileID) after file y (FileID)
 - in MHB_Overlaps instead of choosing name, choose title and mention date of MHB
 - In the future, the file structure will be radically restructured. This is due to the split between software taylored for the University of Augsburg and software made for all universities.
 - run screen python3 -m web_scraping.universal.get_unis_fhs_courses_of_study at night for faster internet connection
+- add Solr for efficient Data Management

@@ -5,6 +5,8 @@
 # For usage please contact the developer.
 
 # Description: read content and extract objects from pdfs
+# Status: IN DEVELOPMENT
+# FileID: Re-ex-0001
 
 import json
 import re

@@ -4,8 +4,9 @@
 #
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
-# Description: verify, whether urls are still valid
-# STATUS: IN DEVELOPMENT
+# Description: verify, whether urls from crawling are still valid
+# STATUS: PROTOTYPING
+# FileID: Sc-cr-0004
 
 import math
 import requests

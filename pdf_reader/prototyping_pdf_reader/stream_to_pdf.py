@@ -4,6 +4,10 @@
 #
 # For usage please contact the developer.
 
+# Description: Tests functions to read text from PDFs using libraries
+# Status: PROTOTYPING
+# FileID: Re-te-0002
+
 from PyPDF2 import PdfWriter
 from PyPDF2 import PageObject
 from PyPDF2.generic import (

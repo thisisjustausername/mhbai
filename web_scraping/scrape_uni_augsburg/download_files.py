@@ -5,6 +5,8 @@
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
 # Description: download mhbs from University of Augsburg
+# Status: FUNCTIONAL-TEMPORARY
+# FileID: Sc-au-0001
 
 import requests
 import json

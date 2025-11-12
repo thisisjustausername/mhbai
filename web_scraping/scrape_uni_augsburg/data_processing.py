@@ -5,6 +5,9 @@
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
 # Description: extract data from pdfs and save them in json, clean data afterwards using cleaning_data.py
+# Status: FUNCTIONAL-TEMPORARY
+# FileID: Sc-au-0002
+
 
 # IMPORTANT NOTE: run this code on remote host
 

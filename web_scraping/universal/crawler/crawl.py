@@ -1,3 +1,14 @@
+# Copyright (c) 2025 Leon Gattermeyer
+#
+# This file is part of mhbai.
+#
+# Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
+
+# Description: crawl a web page and return all the urls it contains
+# STATUS: IN DEVELOPMENT
+# FileID: Sc-cr-0002
+
+
 """
 Multiprocess BFS crawler that keeps the multiprocessing architecture but uses
 async I/O (aiohttp) inside each worker process for fast network fetches.

@@ -1,3 +1,12 @@
+-- Copyright (c) 2025 Leon Gattermeyer
+
+-- This file is part of mhbai.
+
+-- Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.--
+-- Description: crawl a web page and return all the urls it contains
+-- STATUS: VERSION 1.0
+-- FileID: Sc-da-0002
+
 CREATE OR REPLACE FUNCTION check_inserted_vals()
     RETURNS TRIGGER AS
 $$
