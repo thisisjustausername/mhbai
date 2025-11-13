@@ -293,3 +293,5 @@ E.g. for data fetching: Execute file x (FileID) after file y (FileID)
 - In the future, the file structure will be radically restructured. This is due to the split between software taylored for the University of Augsburg and software made for all universities.
 - run screen python3 -m web_scraping.universal.get_unis_fhs_courses_of_study at night for faster internet connection
 - add Solr for efficient Data Management
+- add Tabulate or another appropriate tool
+- implement Docker
