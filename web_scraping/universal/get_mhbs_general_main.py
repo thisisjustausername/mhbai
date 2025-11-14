@@ -11,7 +11,7 @@
 # USE THIS FILE TO AUTOMATE THE PROCESS OF FETCHING THE GENERAL MHB PAGE FOR EACH UNIVERSITY
 import time
 from web_scraping.universal.get_general_mhb_page import automate
-from web_scraping.universal.data import database as db
+from database import database as db
 
 if __name__ == "__main__":
     cursor = db.connect()

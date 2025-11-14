@@ -12,7 +12,7 @@ import time
 
 from bs4 import BeautifulSoup
 import requests
-from web_scraping.universal.data import database as db
+from database import database as db
 
 
 def bundled_universities(universities: list[dict[str, str]]) -> None | Exception:

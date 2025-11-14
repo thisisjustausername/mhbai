@@ -18,7 +18,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from multiprocessing import Pool
 
-from web_scraping.universal.data import database as db
+from database import database as db
 
 def wait_for_page_load(driver, timeout: int = 10) -> None:
     """

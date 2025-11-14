@@ -13,7 +13,7 @@ import time
 
 import requests
 from bs4 import BeautifulSoup
-from web_scraping.universal.data import database as db
+from database import database as db
 
 
 def fetch_search_strings(search_strings: list[dict[str, str]]) -> None | Exception:

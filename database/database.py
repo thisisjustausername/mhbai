@@ -15,7 +15,7 @@ from enum import Enum
 from functools import wraps
 import os
 from typing import Any
-from web_scraping.universal.data.result import DB_Result
+from database.result import DB_Result
 
 from dotenv import load_dotenv
 import psycopg2 as pg

@@ -20,7 +20,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 import multiprocessing
 
-from web_scraping.universal.data import database as db
+from database import database as db
 
 def process_urls(urls: list, offset: int=0, raspi=False):
     """

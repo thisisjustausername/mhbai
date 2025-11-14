@@ -14,7 +14,7 @@ from multiprocessing import pool
 import time
 import requests
 from bs4 import BeautifulSoup
-from web_scraping.universal.data import database as db
+from database import database as db
 
 
 def get_general_mhb_page(university: str, city: str) -> str | None:

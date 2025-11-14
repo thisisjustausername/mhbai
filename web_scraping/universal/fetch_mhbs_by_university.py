@@ -8,7 +8,7 @@
 # Status: DEPRECATED
 # FileID: Sc-ge-0011
 
-from web_scraping.universal.data import database as db
+from database import database as db
 import requests
 
 # connect to db
