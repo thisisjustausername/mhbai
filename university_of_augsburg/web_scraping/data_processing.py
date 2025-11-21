@@ -4,6 +4,10 @@
 #
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
-# Description: automated scraping of mhbs from University of Augsburg
-# Status: IN DEVELOPMENT
-# FileID: Sc-au-0005
+# Description: extracts and processes module data from mhbs
+# Status: VERSION 1.0
+# FileID: Au-sc-0002
+
+from database import database as db
+
+def 
