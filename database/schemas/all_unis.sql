@@ -16,7 +16,7 @@ AUTHORIZATION gatterle;
 
 -- create tables
 
-CREATE TABLE IF NOT EXISTS all_unis.universal_mhbs (
+CREATE TABLE IF NOT EXISTS all_unis.mhbs (
     id SERIAL PRIMARY KEY,
     source_url TEXT NOT NULL UNIQUE,
     source_title TEXT,
