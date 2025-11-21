@@ -8,8 +8,6 @@
 # Status: IN DEVELOPMENT
 # FileID: Re-ex-0002
 
-from ast import Dict
-import sys # only used for testing
 from pdf_reader import pdf_extractor as extr
 import re
 from itertools import groupby
@@ -175,7 +173,8 @@ def search_text_blocks(heading: str, start_info: int, matching_pages: list[bytes
                 if len(exams) > 1:
                     # TODO implement it for more than one exam
                     # is able to find one or less exams for each module block
-                    raise NotImplementedError("More than one exam have been found. Due to a lack of fitting MHBs this issue couldn't be tested enough yet.")
+                    exams = exams[0:1]
+                    #raise NotImplementedError("More than one exam have been found. Due to a lack of fitting MHBs this issue couldn't be tested enough yet.")
                 # NOTE for more precision just search for the last found match
                 exam = None
                 if len(exams) == 1 and exams is not None:
