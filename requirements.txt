@@ -9,3 +9,5 @@ dotenv
 aiohttp
 selectolax
 tldextract
+tqdm
+requests-html
