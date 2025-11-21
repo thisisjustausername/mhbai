@@ -8,9 +8,6 @@ lib
 lib64
 bin
 pyvenv.cfg
-test.csv
-test.html
-test.md
 universities
 Modulhandbuch_Bachelor_of_Music_PO_2023_ID48735_5_de_20250414_1754.html
 .git
@@ -18,6 +15,6 @@ include
 screenlog.*
 do_not_track
 .env
-test
 pdfs_2
 .vscode
+test*
