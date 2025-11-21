@@ -66,7 +66,7 @@ def bundled_mhb_page(data: list[dict]):
             continue
         if link is None:
             continue
-        result = db.update(cursor=cursor, table="universities", arguments={"mhb_url": link}, conditions={"name": university, "city": city})
+        result = db.update(cursor=cursor, table="all_unis.universities", arguments={"mhb_url": link}, conditions={"name": university, "city": city})
         if result.is_error:
             print(f"Error updating university {university}, {city}: {link}")
     db.close(cursor)
@@ -81,7 +81,7 @@ def get_uni_mhb_url(abort: bool = False):
     cursor = db.connect()
 
     # get data
-    result = db.select(cursor=cursor, table="universities", keywords={"name", "city"}, answer_type=db.ANSWER_TYPE.LIST_ANSWER, specific_where="mhb_url IS NULL")
+    result = db.select(cursor=cursor, table="all_unis.universities", keywords={"name", "city"}, answer_type=db.ANSWER_TYPE.LIST_ANSWER, specific_where="mhb_url IS NULL")
     if result.is_error:
         raise result.error
     data = result.data
@@ -95,7 +95,7 @@ def get_uni_mhb_url(abort: bool = False):
                 raise Exception("BLOCKED")
             print(f"No link found for {uni['university']}, {uni['city']}")
             continue
-        result = db.update(cursor=cursor, table="universities", arguments={"mhb_url": link}, conditions={"name": uni["university"], "city": uni["city"]})
+        result = db.update(cursor=cursor, table="all_unis.universities", arguments={"mhb_url": link}, conditions={"name": uni["university"], "city": uni["city"]})
         if result.is_error:
             print(result.error)
             print(f"Error updating university {uni['university']}, {uni['city']}: {link}")
@@ -111,7 +111,7 @@ def get_data_asynchronous(urls_per_job: int = 2):
     cursor = db.connect()
 
     # get data
-    result = db.select(cursor=cursor, table="universities", keywords={"name", "city"}, answer_type=db.ANSWER_TYPE.LIST_ANSWER)
+    result = db.select(cursor=cursor, table="all_unis.universities", keywords={"name", "city"}, answer_type=db.ANSWER_TYPE.LIST_ANSWER)
     if result.is_error:
         raise result.error
     data = result.data

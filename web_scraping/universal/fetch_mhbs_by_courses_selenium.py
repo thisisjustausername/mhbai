@@ -72,7 +72,7 @@ def fetch_search_strings(search_strings: list[dict[str, str]]) -> None | Excepti
         if mhb_url is None:
             print(f"Error for query {search_string}: No OfficialDomain found")
             continue
-        result = db.update(cursor=cursor, table="universal_mhbs", arguments={"mhb_url": mhb_url}, conditions={"search_string": search_string})
+        result = db.update(cursor=cursor, table="all_unis.mhbs", arguments={"mhb_url": mhb_url}, conditions={"search_string": search_string})
         if result.is_error:
             print(f"Error updating search_string {search_string}: {mhb_url}")
             continue
@@ -88,7 +88,7 @@ def main(multiprocessing: bool = True) -> None:
     cursor = db.connect()
 
     # fetch all universities
-    result = db.select(cursor=cursor, table="universal_mhbs", keywords=["search_string"], specific_where="mhb_url IS NULL")
+    result = db.select(cursor=cursor, table="all_unis.mhbs", keywords=["search_string"], specific_where="mhb_url IS NULL")
     db.close(cursor)
     # handle possible error
     if result.is_error:

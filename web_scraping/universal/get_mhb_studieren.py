@@ -53,7 +53,7 @@ def bundled_universities(universities: list[dict[str, str]]) -> None | Exception
         """
         if "/" in uni_url:
             uni_url = uni_url.split("/", 1)[0]
-        result = db.update(cursor=cursor, table="universal_mhbs", arguments={"uni_url": uni_url}, conditions={"university": university["university"], "city": university["city"]})
+        result = db.update(cursor=cursor, table="all_unis.mhbs", arguments={"uni_url": uni_url}, conditions={"university": university["university"], "city": university["city"]})
         if result.is_error:
             print(f"Error updating university {university['university']}, {university['city']}: {uni_url}")
             continue
@@ -72,7 +72,7 @@ def main():
     cursor = db.connect()
 
     # fetch all universities
-    result = db.select(cursor=cursor, table="universal_mhbs", keywords=["university", "city"], specific_where="uni_url IS NULL")
+    result = db.select(cursor=cursor, table="all_unis.mhbs", keywords=["university", "city"], specific_where="uni_url IS NULL")
     db.close(cursor)
 
     # handle possible error

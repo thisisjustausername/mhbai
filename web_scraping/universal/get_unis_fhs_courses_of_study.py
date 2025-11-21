@@ -95,18 +95,20 @@ def process_urls(urls: list, offset: int=0, raspi=False):
                 i["university"] = information[2].strip()
                 i["degree"] = information[3].strip()
                 try:
-                    db.insert(cursor=cursor, table="universal_mhbs", arguments={
-                        "stud_title": i["title"], 
+                    db.insert(cursor=cursor, table="all_unis.mhbs", arguments={
+                        "source_title": i["title"], 
                         "name": i["name"],
                         "city": i["city"],
                         "university": i["university"],
                         "degree": i["degree"],
-                        "stud_url": i["href"]
+                        "source_url": i["href"], 
+                        "source": "studieren.de"
                     })
                 except Exception as e:
-                    db.insert(cursor=cursor, table="universal_mhbs", arguments={
-                        "stud_title": i["title"],
-                        "stud_url": i["href"]})
+                    db.insert(cursor=cursor, table="all_unis.mhbs", arguments={
+                        "source_title": i["title"],
+                        "source_url": i["href"], 
+                        "source": "studieren.de"})
                     print(f"Error inserting into db: {e}")
             # elems = [i.find_element(By.CLASS_NAME, "item-main-link").get_attribute("href") for i in child_elements if i.get_attribute("class") in ["page-course-listing-entry search-result simple profile", "page-course-listing-entry search-result simple profile similar-courses"]]
 

@@ -4,16 +4,18 @@
 #
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
-# Description: extract data from pdfs and save them in json, clean data afterwards using cleaning_data.py
+# Description: extract data from pdfs and save them in json or db, clean data afterwards using cleaning_data.py
 # Status: FUNCTIONAL-TEMPORARY
 # FileID: Sc-au-0002
 
 
 # IMPORTANT NOTE: run this code on remote host
 
-from pdf_reader import pdf_reader_toc as prt
 import os
 import json
+
+from database import database as db
+from pdf_reader import pdf_reader_toc as prt
 
 # retrieve the names of all pdfs
 all_pdfs = os.listdir("pdfs")

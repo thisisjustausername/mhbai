@@ -15,7 +15,7 @@ from database import database as db
 
 if __name__ == "__main__":
     cursor = db.connect()
-    universities = db.select(cursor=cursor, table="universities", keywords=["name", "city"], specific_where="mhb_url IS NOT NULL")
+    universities = db.select(cursor=cursor, table="all_unis.universities", keywords=["name", "city"], specific_where="mhb_url IS NOT NULL")
     if universities.is_error:
         db.close(cursor)
         raise universities.error
@@ -26,7 +26,7 @@ if __name__ == "__main__":
         except:
             time.sleep(61)
             pass
-        universities = db.select(cursor=cursor, table="universities", keywords=["name", "city"], specific_where="mhb_url IS NOT NULL")
+        universities = db.select(cursor=cursor, table="all_unis.universities", keywords=["name", "city"], specific_where="mhb_url IS NOT NULL")
         if universities.is_error:
             db.close(cursor)
             raise universities.error

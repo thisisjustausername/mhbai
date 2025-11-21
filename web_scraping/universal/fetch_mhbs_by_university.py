@@ -15,7 +15,7 @@ import requests
 cursor = db.connect()
 
 # get all universities
-query = """SELECT DISTINCT(city, university) FROM universal_mhbs"""
+query = """SELECT DISTINCT(city, university) FROM all_unis.mhbs"""
 result = db.custom_call(
     cursor=cursor, 
     query=query,
