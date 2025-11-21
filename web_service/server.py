@@ -52,7 +52,7 @@ def compareFast():
         Exception("No valid pdf files")
 
     # mhbs = [MHB("pdfs/" + i) for i in file_names]
-    modules = [prt.Modules("pdfs/" + i) for i in file_names]
+    modules = [prt.Modules("pdfs_2/" + i) for i in file_names]
     #print(modules[0])
     no_infos = "k.A."
 
@@ -172,11 +172,11 @@ def compare_simple():
         information_overlaps.append(module_data)"""
 
     if len(set(file_names)) == 1:
-        overlaps = MHB("pdfs/" + file_names[0])
+        overlaps = MHB("pdfs_2/" + file_names[0])
         ovl_modules = overlaps.modules
         ovl_modules = [{k: v if k != "pages" else group_pages(v) for k, v in i.items()} for i in ovl_modules]
     else:
-        overlaps = Overlaps.input_paths(["pdfs/" + i for i in file_names])
+        overlaps = Overlaps.input_paths(["pdfs_2/" + i for i in file_names])
         ovl_modules = overlaps.ovl_modules
     return jsonify({"data": ovl_modules})
 
