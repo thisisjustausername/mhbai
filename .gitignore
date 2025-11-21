@@ -19,3 +19,5 @@ screenlog.*
 do_not_track
 .env
 test
+pdfs_2
+.vscode
