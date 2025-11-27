@@ -3,6 +3,14 @@ import sys
 from pathlib import Path
 
 def run_target(arg: str):
+    """
+    Run a module or script located relative to the current working directory.
+
+    Parameters:
+        arg (str): Path to the script or module name to run.
+    Returns:
+        None
+    """
     p = Path(arg).resolve()
     # if user passed an explicit module name, run it directly
     if not p.exists() and "." in arg and not arg.endswith(".py"):
@@ -19,6 +27,9 @@ def run_target(arg: str):
         runpy.run_path(str(p), run_name="__main__")
 
 def main():
+    """
+    Run a script or module from the root of the project.
+    """
     if len(sys.argv) < 2:
         print("Usage: run_from_root.py <file.py | package.module>")
         sys.exit(2)
