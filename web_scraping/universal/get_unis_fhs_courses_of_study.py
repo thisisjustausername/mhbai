@@ -95,7 +95,7 @@ def process_urls(urls: list, offset: int=0, raspi=False):
                 i["university"] = information[2].strip()
                 i["degree"] = information[3].strip()
                 try:
-                    db.insert(cursor=cursor, table="all_unis.mhbs", arguments={
+                    db.insert(cursor=cursor, table="all_unis.prototyping_mhbs", arguments={
                         "source_title": i["title"], 
                         "name": i["name"],
                         "city": i["city"],
@@ -105,7 +105,7 @@ def process_urls(urls: list, offset: int=0, raspi=False):
                         "source": "studieren.de"
                     })
                 except Exception as e:
-                    db.insert(cursor=cursor, table="all_unis.mhbs", arguments={
+                    db.insert(cursor=cursor, table="all_unis.prototyping_mhbs", arguments={
                         "source_title": i["title"],
                         "source_url": i["href"], 
                         "source": "studieren.de"})
@@ -159,7 +159,6 @@ def get_base_links(urls_per_job: int = 30, raspi: bool=False):
             elements, error_list = result.get()
             all_elements += elements
             all_errors += error_list
-        sys.exit(0)
 
     # save results to files
     # TODO: remove files and result gathering since usage of db

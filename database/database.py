@@ -15,7 +15,7 @@ from enum import Enum
 from functools import wraps
 import os
 from typing import Any
-from database.result import DB_Result
+from datatypes.result import Result
 
 from dotenv import load_dotenv
 import psycopg2 as pg
@@ -57,7 +57,7 @@ def full_pack(func: Callable[..., Any]):
     def wrapped(*args, **kwargs):
         conn, cursor = connect()
         result = func(cursor, *args, **kwargs)
-        close(connection=conn, cursor=cursor)
+        close(cursor=cursor)
         return result
     return wrapped
 
@@ -73,9 +73,9 @@ def catch_exception(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
-            return DB_Result(data=func(*args, **kwargs))
+            return Result(data=func(*args, **kwargs))
         except Exception as e:
-            return DB_Result(error=e)
+            return Result(error=e)
     return wrapper
 
 def connect(**kwargs):
@@ -108,13 +108,14 @@ def select(
         select_max_of_key: str = "", 
         specific_where: str = "", 
         variables: list[str] | None = None,
-        order_by: tuple[str, ORDER] | None = None) -> DB_Result[Any, Exception]:
+        order_by: tuple[str, ORDER] | None = None) -> Result[Any, Exception]:
     """
     read_table \n
     read data from a table
     
     Parameters:
         cursor (from): cursor for db
+        table (str): table to select from
         keywords (tuple[str] | list[str]): columns, that should be selected, if empty, get all
         conditions (dict): under which conditions (key: column, value: value) values should be selected, if empty, no conditions
         negated_conditions (dict): under which conditions (key: column, value: value) values should NOT be selected, if empty, no negated conditions
@@ -124,7 +125,7 @@ def select(
         variables (list | None): list of variables that should be passed into the specific_where statement
         order_by (str, ORDER) | None: ORDER by default no ordering
     Returns:
-        DB_Result: result object with data or error
+        Result: result object with data or error
     """
 
     # check, whether answer_type is valid
@@ -184,7 +185,7 @@ def select(
     # map the data to the keywords if keywords are explicitly specified
     if keywords is not None and "*" not in keywords:
         result = {key: value for key, value in zip(keywords, data)} if answer_type == ANSWER_TYPE.SINGLE_ANSWER else [{key: value for key, value in zip(keywords, vals)} for vals in data]
-    return DB_Result(data=result)
+    return Result(data=result)
 
 # NOTE arguments is either of type dict or of type list
 # @catch_exception
@@ -192,7 +193,7 @@ def insert(
     cursor: cursor, 
     table: str, 
     returning_column: str | None = None, 
-    arguments: dict[str, Any] | list[str] | None = None) -> DB_Result[Any, Exception]:
+    arguments: dict[str, Any] | list[str] | None = None) -> Result[Any, Exception]:
     """
     insert data into table
 
@@ -202,7 +203,7 @@ def insert(
         arguments (dict | None): values that should be entered (key: column, value: value), if empty, no conditions, if arguments is of type list, then list has to contain all values that have to be entered
         returning_column (int): returns the column
     Returns:
-        DB_Result: result object with data or error
+        Result: result object with data or error
     """
 
     # initialize variables
@@ -236,13 +237,13 @@ def insert(
         # return data if requested
         if returning_column != None:
             data = cursor.fetchone()
-            return DB_Result(data=data)
-        return DB_Result()
+            return Result(data=data)
+        return Result()
 
     # rollback if error occurred
     except Exception as e:
         cursor.connection.rollback()
-        return DB_Result(error=e)
+        return Result(error=e)
 
 # for specific_where conditions must be empty, otherwise conditions will be ignored IMPORTANT what is being ignored differs from the other functions
 def update(
@@ -252,7 +253,7 @@ def update(
     arguments: dict[str, Any] | None = None,
     conditions: dict[str, Any] | None = None, 
     specific_where: str = "", 
-    specific_set: str = "") -> DB_Result[Any, Exception]:
+    specific_set: str = "") -> Result[Any, Exception]:
     """
     updates values in a table \n
     already has try catch
@@ -266,7 +267,7 @@ def update(
         specific_set (str): arguments must be empty, otherwise arguments will be ignored, specifies what should be set
         returning_column (str): returns the specified column, returns just a single column
     Returns:
-        DB_Result: result object with data or error
+        Result: result object with data or error
     """
 
     # initialize variables
@@ -305,19 +306,19 @@ def update(
         # get data if requested
         if returning_column != None:
             data = cursor.fetchone()
-            return DB_Result(data=data)
-        return DB_Result()
+            return Result(data=data)
+        return Result()
 
     # rollback if error occurred
     except Exception as e:
         cursor.connection.rollback()
-        return DB_Result(error=e)
+        return Result(error=e)
 
 def remove(
         cursor: cursor, 
         table: str, 
         conditions: dict[str, Any],
-        returning_column: str | None = None) -> DB_Result[Any, Exception]:
+        returning_column: str | None = None) -> Result[Any, Exception]:
     """
     removes data from table \n
     already has try catch
@@ -328,7 +329,7 @@ def remove(
         conditions (dict): specify from which row to remove the data
         returning_column (str): returns the specified column, returns just a single value
     Returns:
-        DB_Result: result object with data or error
+        Result: result object with data or error
     """
 
     # initialize variables
@@ -352,19 +353,19 @@ def remove(
         # get data if requested
         if returning_column != None:
             data = cursor.fetchone()
-            return DB_Result(data=data)
-        return DB_Result()
+            return Result(data=data)
+        return Result()
     
     # rollback if error occurred
     except Exception as e:
         cursor.connection.rollback()
-        return DB_Result(error=e)
+        return Result(error=e)
 
 def custom_call(
         cursor: cursor, 
         query: str, 
         type_of_answer: ANSWER_TYPE, 
-        variables: list[Any] | tuple[Any] | None = None) -> DB_Result[Any, Exception]:
+        variables: list[Any] | tuple[Any] | None = None) -> Result[Any, Exception]:
     """
     send a custom query to the database
 
@@ -374,7 +375,7 @@ def custom_call(
         type_of_answer (ANSWER_TYPE): what answer to expect
         variables (list | None): list of variables that should be passed into the query
     Returns:
-        DB_Result: result object with data or error
+        Result: result object with data or error
     """
 
     # try custom call
@@ -387,38 +388,38 @@ def custom_call(
             cursor.connection.commit()
         
         if type_of_answer == ANSWER_TYPE.NO_ANSWER:
-            return DB_Result()
+            return Result()
         elif type_of_answer == ANSWER_TYPE.SINGLE_ANSWER:
-            return DB_Result(data=cursor.fetchone())
+            return Result(data=cursor.fetchone())
         elif type_of_answer == ANSWER_TYPE.LIST_ANSWER:
-            return DB_Result(data=cursor.fetchall())
+            return Result(data=cursor.fetchall())
         else:
             # would usually be better to check at the beginning, but since code is used backend, function is mostly used correctly. Therefore, it is more effective to check at the end if no other case matches
-            return DB_Result(error="parameter type_of_answer of the function must be of enum type ANSWER_TYPE")
+            return Result(error="parameter type_of_answer of the function must be of enum type ANSWER_TYPE")
     
     # rollback if error occurred
     except Exception as e:
         cursor.connection.rollback()
-        return DB_Result(error=e)
+        return Result(error=e)
 
 # TODO can only return success True right now
 # @catch_exception
-def get_time(cursor: cursor) -> DB_Result[Any, Exception]:
+def get_time(cursor: cursor) -> Result[Any, Exception]:
     """
     returns the current berlin time
 
     Parameters:
         cursor (cursor): cursor to interact with db
     Returns:
-    DB_Result: result object with data or error
+    Result: result object with data or error
     """
     # execute query
     query = """SELECT NOW() AT TIME ZONE 'Europe/Berlin' AS current_time"""
     cursor.execute(query)
     data = cursor.fetchone()
-    return DB_Result(data=data[0] if data is not None else None)
+    return Result(data=data[0] if data is not None else None)
 
-def close(cursor: cursor | None = None):
+def close(cursor: cursor):
     """
     closes the current cursor
     
