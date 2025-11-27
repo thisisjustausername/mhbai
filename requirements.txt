@@ -11,3 +11,4 @@ selectolax
 tldextract
 tqdm
 requests-html
+typeguard
