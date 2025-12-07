@@ -25,13 +25,14 @@ class Result(Generic[Data, Error]):
     Especially useful for database operations.
     """
 
-    def __init__(self, data: Optional[Data] = None, error: Optional[Error] = None):
+    def __init__(self, data: Optional[Data] = None, error: Optional[Error] = None, stack_trace: Optional[str] = None) -> None:
         """
         Initialization of the Result object.
 
         Parameters:
             data (Optional[Data]): The successful result data.
             error (Optional[Error]): The error information if the operation failed.
+            stack_trace: Optional[str] = None
         Returns:
             None
         """
@@ -40,6 +41,7 @@ class Result(Generic[Data, Error]):
             raise ValueError("Result cannot have both data and error.")
         self._data = data
         self._error = error
+        self._stack_trace = stack_trace
 
     @property
     def is_success(self) -> bool:
@@ -60,6 +62,16 @@ class Result(Generic[Data, Error]):
             bool: True if the result is an error, False otherwise.
         """
         return self._error is not None
+    
+    @property
+    def is_stack_trace(self) -> bool:
+        """
+        Represents whether the result has a stack trace.
+
+        Returns:
+            bool: True if the result has a stack trace, False otherwise.
+        """
+        return self._stack_trace is not None
 
     @property
     def data(self) -> Data:
@@ -69,7 +81,7 @@ class Result(Generic[Data, Error]):
         Returns:
             Data: The successful result data.
         """
-        if self.is_error:
+        if self.is_error or self.is_stack_trace:
             raise ValueError("No data available, operation resulted in an error.")
         return self._data  # type: ignore
 
@@ -82,5 +94,17 @@ class Result(Generic[Data, Error]):
             Error: The error information if the operation failed.
         """
         if self.is_success:
-            raise ValueError("No error available, operation was successful.")
+            raise ValueError("Operation was successful.")
         return self._error  # type: ignore
+    
+    @property
+    def stack_trace(self) -> str:
+        """
+        Represents the stack trace if available.
+
+        Returns:
+            str: The stack trace if available.
+        """
+        if self.is_success:
+            raise ValueError("Operation was successful.")
+        return self._stack_trace  # type: ignore
