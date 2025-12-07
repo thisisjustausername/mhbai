@@ -12,6 +12,7 @@ import json
 import math
 import sys
 import time
+import psycopg2
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -22,7 +23,9 @@ import multiprocessing
 
 from database import database as db
 
-def process_urls(urls: list, offset: int=0, raspi=False):
+
+@db.cursor_handling(manually_supply_cursor=False)
+def process_urls(urls: list, offset: int=0, raspi=False, cursor: psycopg2.extensions.cursor | None = None) -> tuple[list, list]:
     """
     Process a list of URLs to scrape course information.
     Each url is a page of studieren.de containing multiple courses of study.
@@ -31,6 +34,9 @@ def process_urls(urls: list, offset: int=0, raspi=False):
         urls (list): List of URLs to be processed.
         offset (int): Where to start counting in order to show a readable output to the user
         raspi (bool): Whether the program is running on a Raspberry Pi
+        cursor (psycopg2.extensions.cursor | None): SUPPLIED BY DECORATOR; Database cursor for storing data.
+    Returns:
+        tuple[list, list]: A tuple containing a list of scraped elements and a list of URLs that resulted in errors.
     """
 
     # try setting up webdriver
@@ -53,9 +59,6 @@ def process_urls(urls: list, offset: int=0, raspi=False):
     elements = []
     error_list = []
     
-    # connection to db
-    cursor = db.connect()
-
     # process each url page
     for index, element in enumerate(urls):
         try:
@@ -95,7 +98,7 @@ def process_urls(urls: list, offset: int=0, raspi=False):
                 i["university"] = information[2].strip()
                 i["degree"] = information[3].strip()
                 try:
-                    db.insert(cursor=cursor, table="all_unis.prototyping_mhbs", arguments={
+                    db.insert(cursor=cursor, table="all_unis.prototyping_mhbs", values={ # type: ignore
                         "source_title": i["title"], 
                         "name": i["name"],
                         "city": i["city"],
@@ -105,7 +108,7 @@ def process_urls(urls: list, offset: int=0, raspi=False):
                         "source": "studieren.de"
                     })
                 except Exception as e:
-                    db.insert(cursor=cursor, table="all_unis.prototyping_mhbs", arguments={
+                    db.insert(cursor=cursor, table="all_unis.prototyping_mhbs", values={ # type: ignore
                         "source_title": i["title"],
                         "source_url": i["href"], 
                         "source": "studieren.de"})
@@ -123,7 +126,6 @@ def process_urls(urls: list, offset: int=0, raspi=False):
     
     # close driver
     driver.quit()
-    db.close(cursor)
     return elements, error_list
 
 

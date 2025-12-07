@@ -12,6 +12,7 @@ import math
 import multiprocessing
 from multiprocessing import pool
 import time
+import psycopg2
 import requests
 from bs4 import BeautifulSoup
 from database import database as db
@@ -45,11 +46,10 @@ def get_general_mhb_page(university: str, city: str) -> str | None:
         raise Exception("No link found")
     return link
 
+@db.cursor_handling(manually_supply_cursor=False)
 def bundled_mhb_page(data: list[dict]):
     session = requests.Session()
     
-    # get cursor
-    cursor = db.connect()
     # base_url = "https://www.google.com/search"
     base_url = "https://leta.mullvad.net/search?q="
     for uni in data:
@@ -61,27 +61,33 @@ def bundled_mhb_page(data: list[dict]):
             response = session.get(url)
             response.raise_for_status()
             soup = BeautifulSoup(response.text, 'lxml')
-            link = soup.find("div", class_="results svelte-fmlk7p").find("div").find("article").find("a").get("href")
+            link = soup.find("div", class_="results svelte-fmlk7p").find("div").find("article").find("a").get("href") # type: ignore
         except:
             continue
         if link is None:
             continue
-        result = db.update(cursor=cursor, table="all_unis.universities", arguments={"mhb_url": link}, conditions={"name": university, "city": city})
+        result = db.update(cursor=cursor, table="all_unis.universities", arguments={"mhb_url": link}, conditions={"name": university, "city": city}) # type: ignore
         if result.is_error:
             print(f"Error updating university {university}, {city}: {link}")
-    db.close(cursor)
     return None
 
-def get_uni_mhb_url(abort: bool = False):
+@db.cursor_handling(manually_supply_cursor=False)
+def get_uni_mhb_url(abort: bool = False, cursor: psycopg2.extensions.cursor | None = None) -> None:
     """
     get all universities from db
+
+    Parameters:
+        abort (bool): whether to abort on first failure
+        cursor (psycopg2.extensions.cursor | None): SUPPLIED BY DECORATOR; Database cursor for storing data.
+    Returns:
+        None
     """
         
-    # get cursor
-    cursor = db.connect()
-
+    # set cursor again in order to only set linter warning ignore setting once
+    cursor = cursor # type: ignore
+    
     # get data
-    result = db.select(cursor=cursor, table="all_unis.universities", keywords={"name", "city"}, answer_type=db.ANSWER_TYPE.LIST_ANSWER, specific_where="mhb_url IS NULL")
+    result = db.select(cursor=cursor, table="all_unis.universities", keywords=["name", "city"], answer_type=db.ANSWER_TYPE.LIST_ANSWER, specific_where="mhb_url IS NULL") # type: ignore
     if result.is_error:
         raise result.error
     data = result.data
@@ -95,25 +101,32 @@ def get_uni_mhb_url(abort: bool = False):
                 raise Exception("BLOCKED")
             print(f"No link found for {uni['university']}, {uni['city']}")
             continue
-        result = db.update(cursor=cursor, table="all_unis.universities", arguments={"mhb_url": link}, conditions={"name": uni["university"], "city": uni["city"]})
+        result = db.update(cursor=cursor, table="all_unis.universities", arguments={"mhb_url": link}, conditions={"name": uni["university"], "city": uni["city"]}) # type: ignore
         if result.is_error:
             print(result.error)
             print(f"Error updating university {uni['university']}, {uni['city']}: {link}")
         else:
             print(f"Updated university {uni['university']}, {uni['city']}: {link}")
-    db.close(cursor)
 
+
+# NOTE: do not use cursor decorator, since this function closes the cursor very early while running for a long duration
 def get_data_asynchronous(urls_per_job: int = 2):
     # initialize multiprocessing
     multiprocessing.set_start_method("spawn")
 
-    # get cursor
+    # connect to db
     cursor = db.connect()
-
+    
     # get data
-    result = db.select(cursor=cursor, table="all_unis.universities", keywords={"name", "city"}, answer_type=db.ANSWER_TYPE.LIST_ANSWER)
+    result = db.select(cursor=cursor, table="all_unis.universities", keywords=["name", "city"], answer_type=db.ANSWER_TYPE.LIST_ANSWER)
+
+    # close cursor
+    db.close(cursor)
+
+    # handle error
     if result.is_error:
         raise result.error
+    
     data = result.data
     data = [{key if key != "name" else "university": value for key, value in uni.items()} for uni in data]
     # assign processes

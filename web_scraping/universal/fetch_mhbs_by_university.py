@@ -21,6 +21,10 @@ result = db.custom_call(
     query=query,
     type_of_answer=db.ANSWER_TYPE.LIST_ANSWER)
 
+# close database connection
+db.close(cursor)
+
+# handle database error
 if result.is_error:
     print(f"Error fetching universities: {result.error_message}")
     exit(1)

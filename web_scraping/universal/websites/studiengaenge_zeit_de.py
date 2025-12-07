@@ -5,12 +5,18 @@
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
 # Description: scrape courses from Zeit studiengaenge.zeit.de
-# Status: VERSION 1.0
-# FileID: Un-sc-0003
+# Status: DEPRECATED
+# FileID: Un-ws-0002
 
+
+import time
 from psycopg2.extensions import cursor
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
+from database import database as db
+from selenium.webdriver.common.by import By
 
 from web_scraping.universal.scrape import Scraper
 
@@ -71,7 +77,7 @@ class Zeit(Scraper):
             i["university"] = information[2].strip()
             i["degree"] = information[3].strip()
             try:
-                db.insert(cursor=cursor, table="all_unis.prototyping_mhbs", arguments={
+                db.insert(cursor=cursor, table="all_unis.prototyping_mhbs", values={
                     "source_title": i["title"], 
                     "name": i["name"],
                     "city": i["city"],
@@ -81,7 +87,7 @@ class Zeit(Scraper):
                     "source": "studiengaenge.zeit.de"
                 })
             except Exception as e:
-                db.insert(cursor=cursor, table="all_unis.prototyping_mhbs", arguments={
+                db.insert(cursor=cursor, table="all_unis.prototyping_mhbs", values={
                     "source_title": i["title"],
                     "source_url": i["href"], 
                     "source": "studiengaenge.zeit.de"})

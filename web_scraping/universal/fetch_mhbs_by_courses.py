@@ -11,17 +11,24 @@
 from datetime import datetime, timedelta
 import time
 
+import psycopg2
 import requests
 from bs4 import BeautifulSoup
 from database import database as db
 
-
-def fetch_search_strings(search_strings: list[dict[str, str]]) -> None | Exception:
+@db.cursor_handling(manually_supply_cursor=False)
+def fetch_search_strings(search_strings: list[dict[str, str]], cursor: psycopg2.extensions.cursor | None = None) -> None | Exception:
+    """
+    fetches mhb urls for given search strings and updates the database
+    
+    Parameters:
+        search_strings (list[dict[str, str]]): list of search strings to fetch mh
+        cursor (psycopg2.extensions.cursor | None): SUPPLIED BY DECORATOR; Database cursor for storing data.
+    Returns:
+        None | Exception: None if successful, Exception if an error occurred
+    """
 
     session = requests.Session()
-
-    # get cursor
-    cursor = db.connect()
     
     # url for the duckduckgo instant answer api
     # base_url: str = "https://api.duckduckgo.com/"
@@ -45,24 +52,28 @@ def fetch_search_strings(search_strings: list[dict[str, str]]) -> None | Excepti
         if mhb_url is None:
             print(f"Error for query {search_string}: No OfficialDomain found")
             continue
-        result = db.update(cursor=cursor, table="all_unis.prototyping_mhbs", arguments={"mhb_url": mhb_url}, conditions={"search_string": search_string})
+        result = db.update(cursor=cursor, table="all_unis.prototyping_mhbs", arguments={"mhb_url": mhb_url}, conditions={"search_string": search_string}) # type: ignore
         if result.is_error:
             print(f"Error updating search_string {search_string}: {mhb_url}")
             continue
         print(f"Updated search_string {search_string}: {mhb_url}")
         time.sleep(5)
-    db.close(cursor)
     return None
 
 
-def main():
-
-    # get cursor
-    cursor = db.connect()
+@db.cursor_handling(manually_supply_cursor=False)
+def main(cursor: psycopg2.extensions.cursor | None = None) -> None:
+    """
+    main function to fetch mhb urls for all universities without mhb url in the database
+    
+    Parameters:
+        cursor (psycopg2.extensions.cursor | None): SUPPLIED BY DECORATOR; Database cursor for storing data.
+    Returns:
+        None
+    """
 
     # fetch all universities
-    result = db.select(cursor=cursor, table="all_unis.prototyping_mhbs", keywords=["search_string"], specific_where="mhb_url IS NULL")
-    db.close(cursor)
+    result = db.select(cursor=cursor, table="all_unis.prototyping_mhbs", keywords=["search_string"], specific_where="mhb_url IS NULL") # type: ignore
     # handle possible error
     if result.is_error:
         raise result.error

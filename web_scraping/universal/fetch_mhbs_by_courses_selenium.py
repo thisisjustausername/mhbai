@@ -11,12 +11,15 @@
 from datetime import datetime, timedelta
 import math
 import time
+import psycopg2
 import selenium.webdriver as webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from multiprocessing import Pool
+import multiprocessing
+from bs4 import BeautifulSoup
+import selenium.webdriver as webdriver
 
 from database import database as db
 
@@ -43,11 +46,20 @@ def initialize_driver() -> webdriver.Chrome:
     driver = webdriver.Chrome(options=options)
     return driver
 
-def fetch_search_strings(search_strings: list[dict[str, str]]) -> None | Exception:
+@db.cursor_handling(manually_supply_cursor=False)
+def fetch_search_strings(search_strings: list[dict[str, str]], cursor: psycopg2.extensions.cursor | None = None) -> None | Exception:
+    """
+    fetches mhb urls for given search strings and updates the database
 
+    Parameters:
+        search_strings (list[dict[str, str]]): list of search strings to fetch mhb urls for
+        cursor (psycopg2.extensions.cursor | None): SUPPLIED BY DECORATOR; Database cursor for storing data.
+    Returns:
+        None | Exception: None if successful, Exception if an error occurred
+    """
 
-    # get cursor
-    cursor = db.connect()
+    # set cursor again in order to only set linter warning ignore setting once
+    cursor = cursor # type: ignore
 
     driver = initialize_driver()
     
@@ -56,15 +68,15 @@ def fetch_search_strings(search_strings: list[dict[str, str]]) -> None | Excepti
     base_url = "https://www.google.com/search"
     for search_string in search_strings:
         try:
-            response = driver.get(f"{base_url}?q={search_string.replace(" ", "+")}")
+            response = driver.get(f"{base_url}?q={search_string.replace(" ", "+")}") # type: ignore
         except Exception as e:
-            if response.status_code == 429:
+            if response.status_code == 429: # type: ignore
                 raise Exception("Rate limit exceeded. Stopping the scraper.")
-            print(f"Error for query {search_string}: {response.status_code}")
+            print(f"Error for query {search_string}: {response.status_code}") # type: ignore
             continue
-        soup = BeautifulSoup(response.text, 'lxml')
+        soup = BeautifulSoup(response.text, 'lxml') # type: ignore
         try:
-            mhb_url = soup.find("div", {"id": "results"}).find("div").find("a").get("href")
+            mhb_url = soup.find("div", {"id": "results"}).find("div").find("a").get("href") # type: ignore
         except Exception as e:
             print("Error for query: {search_string}: No url found")
             continue
@@ -72,19 +84,27 @@ def fetch_search_strings(search_strings: list[dict[str, str]]) -> None | Excepti
         if mhb_url is None:
             print(f"Error for query {search_string}: No OfficialDomain found")
             continue
-        result = db.update(cursor=cursor, table="all_unis.prototyping_mhbs", arguments={"mhb_url": mhb_url}, conditions={"search_string": search_string})
+        result = db.update(cursor=cursor, table="all_unis.prototyping_mhbs", arguments={"mhb_url": mhb_url}, conditions={"search_string": search_string}) # type: ignore
         if result.is_error:
             print(f"Error updating search_string {search_string}: {mhb_url}")
             continue
         print(f"Updated search_string {search_string}: {mhb_url}")
         time.sleep(5)
-    db.close(cursor)
     return None
 
 
-def main(multiprocessing: bool = True) -> None:
+# NOTE: do not use cursor decorator, since this function closes the cursor very early while running for a long duration
+def main(use_multiprocessing: bool = True) -> None:
+    """
+    main function to fetch mhb urls for all universities without mhb url in the database
 
-    # get cursor
+    Parameters:
+        use_multiprocessing (bool): whether to use multiprocessing
+    Returns:
+        None
+    """
+
+    # connect to db
     cursor = db.connect()
 
     # fetch all universities
@@ -99,7 +119,7 @@ def main(multiprocessing: bool = True) -> None:
     search_strings = [i["search_string"] for i in search_strings if i["search_string"] is not None]
     
     # without multiprocessing
-    if multiprocessing is False:
+    if use_multiprocessing is False:
         fetch_search_strings(search_strings)    
         return
     
@@ -112,6 +132,8 @@ def main(multiprocessing: bool = True) -> None:
         for result in results:
             data = result.get()
 
+    # TODO: not finished yet
+    return data
 
 if __name__ == "__main__":
     retry = True

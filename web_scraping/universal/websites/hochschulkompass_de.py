@@ -5,8 +5,8 @@
 # Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
 
 # Description: scrape courses from Hochschulkompass hochschulkompass.de
-# Status: VERSION 1.0
-# FileID: Un-sc-0002
+# Status: DEPRECATED
+# FileID: Un-ws-0003
 
 
 import time
@@ -117,4 +117,6 @@ if __name__ == "__main__":
     options.add_argument("--disable-dev-shm-usage")
     driver = webdriver.Chrome(options=options)
     wait = WebDriverWait(driver, 1)
-    hk_detailed.scrape_url(cursor=db.connect(), wait=wait, driver=driver, url=hk_detailed.list_urls[0])
+    cursor = db.connect()
+    hk_detailed.scrape_url(cursor=cursor, wait=wait, driver=driver, url=hk_detailed.list_urls[0])
+    db.close(cursor)

@@ -11,16 +11,23 @@
 import time
 
 from bs4 import BeautifulSoup
+import psycopg2
 import requests
 from database import database as db
 
-
-def bundled_universities(universities: list[dict[str, str]]) -> None | Exception:
+@db.cursor_handling(manually_supply_cursor=False)
+def bundled_universities(universities: list[dict[str, str]], cursor: psycopg2.extensions.cursor | None = None) -> None | Exception:
+    """
+    fetches uni urls for given universities and updates the database
+    
+    Parameters:
+        universities (list[dict[str, str]]): list of universities to fetch uni urls for
+        cursor (psycopg2.extensions.cursor | None): SUPPLIED BY DECORATOR; Database cursor for storing data.
+    Returns:
+        None | Exception: None if successful, Exception if an error occurred
+    """
 
     session = requests.Session()
-
-    # get cursor
-    cursor = db.connect()
     
     # url for the duckduckgo instant answer api
     # base_url: str = "https://api.duckduckgo.com/"
@@ -53,24 +60,24 @@ def bundled_universities(universities: list[dict[str, str]]) -> None | Exception
         """
         if "/" in uni_url:
             uni_url = uni_url.split("/", 1)[0]
-        result = db.update(cursor=cursor, table="all_unis.prototyping_mhbs", arguments={"uni_url": uni_url}, conditions={"university": university["university"], "city": university["city"]})
+        result = db.update(cursor=cursor, table="all_unis.prototyping_mhbs", arguments={"uni_url": uni_url}, conditions={"university": university["university"], "city": university["city"]}) # type: ignore
         if result.is_error:
             print(f"Error updating university {university['university']}, {university['city']}: {uni_url}")
             continue
         print(f"Updated university {university['university']}, {university['city']}: {uni_url}")
         time.sleep(5)
-    db.close(cursor)
     return None
 
 
+# NOTE: do not use cursor decorator, since this function closes the cursor very early while running for a long duration
 def main():
     
     # set urls per job
     urls_per_job: int = 10
 
-    # get cursor
+    # connect to db
     cursor = db.connect()
-
+    
     # fetch all universities
     result = db.select(cursor=cursor, table="all_unis.prototyping_mhbs", keywords=["university", "city"], specific_where="uni_url IS NULL")
     db.close(cursor)
