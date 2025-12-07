@@ -18,3 +18,4 @@ do_not_track
 pdfs_2
 .vscode
 test*
+*.json
