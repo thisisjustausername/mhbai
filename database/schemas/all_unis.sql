@@ -19,11 +19,12 @@ CREATE TABLE IF NOT EXISTS all_unis.universities (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     city TEXT,
-    website TEXT UNIQUE,
+    website TEXT,
     type_of_institution TEXT, 
     logo_url TEXT,
-    source_url TEXT, 
-    UNIQUE (name, city, source_url)
+    source TEXT, 
+    hs_nr INTEGER, -- Hochschulnummer, unique identifier for German universities
+    UNIQUE (name, city, source)
 );
 
 
@@ -71,7 +72,7 @@ CREATE TABLE IF NOT EXISTS all_unis.prototyping_universities (
 
 -- view combining mhbs and universities for easier inserts
 CREATE OR REPLACE VIEW all_unis.mhbs_unis AS
-    SELECT all_unis.mhbs.*, all_unis.universities.name AS university_name, all_unis.universities.city, all_unis.universities.type_of_institution
+    SELECT all_unis.mhbs.*, all_unis.universities.name AS university_name, all_unis.universities.city, all_unis.universities.type_of_institution, all_unis.universities.logo_url
     FROM all_unis.mhbs
     JOIN all_unis.universities ON all_unis.mhbs.university = all_unis.universities.id;
 
@@ -88,9 +89,9 @@ BEGIN
     uni_id := NULL;
 
     -- Insert into all_unis.universities
-    INSERT INTO all_unis.universities (name, city, source_url, type_of_institution)
-    VALUES (NEW.university_name, NEW.city, NEW.source_url, NEW.type_of_institution)
-    ON CONFLICT (name, city, source_url) DO NOTHING
+    INSERT INTO all_unis.universities (name, city, type_of_institution, logo_url, source)
+    VALUES (NEW.university_name, NEW.city, NEW.type_of_institution, NEW.logo_url, NEW.source)
+    ON CONFLICT (name, city, source) DO NOTHING
     RETURNING id INTO uni_id;
 
     -- if insert did not happen, select existing id
@@ -99,8 +100,7 @@ BEGIN
         INTO uni_id 
         FROM all_unis.universities 
         WHERE name = NEW.university_name 
-            AND city = NEW.city 
-            AND source_url = NEW.source_url 
+            AND city = NEW.city
         LIMIT 1;
     END IF;
 
@@ -111,6 +111,7 @@ BEGIN
         - 'university_name' 
         - 'city' 
         - 'type_of_institution'
+        - 'logo_url'
         || jsonb_build_object('university', uni_id)
     );
     mhbs_row.id := nextval(pg_get_serial_sequence('all_unis.mhbs','id'));
