@@ -13,13 +13,18 @@
 from collections.abc import Callable
 from enum import Enum
 from functools import wraps
+import inspect
 import os
+import traceback
+import types
 from typing import Any
-from datatypes.result import Result
-
+import warnings
 from dotenv import load_dotenv
 import psycopg2 as pg
 from psycopg2.extensions import cursor
+
+from datatypes.result import Result
+
 
 load_dotenv()
 
@@ -55,11 +60,96 @@ def full_pack(func: Callable[..., Any]):
         function: wrapped function
     """
     def wrapped(*args, **kwargs):
-        conn, cursor = connect()
+        _, cursor = connect()
         result = func(cursor, *args, **kwargs)
-        close(cursor=cursor)
+        close(cursor=cursor) # type: ignore
         return result
     return wrapped
+
+def cursor_handling(*, manually_supply_cursor: bool = False) -> Callable[..., Any]:
+    """
+    decorator to handle cursor opening and closing
+    specify whether the cursor is supplied manually
+
+    Parameters:
+        manually_supply_cursor (bool): whether the cursor is supplied manually, default False
+    Returns:
+        function: decorated function
+    """
+
+    def decorator(func: Callable[..., Any]):
+        """
+        wrapper function to make sure cursor is closed after function call
+        
+
+        Parameters:
+            func (func): function
+        Returns:
+            function: wrapped function
+        """
+
+        @wraps(func)
+        def wrapped(*args, **kwargs) -> Any:
+            """
+            Wrapped function
+
+            Parameters:
+                args: arguments for the function
+                kwargs: keyword arguments for the function
+            Returns:
+                any: return value of the function
+            """
+
+            # initialize cursor handling
+            close_cursor = manually_supply_cursor
+
+            # bind all arguments and keywords to check for cursor
+            bound = inspect.signature(func).bind_partial(*args, **kwargs)
+            bound.apply_defaults()
+            
+            # check whether cursor is a valid keyword argument
+            try:
+                _ = bound.arguments['cursor']
+            except KeyError:
+                raise ValueError(f"cursor must be a valid keyword argument of the function {func.__name__}")
+            
+            # set cursor based on whether it is supplied manually or not
+            
+            # if cursor is not supplied manually and is None, create a new one
+            if (cursor := bound.arguments.get('cursor', None)) is None and manually_supply_cursor is False:                
+                # connect to db
+                cursor = connect()
+
+            # if cursor is supplied manually but manually_supply_cursor is False, raise error
+            elif cursor is None and manually_supply_cursor is True:
+                raise ValueError(f"cursor must be supplied manually for function {func.__name__} but is None")
+            
+            # if cursor is supplied manually and manually_supply_cursor is True, respond with user warning and create a new cursor
+            elif cursor is not None and manually_supply_cursor is False:
+                warnings.warn(f"cursor is supplied manually for function {func.__name__} but manually_supply_cursor is set to False; the manually set cursor will be IGNORED", UserWarning)
+                
+                # set close_cursor to True since the cursor is only used locally
+                close_cursor = True
+
+                # connect to db
+                cursor = connect()
+
+            # if manually_supply_cursor is not of type bool, raise error
+            elif isinstance(manually_supply_cursor, bool) is False:
+                raise ValueError("manually_supply_cursor must be of type bool")
+
+            try:
+                # run function
+                kwargs["cursor"] = cursor
+                return func(*args, **kwargs)
+            
+            finally:
+                # if cursor was created in this function, close it
+                if close_cursor is True:
+                    # close the cursor after the function call
+                    close(cursor=cursor) # type: ignore
+        return wrapped
+    return decorator
 
 # TODO right now for development and testing enabled, for website rather use failsafes (SAME AS IN often_used_db_calls.py)
 def catch_exception(func):
@@ -75,7 +165,7 @@ def catch_exception(func):
         try:
             return Result(data=func(*args, **kwargs))
         except Exception as e:
-            return Result(error=e)
+            return Result(error=e, stack_trace=traceback.format_exc())
     return wrapper
 
 def connect(**kwargs):
@@ -184,7 +274,7 @@ def select(
     
     # map the data to the keywords if keywords are explicitly specified
     if keywords is not None and "*" not in keywords:
-        result = {key: value for key, value in zip(keywords, data)} if answer_type == ANSWER_TYPE.SINGLE_ANSWER else [{key: value for key, value in zip(keywords, vals)} for vals in data]
+        result = {key: value for key, value in zip(keywords, data)} if answer_type == ANSWER_TYPE.SINGLE_ANSWER else [{key: value for key, value in zip(keywords, vals)} for vals in data] # type: ignore
     return Result(data=result)
 
 # NOTE arguments is either of type dict or of type list
@@ -192,23 +282,23 @@ def select(
 def insert(
     cursor: cursor, 
     table: str, 
-    returning_column: str | None = None, 
-    arguments: dict[str, Any] | list[str] | None = None) -> Result[Any, Exception]:
+    values: dict[str, Any] | list[str], 
+    returning_column: str | None = None) -> Result[Any, Exception]:
     """
     insert data into table
 
     Parameters:
         cursor (cursor): cursor for interaction with db
         table (str): table to insert into, if empty set all
-        arguments (dict | None): values that should be entered (key: column, value: value), if empty, no conditions, if arguments is of type list, then list has to contain all values that have to be entered
+        values (dict | list): values that should be entered (key: column, value: value), if empty, no conditions, if values is of type list, then list has to contain all values that have to be entered
         returning_column (int): returns the column
     Returns:
         Result: result object with data or error
     """
 
     # initialize variables
-    if arguments is None:
-        arguments = {}
+    if values is None:
+        values = {}
     if returning_column == "":
         returning_column = None
     query = ""
@@ -217,14 +307,14 @@ def insert(
     # try insert
     try:
         # build parametrized query
-        if type(arguments) == list:
+        if type(values) == list:
             query = f"""INSERT INTO {table}
-                        VALUES ({', '.join('%s' for _ in range(len(arguments)))})"""
-            vals = arguments
-        elif type(arguments) == dict:
-            query = f"""INSERT INTO {table} ({', '.join(arguments.keys())})
-                    VALUES ({', '.join('%s' for _, _ in enumerate(arguments.keys()))})"""
-            vals = list(arguments.values())
+                        VALUES ({', '.join('%s' for _ in range(len(values)))})"""
+            vals = values
+        elif type(values) == dict:
+            query = f"""INSERT INTO {table} ({', '.join(values.keys())})
+                    VALUES ({', '.join('%s' for _, _ in enumerate(values.keys()))})"""
+            vals = list(values.values())
 
         # add returning_column !NOT PARAMETRIZED!
         if returning_column != None:
@@ -243,7 +333,7 @@ def insert(
     # rollback if error occurred
     except Exception as e:
         cursor.connection.rollback()
-        return Result(error=e)
+        return Result(error=e, stack_trace=traceback.format_exc())
 
 # for specific_where conditions must be empty, otherwise conditions will be ignored IMPORTANT what is being ignored differs from the other functions
 def update(
@@ -312,7 +402,7 @@ def update(
     # rollback if error occurred
     except Exception as e:
         cursor.connection.rollback()
-        return Result(error=e)
+        return Result(error=e, stack_trace=traceback.format_exc())
 
 def remove(
         cursor: cursor, 
@@ -359,7 +449,7 @@ def remove(
     # rollback if error occurred
     except Exception as e:
         cursor.connection.rollback()
-        return Result(error=e)
+        return Result(error=e, stack_trace=traceback.format_exc())
 
 def custom_call(
         cursor: cursor, 
@@ -400,7 +490,7 @@ def custom_call(
     # rollback if error occurred
     except Exception as e:
         cursor.connection.rollback()
-        return Result(error=e)
+        return Result(error=e, stack_trace=traceback.format_exc())
 
 # TODO can only return success True right now
 # @catch_exception
