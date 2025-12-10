@@ -14,5 +14,8 @@ requests-html
 typeguard
 ollama
 crawl4ai
+<<<<<<< HEAD
 mypy
 pylint
+=======
+>>>>>>> 9e8ec3a (update requirements.txt)

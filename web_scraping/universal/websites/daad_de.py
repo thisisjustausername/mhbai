@@ -334,9 +334,21 @@ class Daad(Scraper):
         
         # matches should only contain 1:1 relations but due to counting unclean matches as matches, this relation condition might me broken
         # therefore allow 1:n relations so each db_uni can only appear once but fetched_uni can appear multiple times (since e.g. a university has multiple locations can exist, that has only one entry in fetched_unis, since multiple citys are being combined)
-        for db_uni in [i[0] for i in matches]:
+        
+        # new dict that contains db_unis grouped by name
+        grouped_db_unis = {}
+        
+        for uni in matches:
+            if uni[0]["name"] not in grouped_db_unis:
+                grouped_db_unis[uni[0]["name"]] = [uni]
+                continue
+            grouped_db_unis[uni[0]["name"]].append(uni)
+        
+        # iterate over all db_unis that have multiple fetched uni matches
+        for uni in [{key: value for key, value in grouped_db_unis.items() if len(value) > 1}]:
+            success_fetched = [{key: value} for key, value in uni.items() for val in value if val[1]["city"] in val[0]["city"].split(", ")] # check whether the city of the fetched uni matches one of the cities for the db_uni
+            # if none matches, take none
             
-
     
     @db.cursor_handling(manually_supply_cursor=False)
     @typechecked
@@ -459,6 +471,26 @@ class Daad(Scraper):
                 details={"exception": result.error, "stack_trace": result.stack_trace},
                 code=None
             ))
+
+        # get universities from db again, but with updated values
+        result = db.select(cursor=cursor, # type: ignore
+                           table="all_unis.universities", 
+                           answer_type=db.ANSWER_TYPE.LIST_ANSWER, 
+                           keywords=["id", "name", "city"], 
+                           specific_where="source = 'daad.de' AND website IS NULL")
+        
+        # handle database error
+        if result.is_error:
+            return Response(message=Message(
+                name="DatabaseError",
+                type="Error",
+                category="database",
+                info="Failed to fetch universities from database.",
+                details={"exception": result.error, "stack_trace": result.stack_trace},
+                code=None
+            ))
+        
+        universities = result.data
         
         # handle complicated cases, that do not match 1:1
         self.add_data_complicated_universities(db_unis=universities, fetched_unis=fetched_unis)
