@@ -12,3 +12,7 @@ tldextract
 tqdm
 requests-html
 typeguard
+ollama
+crawl4ai
+mypy
+pylint
