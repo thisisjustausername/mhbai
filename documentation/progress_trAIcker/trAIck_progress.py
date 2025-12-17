@@ -18,7 +18,7 @@ def fetch_history(history_file: str = "~/.zsh_history", save_to_json: bool = Fal
     """
     Fetch and parse Zsh shell history from the specified history file.
 
-    Parameters:
+    Args:
         history_file (str): Path to the Zsh history file. Defaults to "~/.zsh_history".
         save_to_json (bool): Whether to save the parsed history to a JSON file. Defaults to False.
     Returns:
@@ -75,7 +75,7 @@ def question_ai(data: list[dict]) -> str:
     """
     Use an AI model to comprehense the daily progress and group it into tasks.
 
-    Parameters:
+    Args:
         data (list[dict]): List of dictionaries containing Zsh history entries.
 
     Returns:

@@ -19,7 +19,7 @@ class Overlaps:
     """
     dataclass to store the overlaps of all passed in MHBs
     
-    Parameters:
+    Args:
         mbhs (list[MHB]): list of MHBs
     """
     # this list is also used as priority list for the order of the mhbs
@@ -35,7 +35,7 @@ class Overlaps:
         """
         alternative __init__ for passing in paths instead of MHBs
 
-        Parameters:
+        Args:
             paths_list (list[str]): list of paths
         """
 
@@ -57,7 +57,7 @@ class Overlaps:
                ordered: bool = True, delimiter: Annotated[None | Literal[";", "\t", ","], "Mutually exclusive with the values json, pdf, md, html in file_type"] = None, 
                borders: Annotated[bool, "True only works with file_types html"] = False) -> None | io.StringIO:
         """
-        Parameters:
+        Args:
             file_type (Literal["json", "csv", "txt", "pdf", "md", "html"]): chosen filetype
             file_path (str | None): path to where to save the file to, not allowed to have file type at the end, if file_path is None, buffer will be returned
             information (list[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]] | None): chosen list of information, data is ordered by this list

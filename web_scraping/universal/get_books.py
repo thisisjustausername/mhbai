@@ -45,7 +45,7 @@ def create_link(link: str, queue: Queue, bachelor_only: bool=False) -> None | st
     """
     Create a search string for a course link
     
-    Parameters:
+    Args:
         link (str): The URL of the course page.
         queue (multiprocessing.Queue): Queue to store the resulting search string.
         bachelor_only (bool): Whether to filter for bachelor courses only.

@@ -20,7 +20,7 @@ def bundled_universities(universities: list[dict[str, str]], cursor: psycopg2.ex
     """
     fetches uni urls for given universities and updates the database
     
-    Parameters:
+    Args:
         universities (list[dict[str, str]]): list of universities to fetch uni urls for
         cursor (psycopg2.extensions.cursor | None): SUPPLIED BY DECORATOR; Database cursor for storing data.
     Returns:

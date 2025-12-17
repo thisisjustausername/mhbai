@@ -21,7 +21,7 @@ def fetch_search_strings(search_strings: list[dict[str, str]], cursor: psycopg2.
     """
     fetches mhb urls for given search strings and updates the database
     
-    Parameters:
+    Args:
         search_strings (list[dict[str, str]]): list of search strings to fetch mh
         cursor (psycopg2.extensions.cursor | None): SUPPLIED BY DECORATOR; Database cursor for storing data.
     Returns:
@@ -66,7 +66,7 @@ def main(cursor: psycopg2.extensions.cursor | None = None) -> None:
     """
     main function to fetch mhb urls for all universities without mhb url in the database
     
-    Parameters:
+    Args:
         cursor (psycopg2.extensions.cursor | None): SUPPLIED BY DECORATOR; Database cursor for storing data.
     Returns:
         None

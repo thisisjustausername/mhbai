@@ -6,7 +6,7 @@ def run_target(arg: str):
     """
     Run a module or script located relative to the current working directory.
 
-    Parameters:
+    Args:
         arg (str): Path to the script or module name to run.
     Returns:
         None

@@ -184,7 +184,7 @@ def get_file_name(url: str) -> str:
     """
     gets the file name that fits to the url
 
-    Parameters:
+    Args:
         url (str): url \n
     Returns:
     str: file name or link if no file name was found\n

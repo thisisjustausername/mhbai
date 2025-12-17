@@ -20,7 +20,7 @@ class Pdf:
     def __init__(self, pdf_path: str):
         """
         initializes class variables
-        Parameters:
+        Args:
             pdf_path (str): path to pdf file
         """
         self.path: str = pdf_path
@@ -39,7 +39,7 @@ class Pdf:
     def extract_objects(self, additional_bytes: int=100000) -> list:
         """
         finds the xref to each object and then extracts that object
-        Parameters: 
+        Args: 
             additional_bytes (int): how many bytes to read ahead of start of object in order to select the whole object
         Returns: 
             List[Dict[str, str | bytes | int]]: list of objects

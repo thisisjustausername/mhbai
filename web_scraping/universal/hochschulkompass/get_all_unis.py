@@ -63,7 +63,7 @@ def save_info_to_db(cursor, uni_info: dict[str, str]) -> None:
     """
     Saves the university information to the database.
 
-    Parameters:
+    Args:
         cursor: Database cursor to execute the SQL commands.
         uni_info (dict[str, str]): A dictionary containing university information.
     """

@@ -38,7 +38,7 @@ def _is_json_serializable(value: Any) -> bool:
     NOTE: This code IS NOT SAVE, because json.dumps can consume a big amount of cpu and memory for the wrong data
     Check if a value is JSON-serializable.
 
-    Parameters:
+    Args:
         value (Any): The value to check.
     Returns:
         bool: True if the value is JSON-serializable, False otherwise.
@@ -110,7 +110,7 @@ class Response(Generic[T, E]):
         """
         Initialize a Response object.
 
-        Parameters:
+        Args:
             success_list (T | None): The successful result data.
             error_list (E | None): The error information if the operation failed.
             message (str | dict[str, Any] | None): Additional message or information.

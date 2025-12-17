@@ -43,7 +43,7 @@ class HochschulkompassDetailed(Scraper):
         """
         extract information from detail-page
 
-        Parameters:
+        Args:
             driver (webdriver.Chrome): Selenium WebDriver instance.
             wait (WebDriverWait): Selenium WebDriverWait instance.
             cursor (psycopg2.extensions.cursor): Database cursor for storing data.
@@ -99,7 +99,7 @@ class HochschulkompassUndetailed(Scraper):
         """
         extract course link and information from list page
 
-        Parameters:
+        Args:
             driver (webdriver.Chrome): Selenium WebDriver instance.
             wait (WebDriverWait): Selenium WebDriverWait instance.
             cursor (psycopg2.extensions.cursor): Database cursor for storing data.

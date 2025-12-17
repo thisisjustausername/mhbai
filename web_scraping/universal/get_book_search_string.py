@@ -46,7 +46,7 @@ def create_links(links: list[str], bachelor_only: bool=False) -> None | str | Ex
     """
     Create a search string for a course link
     
-    Parameters:
+    Args:
         links (list[str]): The URLs of the course pages.
         bachelor_only (bool): Whether to filter for bachelor courses only.
     """
@@ -85,7 +85,7 @@ def get_search_strings(urls_per_job: int = 5):
     """
     Get the search strings for all courses of study from studieren.de
     A search string looks like this: "page:<uni.de> filetype:pdf modulhandbuch <course title>"
-    Parameters:
+    Args:
         urls_per_job (int): Number of URLs to be processed per job in the multiprocessing pool.
     Returns: 
         None
@@ -112,7 +112,7 @@ def get_error_base_links(urls_per_job: int = 1):
     """
     Get the base links for all courses of study from studieren.de where errors occurred.
     
-    Parameters:
+    Args:
         urls_per_job (int): Number of URLs to be processed per job in the multiprocessing pool.
     """
     multiprocessing.set_start_method("spawn")

@@ -24,7 +24,7 @@ def fetch_valid_urls(url_list=["https://mhb.uni-augsburg.de/"], final_links=[]) 
     """
     searches for all mhb links and saves them as valid urls
 
-    Parameters:
+    Args:
         url_list (list): list of urls to search for mhb links
         final_links (list): list of valid mhb links found so far
     Returns:
@@ -81,7 +81,7 @@ def fetch_pdf(cursor: db.cursor, web_url: str, adapt_file_names: bool = False) -
     """
     fetches the pdf from the given web url
 
-    Parameters:
+    Args:
         cursor (db.cursor): database cursor
         web_url (str): url of the pdf to fetch
         adapt_file_names (bool): whether to adapt file names in order to reduce conflicts
@@ -119,7 +119,7 @@ def download_pdfs(new_links: list, new_only: bool = False, adapt_file_names: boo
     """
     downloads only new mhb pdfs
 
-    Parameters:
+    Args:
         new_links (list): list of new mhb links
         new_only (bool): whether to only download new links
         adapt_file_names (bool): whether to adapt file names in order to reduce conflicts; filenames still aren't unique e.g. for instrument courses
@@ -152,7 +152,7 @@ def download_async(new_links: list[str], new_only: bool = False, adapt_file_name
     """
     downloads mhb pdfs using multiprocessing
 
-    Parameters:
+    Args:
         new_links (list): list of new mhb links
         new_only (bool): whether to only download new links
         adapt_file_names (bool): whether to adapt file names in order to reduce conflicts
@@ -202,7 +202,7 @@ def check_url(url: str) -> bool:
     checks, whether the url is safe to use
     e.g. when it is not a pdf or it is a redirect link, return False
 
-    Parameters:
+    Args:
         url (str): url to check
     Returns:
         bool: whether the url is safe to use

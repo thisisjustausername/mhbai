@@ -24,7 +24,7 @@ class MHB:
     """
     dataclass to store a single MHB
 
-    Parameters:
+    Args:
         path (str): the file_path to the pdf
     """
 
@@ -59,7 +59,7 @@ class MHB:
         """
         initializes MHB manually, used for creating an MHB from saved data
 
-        Parameters:
+        Args:
             path (str): the file_path to the pdf
             title (str): the title of the MHB
             name (str): the name of the MHB, used as id
@@ -85,7 +85,7 @@ class MHB:
         """
         extracts the specified data as json
 
-        Parameters:
+        Args:
             data (list[dict[str, str | int | None]]): the data, that should be converted to json
             ordered (bool): whether the data should stay ordered; mutually exclusive with module_code_key
             module_code_key (bool): when specified, data is saved as dict with module_code as key; mutually exclusive with ordered
@@ -117,7 +117,7 @@ class MHB:
         """
         extracts the specified data as csv
 
-        Parameters:
+        Args:
             data (list[dict[str, str | int | None]]): the data, that should be converted to json
             delimiter (Literal[";", "\t", ","]): delimiter to separate the data in each row
             name (None | str): name of the file
@@ -148,7 +148,7 @@ class MHB:
         """
         extracts the specified data as txt
 
-        Parameters:
+        Args:
             data (list[dict[str, str | int | None]]): the data, that should be converted to txt
             delimiter (Literal[";", "\t", ","]): the delimiter to use
             name (None | str): name of the file
@@ -170,7 +170,7 @@ class MHB:
         """
         extracts the specified data as markdown
 
-        Parameters:
+        Args:
             data (list[dict[str, str | int | None]]): the data, that should be converted to markdown
             name (None | str): name of the file
             return_type (| str): specify whether to return a buffer or a string
@@ -226,7 +226,7 @@ class MHB:
                borders: Annotated[bool, "True only works with file_types html"] = False) -> None | io.StringIO:
         """
         staticmethod to extract data
-        Parameters:
+        Args:
             file_type (Literal["json", "csv", "txt", "pdf", "md", "html"]): chosen filetype
             modules (list[dict[str, str | int | None]]): if specified instead of the modules of the current MHB, the specified modules are used
             name (str): name of the file
@@ -279,7 +279,7 @@ class MHB:
                borders: Annotated[bool, "True only works with file_types html"] = False) -> None | io.StringIO:
         """
         extract data from current MHB
-        Parameters:
+        Args:
             file_type (Literal["json", "csv", "txt", "pdf", "md", "html"]): chosen filetype
             file_path (str | None): path to where to save the file to, not allowed to have file type at the end, if file_path is None, buffer will be returned
             information (list[Literal["initial_modules", "module_code", "title", "ects", "info", "goals", "pages"]] | None): chosen list of information, data is ordered by this list

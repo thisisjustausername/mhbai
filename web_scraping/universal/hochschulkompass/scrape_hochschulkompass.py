@@ -30,7 +30,7 @@ def process_urls(urls: list, offset: int=0, raspi=False, cursor: psycopg2.extens
     Process a list of URLs to scrape course information.
     Each url is a page of studiengaenge.zeit.de containing multiple courses of study.
 
-    Parameters:
+    Args:
         urls (list): List of URLs to be processed.
         offset (int): Where to start counting in order to show a readable output to the user
         raspi (bool): Whether the program is running on a Raspberry Pi
@@ -78,7 +78,7 @@ def find_courses_off_list_page(driver: webdriver.Chrome, wait: WebDriverWait, cu
     """
     extract course link and information from list page
 
-    Parameters:
+    Args:
         driver (webdriver.Chrome): Selenium WebDriver instance.
         wait (WebDriverWait): Selenium WebDriverWait instance.
         cursor (psycopg2.extensions.cursor): Database cursor for storing data.
@@ -93,7 +93,7 @@ def find_courses_on_detail_page(driver: webdriver.Chrome, wait: WebDriverWait, c
     """
     extract information from detail-page
 
-    Parameters:
+    Args:
         driver (webdriver.Chrome): Selenium WebDriver instance.
         wait (WebDriverWait): Selenium WebDriverWait instance.
         cursor (psycopg2.extensions.cursor): Database cursor for storing data.
@@ -108,7 +108,7 @@ def get_base_links(urls_per_job: int = 30, raspi: bool=False):
     """
     Get the base links for all courses of study from studiengaenge.zeit.de
     
-    Parameters:
+    Args:
         urls_per_job (int): Number of URLs to be processed per job in the multiprocessing pool.
         raspi (bool): Whether the program is running on a Raspberry Pi
     """
@@ -154,7 +154,7 @@ def get_base_links_synchronous(raspi: bool=False):
     """
     Get the base links for all courses of study from studiengaenge.zeit.de synchronously.
     
-    Parameters:
+    Args:
         raspi (bool): Whether the program is running on a Raspberry Pi
     """
     # for debugging purposes
@@ -167,7 +167,7 @@ def get_error_base_links(urls_per_job: int = 1):
     """
     Get the base links for all courses of study from studiengaenge.zeit.de where errors occurred.
     
-    Parameters:
+    Args:
         urls_per_job (int): Number of URLs to be processed per job in the multiprocessing pool.
     """
     multiprocessing.set_start_method("spawn")

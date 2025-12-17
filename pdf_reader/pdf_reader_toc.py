@@ -16,7 +16,7 @@ def decode(text: str) -> str:
     """
     decodes text appropriately
 
-    Parameters:
+    Args:
         text (str): text to decode
     Returns:
         str: decoded text
@@ -28,7 +28,7 @@ def find_title(split_line: str, title_search_lines: list) -> tuple[str, int] | N
     """
     helper function to extract title from a specific search window
 
-    Parameters:
+    Args:
         split_line (str): the part to split, e.g. english title or end of box
         title_search_lines (list): search windows split into lines
     Returns:
@@ -93,7 +93,7 @@ def search_text_blocks(heading: str, start_info: int, matching_pages: list[bytes
     This function extracts text blocks for a specific heading in a module (e.g. Inhalt in a module) \n
     This only works when the box doesn't contain any subcells from the table
 
-    Parameters:
+    Args:
         heading (str): string to search for e.g. Inhalte:
         start_info (int): needed when using it as helper function instead of inside function
         matching_pages (list[bytes]): needed when using it as helper function instead of inside function
@@ -145,7 +145,7 @@ def search_text_blocks(heading: str, start_info: int, matching_pages: list[bytes
                     """
                     finds data in a module part
 
-                    Parameters:
+                    Args:
                         name: name of the data to find
                     Returns:
                         str | None: the found data or None
@@ -227,7 +227,7 @@ def search_text_blocks(heading: str, start_info: int, matching_pages: list[bytes
 class Modules:
     def __init__(self, pdf_path: str):
         """
-        Parameters:
+        Args:
             pdf_path: path to pdf file
         """
         self.path: str = pdf_path
@@ -357,7 +357,7 @@ class Modules:
     # TODO in order to make the program more efficient, when finding all title pages already save them for extracting ects etc. instead of searching them again
     def data_to_module(self, module_code: str) -> dict[str, str | int | None] | None:
         """
-        Parameters:
+        Args:
             module_code (str): module code of the module, that should be searched
         Returns:
             dict[str, str | int | None] | None: information to the module

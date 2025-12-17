@@ -29,7 +29,7 @@ class Result(Generic[Data, Error]):
         """
         Initialization of the Result object.
 
-        Parameters:
+        Args:
             data (Optional[Data]): The successful result data.
             error (Optional[Error]): The error information if the operation failed.
             stack_trace: Optional[str] = None

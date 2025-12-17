@@ -65,7 +65,7 @@ def replace_heading(match):
     """
     used to replace all headings in pdf so e.g. Inhalt will be marked with __heading__
     
-    Parameters:
+    Args:
     match
     Returns:
     bytes: the match with __heading__ added
@@ -76,7 +76,7 @@ def text_continuing(match):
     """
     adds __continuing_on_new_page__ when a new page begins after text
     
-    Parameters:
+    Args:
     match
     Returns:
     bytes: the match with __continuing_on_new_page__ added

@@ -27,7 +27,7 @@ def wait_for_page_load(driver, timeout: int = 10) -> None:
     """
     Wait for the page to fully load.
 
-    Parameters:
+    Args:
         driver (webdriver): The Selenium WebDriver instance.
         timeout (int): Maximum time to wait for the page to load.
     """
@@ -51,7 +51,7 @@ def fetch_search_strings(search_strings: list[dict[str, str]], cursor: psycopg2.
     """
     fetches mhb urls for given search strings and updates the database
 
-    Parameters:
+    Args:
         search_strings (list[dict[str, str]]): list of search strings to fetch mhb urls for
         cursor (psycopg2.extensions.cursor | None): SUPPLIED BY DECORATOR; Database cursor for storing data.
     Returns:
@@ -98,7 +98,7 @@ def main(use_multiprocessing: bool = True) -> None:
     """
     main function to fetch mhb urls for all universities without mhb url in the database
 
-    Parameters:
+    Args:
         use_multiprocessing (bool): whether to use multiprocessing
     Returns:
         None

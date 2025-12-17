@@ -22,7 +22,7 @@ def get_general_mhb_page(university: str, city: str) -> str | None:
     """
     Get the general mhb page for each university.
 
-    Parameters:
+    Args:
         university (str): Name of the university.
         city (str): City of the university.
 
@@ -76,7 +76,7 @@ def get_uni_mhb_url(abort: bool = False, cursor: psycopg2.extensions.cursor | No
     """
     get all universities from db
 
-    Parameters:
+    Args:
         abort (bool): whether to abort on first failure
         cursor (psycopg2.extensions.cursor | None): SUPPLIED BY DECORATOR; Database cursor for storing data.
     Returns:

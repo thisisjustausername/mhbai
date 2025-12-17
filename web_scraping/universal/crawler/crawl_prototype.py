@@ -23,7 +23,7 @@ def crawl(url: str, depth: int = 0, queue: Queue = None) -> dict[str, int | list
     """
     Crawl a web page and return all the urls it contains.
 
-    Parameters:
+    Args:
         url (str): The URL of the web page to crawl.
         depth (int): The depth of crawling. Default is 0 (only the given page).
         queue (Queue): A multiprocessing Queue to store results. If not None, results will be put into the queue.
@@ -51,7 +51,7 @@ def batch_crawl(urls: list[str], depth: int, queue: Queue = None) -> list[str]:
     """
     Crawl a batch of web pages of a specific depth and return all the urls they contain.
 
-    Parameters:
+    Args:
         urls (list[str]): A list of URLs of the web pages to crawl.
         depth (int): The depth of crawling.
         queue (Queue): A multiprocessing Queue to store results. If not None, results will be put into the queue.
@@ -82,7 +82,7 @@ def recursive_crawl_synchr(url: str, max_depth: int) -> set[str]:
     Recursively crawl a web page up to a specified depth using synchronous calls.
     Not implemented yet.
 
-    Parameters:
+    Args:
         url (str): The URL of the web page to crawl.
         max_depth (int): The maximum depth to crawl.
     Returns:
@@ -108,7 +108,7 @@ def filter(urls: set[str]) -> set[str]:
     """
     Filter a set of URLs to only include those that are likely to be MHB pages.
     Only German filters are added at this point.
-    Parameters:
+    Args:
         urls (set[str]): A set of URLs to filter.
     Returns:
         set[str]: A filtered set of URLs.

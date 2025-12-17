@@ -30,7 +30,7 @@ def process_urls(urls: list, offset: int=0, raspi=False, cursor: psycopg2.extens
     Process a list of URLs to scrape course information.
     Each url is a page of studieren.de containing multiple courses of study.
 
-    Parameters:
+    Args:
         urls (list): List of URLs to be processed.
         offset (int): Where to start counting in order to show a readable output to the user
         raspi (bool): Whether the program is running on a Raspberry Pi
@@ -133,7 +133,7 @@ def get_base_links(urls_per_job: int = 30, raspi: bool=False):
     """
     Get the base links for all courses of study from studieren.de
     
-    Parameters:
+    Args:
         urls_per_job (int): Number of URLs to be processed per job in the multiprocessing pool.
         raspi (bool): Whether the program is running on a Raspberry Pi
     """
@@ -173,7 +173,7 @@ def get_base_links_synchronous(raspi: bool=False):
     """
     Get the base links for all courses of study from studieren.de synchronously.
     
-    Parameters:
+    Args:
         raspi (bool): Whether the program is running on a Raspberry Pi
     """
     # for debugging purposes
@@ -185,7 +185,7 @@ def get_error_base_links(urls_per_job: int = 1):
     """
     Get the base links for all courses of study from studieren.de where errors occurred.
     
-    Parameters:
+    Args:
         urls_per_job (int): Number of URLs to be processed per job in the multiprocessing pool.
     """
     multiprocessing.set_start_method("spawn")
