@@ -9,7 +9,7 @@
 # FileID: Un-ws-0001
 
 
-from flask import json
+import json
 import psycopg2
 import requests
 import time
@@ -44,7 +44,7 @@ class Daad(Scraper):
         """
         Generate list of URLs to scrape from studiengaenge.zeit.de
 
-        Parameters:
+        Args:
             new_only (bool): Whether to generate only unfetched URLs
         Returns:
             list[str]: List of URLs to scrape
@@ -74,7 +74,7 @@ class Daad(Scraper):
         Process a list of URLs to scrape course information.
         Each url is a page of daad.de containing multiple courses of study using the API.
 
-        Parameters:
+        Args:
             urls (list): List of URLs to be processed.
             offset (int): Where to start counting in order to show a readable output to the user
             delay (float): Delay in seconds between fetching URLs in order to avoid rate limits
@@ -150,7 +150,7 @@ class Daad(Scraper):
 
         extract information from api
 
-        Parameters:
+        Args:
             cursor (psycopg2.extensions.cursor): Database cursor for storing data.
             url (str): URL of the list page to scrape.
         Returns:
@@ -283,7 +283,7 @@ class Daad(Scraper):
         """
         Compares two university names for similarity.
 
-        Parameters:
+        Args:
             name1 (str): First university name.
             name2 (str): Second university name.
         Returns:
@@ -310,12 +310,13 @@ class Daad(Scraper):
     
 
     @typechecked
-    def add_data_complicated_universities(self, db_unis: list[dict[str, str]], fetched_unis: dict[str, dict[str, str]]) -> Response:
+    def add_data_complicated_universities(self, db_unis: list[dict[str, str | int]], fetched_unis: dict[str, dict[str, str | int]]) -> Response | Exception:
         """
         Submethod of add_data_universities to handle complicated cases.
         This method is called after the main method add_data_universities.
         Since this method takes longer than the simple compare compare algorithm, only call this for the complicated cases.
-
+        NOTE: this method is not fully implemented yet. It is ignored, that for a university, multiple results can be found.
+        
         Returns:
             Response: Response object indicating success or failure of the operation.
         """
@@ -323,17 +324,39 @@ class Daad(Scraper):
         # do not stop comparing after match was found since better match could be found
 
         # create a possible combinations without duplicates
-        combinations = {(db_uni, fetched_uni) for db_uni in db_unis for fetched_uni in fetched_unis.keys()}
+        # combinations = {(db_uni dict, fetched_uni dict), ...}
+        combinations = set() # use set to remove duplicates
+        for db_uni in db_unis:
+            for fetched_uni_k, fetched_uni_v in fetched_unis.items():
+                fetched_uni_v["name"] = fetched_uni_k
+                combinations.add((frozenset(db_uni.items()), frozenset(fetched_uni_v.items()))) # list of all combinations of db_unis and fetched_unis (only names of fetched_unis)
 
+        combinations = [(dict(i[0]), dict(i[1])) for i in combinations] # convert frozensets back to dicts
+        combinations = set() # use set to remove duplicates
+        for db_uni in db_unis:
+            for fetched_uni_k, fetched_uni_v in fetched_unis.items():
+                fetched_uni_v["name"] = fetched_uni_k
+                combinations.add((frozenset(db_uni.items()), frozenset(fetched_uni_v.items()))) # list of all combinations of db_unis and fetched_unis (only names of fetched_unis)
+
+        combinations = [(dict(i[0]), dict(i[1])) for i in combinations] # convert frozensets back to dicts
         # initialize matches
         matches = [] # create list since no duplicates can exist
 
         for i in combinations:
-            if self._compare_university_names(fetched_name=i[1], db_name=i[0]["name"]):
-                matches.append(i)
-        
+            if self._compare_university_names(fetched_name=i[1]["name"], db_name=i[0]["name"]):
+                matches.append(i)        
+
         # matches should only contain 1:1 relations but due to counting unclean matches as matches, this relation condition might me broken
         # therefore allow 1:n relations so each db_uni can only appear once but fetched_uni can appear multiple times (since e.g. a university has multiple locations can exist, that has only one entry in fetched_unis, since multiple citys are being combined)
+        
+        # new dict that contains db_unis grouped by name
+        grouped_db_unis = {}
+        
+        for uni in matches:
+            if uni[0]["id"] not in grouped_db_unis:
+                grouped_db_unis[uni[0]["id"]] = [uni]
+                continue
+            grouped_db_unis[uni[0]["id"]].append(uni)
         
         # new dict that contains db_unis grouped by name
         grouped_db_unis = {}
@@ -344,10 +367,15 @@ class Daad(Scraper):
                 continue
             grouped_db_unis[uni[0]["name"]].append(uni)
         
-        # iterate over all db_unis that have multiple fetched uni matches
-        for uni in [{key: value for key, value in grouped_db_unis.items() if len(value) > 1}]:
-            success_fetched = [{key: value} for key, value in uni.items() for val in value if val[1]["city"] in val[0]["city"].split(", ")] # check whether the city of the fetched uni matches one of the cities for the db_uni
-            # if none matches, take none
+        for matches in grouped_db_unis.values():
+            print(json.dumps(matches, indent=4))
+        print(grouped_db_unis)
+
+        # check whether multiple fetched universities exist for one database university
+        if any(len(matches) > 1 for matches in grouped_db_unis.values()):
+            raise NotImplementedError("Handling multiple fetched universities for one database university not implemented yet.")
+        
+        return Response(success_list=list(grouped_db_unis.keys()))
             
     
     @db.cursor_handling(manually_supply_cursor=False)
@@ -358,7 +386,7 @@ class Daad(Scraper):
 
         Scrape information of universities and store them in the database.
 
-        Parameters:
+        Args:
             cursor (psycopg2.extensions.cursor | None): SUPPLIED BY DECORATOR; Database cursor for storing data.
 
         Returns:
@@ -449,28 +477,55 @@ class Daad(Scraper):
         ]
         variables = [e for i in variables for e in i]
 
-        # if no universities to update, return success response
-        if len(variables) == 0:
-            return Response(success_list=[])
-        
-        # execute update query
-        result = db.custom_call(
-            cursor=cursor, # type: ignore
-            query=query, 
-            variables=variables,
-            type_of_answer=db.ANSWER_TYPE.NO_ANSWER
-        )
+        # if easy universities to update, update database
+        if len(variables) != 0:
+            # execute update query
+            result = db.custom_call(
+                cursor=cursor, # type: ignore
+                query=query, 
+                variables=variables,
+                type_of_answer=db.ANSWER_TYPE.NO_ANSWER
+            )
+        # if easy universities to update, update database
+        if len(variables) != 0:
+            # execute update query
+            result = db.custom_call(
+                cursor=cursor, # type: ignore
+                query=query, 
+                variables=variables,
+                type_of_answer=db.ANSWER_TYPE.NO_ANSWER
+            )
 
+            # handle database error
+            if result.is_error:
+                return Response(message=Message(
+                    name="DatabaseError",
+                    type="Error",
+                    category="database",
+                    info="Failed to update universities in database.",
+                    details={"exception": result.error, "stack_trace": result.stack_trace},
+                    code=None
+                ))
+
+        # get universities from db again, but with updated values
+        result = db.select(cursor=cursor, # type: ignore
+                           table="all_unis.universities", 
+                           answer_type=db.ANSWER_TYPE.LIST_ANSWER, 
+                           keywords=["id", "name", "city"], 
+                           specific_where="source = 'daad.de' AND website IS NULL")
+        
         # handle database error
         if result.is_error:
             return Response(message=Message(
                 name="DatabaseError",
                 type="Error",
                 category="database",
-                info="Failed to update universities in database.",
+                info="Failed to fetch universities from database.",
                 details={"exception": result.error, "stack_trace": result.stack_trace},
                 code=None
             ))
+        
+        universities = result.data
 
         # get universities from db again, but with updated values
         result = db.select(cursor=cursor, # type: ignore

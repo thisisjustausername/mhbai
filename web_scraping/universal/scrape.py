@@ -1,3 +1,13 @@
+# Copyright (c) 2025 Leon Gattermeyer
+#
+# This file is part of mhbai.
+#
+# Licensed under the AGPL-3.0 License. See LICENSE file in the project root for full license information.
+
+# Description: scrape courses from Daad daad.de using their api (data from Hochschulkompass)
+# Status: VERSION 1.0
+# FileID: Un-sc-0001
+
 from datetime import datetime, timedelta
 import json
 import math
@@ -30,7 +40,7 @@ class Scraper(ABC):
         """
         Initialize Scraper object.
 
-        Parameters:
+        Args:
             new_only (bool): Whether to scrape only new URLs
         Returns:
             None
@@ -56,7 +66,7 @@ class Scraper(ABC):
         Process a list of URLs to scrape course information.
         Each url is a page of a website containing multiple courses of study.
 
-        Parameters:
+        Args:
             urls (list): List of URLs to be processed.
             offset (int): Where to start counting in order to show a readable output to the user
             delay (float): Delay in seconds between fetching URLs in order to avoid rate limits
@@ -123,7 +133,7 @@ class Scraper(ABC):
         """
         Generate list of URLs to scrape
 
-        Parameters:
+        Args:
             new_only (bool): Whether to generate only unfetched URLs
         Returns:
             list[str]: List of URLs to scrape
@@ -137,7 +147,7 @@ class Scraper(ABC):
         """
         extract course link and information from list page
 
-        Parameters:
+        Args:
             driver (webdriver.Chrome): Selenium WebDriver instance.
             wait (WebDriverWait): Selenium WebDriverWait instance.
             cursor (psycopg2.extensions.cursor): Database cursor for storing data.
@@ -166,7 +176,7 @@ class Scraper(ABC):
         This method is deprecated since the synchronous fetching method is faster due to avoiding rate limits.
         Fetch data from a list of URLs asynchronously.
 
-        Parameters:
+        Args:
             urls_per_job (int): Number of URLs per job for asynchronous fetching.
             printing (bool): Whether to print progress information
             raspi (bool): Whether the program is running on a Raspberry Pi
@@ -224,7 +234,7 @@ class Scraper(ABC):
         """
         Fetch data from a list of URLs synchronously.
 
-        Parameters:
+        Args:
             delay (float): Delay in seconds between fetching URLs in order to avoid rate limits
             printing (bool): Whether to print progress information
         Returns:
@@ -254,7 +264,7 @@ class Scraper(ABC):
         """
         Main method to start the scraping process.
 
-        Parameters:
+        Args:
             async_fetch (bool): Whether to fetch data asynchronously
             rate_limit_delay (int): Delay in minutes to wait after hitting a rate limit
             printing (bool): Whether to print progress information
