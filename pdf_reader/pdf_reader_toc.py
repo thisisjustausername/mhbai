@@ -11,6 +11,8 @@
 from pdf_reader import pdf_extractor as extr
 import re
 from itertools import groupby
+from typing import Any
+
 
 def decode(text: str) -> str:
     """
@@ -21,7 +23,16 @@ def decode(text: str) -> str:
     Returns:
         str: decoded text
     """
-    return text.encode('latin-1').decode('unicode_escape').encode("latin-1").decode('cp1252').encode("utf-8").decode("utf-8").replace("\\", "")
+    return (
+        text.encode("latin-1")
+        .decode("unicode_escape")
+        .encode("latin-1")
+        .decode("cp1252")
+        .encode("utf-8")
+        .decode("utf-8")
+        .replace("\\", "")
+    )
+
 
 # TODO cleanly comment this code
 def find_title(split_line: str, title_search_lines: list) -> tuple[str, int] | None:
@@ -34,7 +45,9 @@ def find_title(split_line: str, title_search_lines: list) -> tuple[str, int] | N
     Returns:
         tuple[str, int] | None: title, local index of the end of the title
     """
-    if not any([split_line == i for i in title_search_lines]):  # false, when split_line was found
+    if not any(
+        [split_line == i for i in title_search_lines]
+    ):  # false, when split_line was found
         return None
     # shrink window
     # set indexer to -1 so it is clear when nothing was found
@@ -44,30 +57,37 @@ def find_title(split_line: str, title_search_lines: list) -> tuple[str, int] | N
         if i == split_line:
             indexer = index
             break
-    if not indexer != -1:  # checks whether window shrink was successful (this is unnecessary, since always false, but for failsave)
+    if (
+        not indexer != -1
+    ):  # checks whether window shrink was successful (this is unnecessary, since always false, but for failsave)
         return None
 
     # save the local index of the end of the title, so it can be added to the global offset to get the position from where on ects etc. will be searched
     local_end_index = len("\n".join(title_search_lines[:indexer])) + 1  # plus new line
-    title_search_lines = title_search_lines[:indexer] # lines to search in for title
-    title_list = [] # contains all title matches
-    is_gray = False # if something is written in gray it is an alternative title / module, so it can be ignored
+    title_search_lines = title_search_lines[:indexer]  # lines to search in for title
+    title_list = []  # contains all title matches
+    is_gray = False  # if something is written in gray it is an alternative title / module, so it can be ignored
 
     # this iteration collects the whole title, also when it spans over multiple lines
     # enumerate through lines, that may contain title
     for index, i in enumerate(title_search_lines):
-        if re.match(r'\d+(?:\.\d+)? g', i): # pattern for start gray writing
+        if re.match(r"\d+(?:\.\d+)? g", i):  # pattern for start gray writing
             is_gray = True
-        elif re.match(r'0 0 1 rg', i): # pattern for end gray writing
+        elif re.match(r"0 0 1 rg", i):  # pattern for end gray writing
             is_gray = False
         if not is_gray:
-            pattern = r'\[\(.*?\)\]' if index != 0 else r'.*?\)\]' # pattern for a part of the title
+            pattern = (
+                r"\[\(.*?\)\]" if index != 0 else r".*?\)\]"
+            )  # pattern for a part of the title
             match = re.search(pattern, i)
             if match is not None:
                 # if title is found, add rawly cleaned part of title
                 # depending on whether the title is in the first line or another, clean it differently
-                cleaned = match.group(0)[:-2] if index == 0 and not match.group(0).startswith("[(") else \
-                match.group(0).split("[(", 1)[1][:-2]
+                cleaned = (
+                    match.group(0)[:-2]
+                    if index == 0 and not match.group(0).startswith("[(")
+                    else match.group(0).split("[(", 1)[1][:-2]
+                )
                 title_list.append(cleaned)
 
     # removes hyphen from the end of line when a word is separated into two lines
@@ -86,7 +106,9 @@ def find_title(split_line: str, title_search_lines: list) -> tuple[str, int] | N
     return title, local_end_index
 
 
-def search_text_blocks(heading: str, start_info: int, matching_pages: list[bytes]) -> str:
+def search_text_blocks(
+    heading: str, start_info: int, matching_pages: list[bytes]
+) -> str:
     """
     helper function \n
     Can be used as inside function, then just heading is needed as parameter \n
@@ -104,39 +126,62 @@ def search_text_blocks(heading: str, start_info: int, matching_pages: list[bytes
     information = [page[start_info:] for page in matching_pages]  # shrink search window
     page_numbers = []
     for e in information:
-        page_match = list(re.finditer(r' Tm \[\(\d+\)\] TJ\nET\nQ\n', e))[-1] # find pages with module data by searching for the required module code at the top of each page
-        page_numbers.append(page_match.group(0)[6:-11] if page_match is not None else None)
+        page_match = list(
+            re.finditer(r" Tm \[\(\d+\)\] TJ\nET\nQ\n", e)
+        )[
+            -1
+        ]  # find pages with module data by searching for the required module code at the top of each page
+        page_numbers.append(
+            page_match.group(0)[6:-11] if page_match is not None else None
+        )
     details_list = []  # save cells with information in it in details_list
     # extracts all cells, that have the desired heading
     pages_selected = []
     for indexer, page in enumerate(information):
         # for each page search for the heading
-        start = re.search(r' Tm \[\(' + heading + r'\)\] TJ', page)
+        start = re.search(r" Tm \[\(" + heading + r"\)\] TJ", page)
         if start is None:
             continue
         start = start.start()
-        end = re.search(r'\nET\nQ', page[start:]).start()  # end of the cell
+        end = re.search(r"\nET\nQ", page[start:]).start()  # end of the cell
         # since Modulteile sometimes is splitted into many blocks, treat it differently
         if heading == "Modulteile":
-            end = re.search(r' Tm \[\(G\\374ltig \) ', page[start:]).start()
-        details_list.append(page[start:start + end])
+            end = re.search(r" Tm \[\(G\\374ltig \) ", page[start:]).start()
+        details_list.append(page[start : start + end])
         pages_selected.append(page_numbers[indexer])
         if heading == "Modulteile":
-            module_parts = [] # combine all module parts for from all module blocks
+            module_parts = []  # combine all module parts for from all module blocks
             for i in details_list:
-                parts = list(re.finditer(r' Tm \[\(Modulteil:', i)) # each block Modulteile is split up into the parts Modulteil, extract all of them
-                module_parts.extend([i[part.end()+2: (parts[index+1].start() if len(parts) > index+1 else len(i))] for index, part in enumerate(parts)])
-            module_parts_dict = [] # module parts but with extracted information
+                parts = list(
+                    re.finditer(r" Tm \[\(Modulteil:", i)
+                )  # each block Modulteile is split up into the parts Modulteil, extract all of them
+                module_parts.extend(
+                    [
+                        i[
+                            part.end() + 2 : (
+                                parts[index + 1].start()
+                                if len(parts) > index + 1
+                                else len(i)
+                            )
+                        ]
+                        for index, part in enumerate(parts)
+                    ]
+                )
+            module_parts_dict = []  # module parts but with extracted information
             for i in module_parts:
-                part_heading = re.search(r' Tm \[\(', i)
+                part_heading = re.search(r" Tm \[\(", i)
                 part_dict = {}
 
                 # find title
                 title = None
-                if part_heading is not None and i[part_heading.end():part_heading.end()+len("Lehrformen:")] != "Lehrformen:":
-                    end = re.search(r'\)\] TJ', i)
+                if (
+                    part_heading is not None
+                    and i[part_heading.end() : part_heading.end() + len("Lehrformen:")]
+                    != "Lehrformen:"
+                ):
+                    end = re.search(r"\)\] TJ", i)
                     if end is not None:
-                        title = i[part_heading.end():end.start()]
+                        title = i[part_heading.end() : end.start()]
                         title = decode(title)
                 part_dict["name"] = title
 
@@ -150,10 +195,12 @@ def search_text_blocks(heading: str, start_info: int, matching_pages: list[bytes
                     Returns:
                         str | None: the found data or None
                     """
-                    name_index = re.search(rf' Tm \[\({name}: \)\] TJ', i)
+                    name_index = re.search(rf" Tm \[\({name}: \)\] TJ", i)
                     found = None
                     if name_index is not None:
-                        found = re.search(r' Tm \[\([^\n\r]*?\)\] TJ', i[name_index.end():])
+                        found = re.search(
+                            r" Tm \[\([^\n\r]*?\)\] TJ", i[name_index.end() :]
+                        )
                         if found is not None:
                             found = found.group(0)[6:-5]
                             found = decode(found)
@@ -169,46 +216,60 @@ def search_text_blocks(heading: str, start_info: int, matching_pages: list[bytes
                 part_dict["weekly_hours"] = find_in_module_part("SWS")
 
                 # add type of exam
-                exams = list(re.finditer(r' Tm \[\(Pr\\374fung\)\] TJ', i))
+                exams = list(re.finditer(r" Tm \[\(Pr\\374fung\)\] TJ", i))
                 if len(exams) > 1:
                     # TODO implement it for more than one exam
                     # is able to find one or less exams for each module block
                     exams = exams[0:1]
-                    #raise NotImplementedError("More than one exam have been found. Due to a lack of fitting MHBs this issue couldn't be tested enough yet.")
+                    # raise NotImplementedError("More than one exam have been found. Due to a lack of fitting MHBs this issue couldn't be tested enough yet.")
                 # NOTE for more precision just search for the last found match
                 exam = None
                 if len(exams) == 1 and exams is not None:
-                    exam_index = exams[-1].end()+1
-                    end = re.search(r'\nQ\nQ\n', i[exam_index:])
+                    exam_index = exams[-1].end() + 1
+                    end = re.search(r"\nQ\nQ\n", i[exam_index:])
                     if end is not None:
                         end = end.start() + exam_index
-                        exam_texts = re.findall(r' Tm \[\([^\n\r]*?\)\] TJ', i[exam_index:end])
+                        exam_texts = re.findall(
+                            r" Tm \[\([^\n\r]*?\)\] TJ", i[exam_index:end]
+                        )
                         exam_texts = [i[6:-5] for i in exam_texts]
                         exam = "\n".join(exam_texts)
                 part_dict["exam"] = decode(exam) if exam is not None else None
-            
+
                 # TODO not finished yet, not all information extracted
                 module_parts_dict.append(part_dict)
             return module_parts_dict
     # extract the text out of each block
     texts_raw = []
     for block, page_nr in zip(details_list, page_numbers):
-        for element in block.split('\n'):
-            if not re.match(r'1 0 0 -1 ', element):
+        for element in block.split("\n"):
+            if not re.match(r"1 0 0 -1 ", element):
                 continue
-            text_raw = element[re.search(r' Tm \[\(', element).end():]
-            text_full = text_raw[:re.search(r'\)\] TJ', text_raw).start()]
-            raw_element = {"width": re.search(r'1 0 0 -1 \d+(?:\.\d+)?', element).group(0)[9:],
-                           "height": re.search(r' \d+(?:\.\d+)? Tm ', element).group(0)[1:-4],
-                           "text": text_full,
-                           "page_nr": int(page_nr)}
+            text_raw = element[re.search(r" Tm \[\(", element).end() :]
+            text_full = text_raw[: re.search(r"\)\] TJ", text_raw).start()]
+            raw_element = {
+                "width": re.search(r"1 0 0 -1 \d+(?:\.\d+)?", element).group(0)[9:],
+                "height": re.search(r" \d+(?:\.\d+)? Tm ", element).group(0)[1:-4],
+                "text": text_full,
+                "page_nr": int(page_nr),
+            }
             texts_raw.append(raw_element)
     # groups all blocks and combines them with "\n"
-    pgnr_sorted = [list(ge) for _, ge in groupby(texts_raw, key=lambda z: z["page_nr"])] # groups all stuff from one page together
-    adjacent_junks = [e for _, i in groupby(pgnr_sorted, key=lambda z: z[0]["page_nr"] - pgnr_sorted.index(z)) for e in i] # groups all stuff from adjacent pages together
+    pgnr_sorted = [
+        list(ge) for _, ge in groupby(texts_raw, key=lambda z: z["page_nr"])
+    ]  # groups all stuff from one page together
+    adjacent_junks = [
+        e
+        for _, i in groupby(
+            pgnr_sorted, key=lambda z: z[0]["page_nr"] - pgnr_sorted.index(z)
+        )
+        for e in i
+    ]  # groups all stuff from adjacent pages together
     junks_text = []
     for junk_block in adjacent_junks:
-        lines = [list(group) for key, group in groupby(junk_block, key=lambda x: x["height"])]
+        lines = [
+            list(group) for key, group in groupby(junk_block, key=lambda x: x["height"])
+        ]
         text = "\n".join([" ".join(i["text"] for i in line) for line in lines])
         junks_text.append(text)
     seen_set = set()
@@ -233,7 +294,9 @@ class Modules:
         self.path: str = pdf_path
         self.pdf: extr.Pdf = extr.Pdf(pdf_path=self.path)
         self.content: list = self.pdf.extract_objects()
-        self.stream_data: list = [i["data"] for i in self.content if i["information"] == "success"]
+        self.stream_data: list = [
+            i["data"] for i in self.content if i["information"] == "success"
+        ]
         self.module_codes: list[str] = []
         # NOTE enable this to extract page numbers from toc, version 2.0
         # self.module_codes_detailed: list = []
@@ -243,18 +306,20 @@ class Modules:
         Returns:
             str: title of the mhb extracted from the mhb
         """
-        
+
         match = None
         for i in self.stream_data:
-            match = re.search('Modulhandbuch', i)
+            match = re.search("Modulhandbuch", i)
             if match is not None:
                 break
-        if match is None: return None
-        search_window = i[match.end():]
+        if match is None:
+            return None
+        search_window = i[match.end() :]
         search_list = search_window.split("\n")[2:4]
         title_match = re.search(r"\[\(", search_list[0])
-        if title_match is None: return None
-        title = search_list[0][title_match.end():-5]
+        if title_match is None:
+            return None
+        title = search_list[0][title_match.end() : -5]
         title = title.replace("\\", "")
         return title
 
@@ -266,12 +331,12 @@ class Modules:
         # this identifies every page of the toc
         # toc_identifier = "BT\n/F1 12 Tf\n1 0 0 -1 0 10.26599979 Tm [(Inhaltsverzeichnis)] TJ\nET"
         toc_pages = [i for i in self.stream_data if "Inhaltsverzeichnis" in i]
-        text_orientation = r'1 0 0 -1'
-        position = r'\d+(?:\.\d+)? \d+(?:\.\d+)?'
+        text_orientation = r"1 0 0 -1"
+        position = r"\d+(?:\.\d+)? \d+(?:\.\d+)?"
         # Tm sets the text positioning
         # TJ shows the text individually
 
-        module_code = text_orientation + r' ' + position + r' Tm\s?\[\([^\n\r]*?\)'
+        module_code = text_orientation + r" " + position + r" Tm\s?\[\([^\n\r]*?\)"
 
         matches_list = []
         for i in toc_pages:
@@ -279,7 +344,15 @@ class Modules:
             matches_list.append(page_matches)
         # matches is made out of the match the height coordinate and the width coordinate
         # WATCH OUT instantly casting to float can cause exceptions really quickly. Keep this simply for debugging
-        matches = [[e, float(re.search(r'\d+(?:\.\d+)? Tm', e).group(0)[:-3]), float(re.search(r'1 0 0 -1 \d+(?:\.\d+)?', e).group(0)[9:])] for i in matches_list for e in i]
+        matches = [
+            [
+                e,
+                float(re.search(r"\d+(?:\.\d+)? Tm", e).group(0)[:-3]),
+                float(re.search(r"1 0 0 -1 \d+(?:\.\d+)?", e).group(0)[9:]),
+            ]
+            for i in matches_list
+            for e in i
+        ]
         # remove dots
         # removing dots in advance saves time but makes result little less accurate since it cant be verified that some unexpected data was accidentally selected
         matches = [i for i in matches if " Tm [(.)" not in i[0]]
@@ -287,8 +360,8 @@ class Modules:
         # matches = [i for i in matches]
         # split matches in lines
         # not sorting so that just lines that are together are packed together in order to not ignore page breaks
-        #matches.sort(key=lambda x: x[1])
-        lines = [list(group) for key, group in groupby(matches, key=lambda x:x[1])]
+        # matches.sort(key=lambda x: x[1])
+        lines = [list(group) for key, group in groupby(matches, key=lambda x: x[1])]
         # probably not anymore: in the current code page breaks are ignored. this creates the error of mixing module codes, that are on the same height but on different pages. Fix it by either not ignoring line breaks or making it a different height, when between it is a different height, e.g. by not sorting list before grouping it
         # get page number and module code
         modules = []
@@ -296,16 +369,18 @@ class Modules:
         # modules_detailed = []
         # TODO if the page number is in the next line, still take it
         # for now simply ignore page number
-        for line_index, line in enumerate(lines): # go through every line
+        for line_index, line in enumerate(lines):  # go through every line
             # is_module = False # if module code is found set to true NOTE uncomment if using page numbers
             # module = [] NOTE uncomment if using page numbers
-            for index, part in enumerate(line): # for every part in the line, check whether it is a module code
+            for index, part in enumerate(
+                line
+            ):  # for every part in the line, check whether it is a module code
                 # NOTE uncomment if using page numbers
                 # if not is_module:  # if it is not the first module code, then ignore it
-                code = re.search(r' Tm \[\([A-ZÄÖÜ]{2,}-\d{3,}', part[0])
-                if code is not None: # if module code is found, execute this
+                code = re.search(r" Tm \[\([A-ZÄÖÜ]{2,}-\d{3,}", part[0])
+                if code is not None:  # if module code is found, execute this
                     # NOTE enable this to extract page numbers from toc, version 2.0
-                    """
+                    r"""
                     # not working dirty code but it extracts page numbers of modules, if the page number is in the same or up to two lines below the module code
                     page_nr_index = line_index
                     dot = " Tm [(.)"
@@ -329,7 +404,7 @@ class Modules:
                     # modules_detailed.append({"module_code": code.group(0)[6:], "page_nr": page_nr})
 
                     # module.append(code.group(0)[6:-2]) # append the code to the module list NOTE uncomment if using page numbers
-                    break # NOTE comment this if using page numbers, version 1.0 and 2.0
+                    break  # NOTE comment this if using page numbers, version 1.0 and 2.0
                 # ignore page number
                 # NOTE when uncommenting do this: if the page number is in the next line, still take it
                 r"""else: # if a module code was already found, then search for page numbers
@@ -351,8 +426,7 @@ class Modules:
         self.module_codes = modules
         # NOTE enable this to extract page numbers from toc, version 2.0
         # self.module_codes_detailed = modules_detailed
-        return modules #, modules_detailed NOTE enable this to extract page numbers from toc, version 2.0
-
+        return modules  # , modules_detailed NOTE enable this to extract page numbers from toc, version 2.0
 
     # TODO in order to make the program more efficient, when finding all title pages already save them for extracting ects etc. instead of searching them again
     def data_to_module(self, module_code: str) -> dict[str, str | int | None] | None:
@@ -361,7 +435,7 @@ class Modules:
             module_code (str): module code of the module, that should be searched
         Returns:
             dict[str, str | int | None] | None: information to the module
-        
+
         """
         # TODO alternative way of extracting page numbers, extract page number of every page that has the module in the head
         # if no module_codes were extracted, extract them first
@@ -378,26 +452,49 @@ class Modules:
             return None
 
         # all pages that mentions the module
-        matching_pages = [page for page in self.stream_data if re.search(r'Modul ' + module_code, page) is not None]
+        matching_pages = [
+            page
+            for page in self.stream_data
+            if re.search(r"Modul " + module_code, page) is not None
+        ]
 
         # find the first page that has the module in the heading signature
         error = True
         page_index = None
-        correct_pages = [page for page in self.stream_data if re.search(r'Tm \[\(Modul ' + module_code, page) is not None]
+        correct_pages = [
+            page
+            for page in self.stream_data
+            if re.search(r"Tm \[\(Modul " + module_code, page) is not None
+        ]
 
         page_nr_list = []
         # find page numbers
         for i in correct_pages:
             # match = re.search(r' Tm \[\(\d+\)\] TJ\nET\nQ\n', i)
-            match = list(re.finditer(r' Tm \[\(\d+\)\] TJ\nET\nQ\n', i))[-1]
+            match = list(re.finditer(r" Tm \[\(\d+\)\] TJ\nET\nQ\n", i))[-1]
             page_nr_list.append(match.group(0)[6:-11] if match is not None else None)
         page_nr_list = [int(i) for i in page_nr_list]
         for index, match_page in enumerate(matching_pages):
             # e.g. module is not found if it was mentioned in the chapter of another module
             try:
-                titles = re.finditer(r'Tm \[\(Modul ' + module_code, matching_pages[index])
-                titles_list = list(re.finditer(r'Tm \[\(Modul ' + module_code, matching_pages[index]))
-                title_start = [i for i in titles if len(matching_pages[index][i.start()-100: i.start()].split("\n")) > 1 and "/F3 10" in matching_pages[index][i.start()-100: i.start()].split("\n")[-2]][0].end()
+                titles = re.finditer(
+                    r"Tm \[\(Modul " + module_code, matching_pages[index]
+                )
+                titles_list = list(
+                    re.finditer(r"Tm \[\(Modul " + module_code, matching_pages[index])
+                )
+                title_start = [
+                    i
+                    for i in titles
+                    if len(
+                        matching_pages[index][i.start() - 100 : i.start()].split("\n")
+                    )
+                    > 1
+                    and "/F3 10"
+                    in matching_pages[index][i.start() - 100 : i.start()].split("\n")[
+                        -2
+                    ]
+                ][0].end()
                 error = False
                 page_index = index
                 break
@@ -408,36 +505,42 @@ class Modules:
             title = None
         else:
             # create a search window around the found title
-            title_search = matching_pages[page_index][title_start:title_start+700] # type: ignore[ReportCallIssue]
-            title_search_lines = title_search.split("\n") # split search window into lines
+            title_search = matching_pages[page_index][title_start : title_start + 700]  # type: ignore[ReportCallIssue]
+            title_search_lines = title_search.split(
+                "\n"
+            )  # split search window into lines
 
             # no need to check, whether end of box ET or engl title is earlier, since engl title seq doesn't exist near after ET
             # if english title is found, shrink title window until this begins
-            engl_title_seq = '/F2 9 Tf'
-            result = find_title(engl_title_seq, title_search_lines) # try to find english title
+            engl_title_seq = "/F2 9 Tf"
+            result = find_title(
+                engl_title_seq, title_search_lines
+            )  # try to find english title
             # if english title exists, then set title
             if result is not None:
                 title = result[0]
                 start_info = result[1] + title_start
-            else: # if no english title exists shrink search window to the end of the cell
+            else:  # if no english title exists shrink search window to the end of the cell
                 end_of_box = "ET"
                 result = find_title(end_of_box, title_search_lines)
                 # search again for the title
                 if result is not None:
                     title = result[0]
                     start_info = result[1] + title_start
-                else: # if no title was found, simply use title pattern for title
-                    title_raw = re.search(r': [^\]]+\)\] TJ', title_search)
+                else:  # if no title was found, simply use title pattern for title
+                    title_raw = re.search(r": [^\]]+\)\] TJ", title_search)
                     if title_raw is None:
                         title = None
                     else:
                         title = title_raw.group(0)[2:].split(")]")[-2]
-                        start_info = title_raw.end() + title_start  # doesn't it have to be plus title_start
+                        start_info = (
+                            title_raw.end() + title_start
+                        )  # doesn't it have to be plus title_start
 
         # if title was found, do further cleaning
         if title is not None:
             # check whether LP information is in the title
-            pattern_list = [r'\\\(\d+LP\\\)', r' \\\(\d+ LP\\\)', r' \d+ CP$']
+            pattern_list = [r"\\\(\d+LP\\\)", r" \\\(\d+ LP\\\)", r" \d+ CP$"]
 
             title_match = re.search(pattern_list[0], title)
             if title_match is None:
@@ -445,64 +548,86 @@ class Modules:
                 if title_match is None:
                     title_match = re.search(pattern_list[2], title)
             if title_match is not None:
-                title = title[:title_match.start()] + " " + title[title_match.end():]
+                title = title[: title_match.start()] + " " + title[title_match.end() :]
             # further LP extraction
             else:
                 # match = re.search(r' \\\(.*\d+ LP.*\\\)', title)
-                partly_pattern_list = [r'[;,] \d+ LP\\\)', r' \d+ LP\\\)']
-                match = re.search(r' \\\(\d+ LP[;,] ', title)
+                partly_pattern_list = [r"[;,] \d+ LP\\\)", r" \d+ LP\\\)"]
+                match = re.search(r" \\\(\d+ LP[;,] ", title)
                 if match is not None:
-                    title = title[:match.start()+3] + title[match.end():]
+                    title = title[: match.start() + 3] + title[match.end() :]
                 else:
                     for pattern in partly_pattern_list:
                         match = re.search(pattern, title)
                         if match is not None:
-                            title = title[:match.start()] + title[match.end()-3:]
+                            title = title[: match.start()] + title[match.end() - 3 :]
                             break
         if title is not None:
             title = title.strip()
-            title = re.sub(r'\s+', ' ', title)
-            title = title.encode('latin-1').decode('unicode_escape').encode("latin-1").decode('cp1252').encode("utf-8").decode("utf-8").replace("\\", "")
+            title = re.sub(r"\s+", " ", title)
+            title = (
+                title.encode("latin-1")
+                .decode("unicode_escape")
+                .encode("latin-1")
+                .decode("cp1252")
+                .encode("utf-8")
+                .decode("utf-8")
+                .replace("\\", "")
+            )
             title = title.replace("\\", "")
 
         # TODO if no ects but everything else available, simply set ects to None
         # TODO when no title was found, then set a default start_info index
         try:
-            ects = int(re.search(r' Tm \[\(\d+ ECTS/LP\)\] TJ', matching_pages[page_index][start_info:]).group(0).split("Tm [(", 1)[1].split("ECTS", 1)[0]) # type: ignore[ReportCallIssue, ReportOptionalMemberAccess]
+            ects = int(
+                re.search(
+                    r" Tm \[\(\d+ ECTS/LP\)\] TJ",
+                    matching_pages[page_index][start_info:],
+                )
+                .group(0)
+                .split("Tm [(", 1)[1]
+                .split("ECTS", 1)[0]
+            )  # type: ignore[ReportCallIssue, ReportOptionalMemberAccess]
         except:
             ects = None
 
         # extract the info description of a module
         try:
-            content =  search_text_blocks("Inhalte:", start_info, matching_pages)
+            content = search_text_blocks("Inhalte:", start_info, matching_pages)
         except:
             content = None
 
         # extract the goals of a module
         try:
-            goals = search_text_blocks("Lernziele/Kompetenzen:", start_info, matching_pages)
+            goals = search_text_blocks(
+                "Lernziele/Kompetenzen:", start_info, matching_pages
+            )
         except:
             goals = None
 
         # extract module_exam_parts
         # TODO: watch out, since this ignores some page breaks
         module_parts = search_text_blocks("Modulteile", start_info, matching_pages)
-        module_exam = "\n".join(i["exam"] for i in module_parts if i["exam"] is not None)
+        module_exam = "\n".join(
+            i["exam"] for i in module_parts if i["exam"] is not None
+        )
 
         # Hi, is someone reading me?
         # Will anyone ever read this? (yes|no|maybe) (probably me when making that whole piece of code pretty)
 
         # TODO instead of decoding fancy chars remove them when using data to train ai
         # return a dictionary of title, module_code, ects, content, goals and pages
-        detailed_dict = {"title": title,
-                        "module_code": module_code.encode('utf-8').decode('unicode_escape'),
-                        "ects": ects,
-                        "content": decode(content) if content is not None else None,
-                        "goals": decode(goals) if goals is not None else None,
-                        "module_parts": module_parts,
-                        "module_exam": module_exam, 
-                        "pages": page_nr_list,
-                        "mhbai_hints": None}
+        detailed_dict = {
+            "title": title,
+            "module_code": module_code.encode("utf-8").decode("unicode_escape"),
+            "ects": ects,
+            "content": decode(content) if content is not None else None,
+            "goals": decode(goals) if goals is not None else None,
+            "module_parts": module_parts,
+            "module_exam": module_exam,
+            "pages": page_nr_list,
+            "mhbai_hints": None,
+        }
 
         # NOTE enable this if validation of page_nrs with toc is wished
         """
@@ -511,3 +636,62 @@ class Modules:
         detailed_dict["mhbai_hints"] = f"Pages of module information ({', '.join([str(i) for i in page_nr_list])}) don't match page number ({str(toc_page_nr)}) in table of content "
         """
         return detailed_dict
+
+    def raw_module_texts(self) -> list[dict[str, Any]]:
+        """
+        Extracts the raw text pages for a specific module_code
+
+        Returns:
+            list[tuple[int, bytes]] | None: list of tuples containing the page index and the raw page data
+        """
+
+        # split the pdf data into pages
+        pages = [
+            page
+            for page in self.stream_data
+            if re.search(r"Tm \[\(Modul ", page) is not None
+        ]
+
+        # remove pdf patterns and only keep the text
+        pages_text = [
+            "\n".join(i[6:-5] for i in re.findall(r" Tm \[\([^\n\r]*?\)\] TJ", page))
+            for page in pages
+        ]
+
+        # combine by line separated word fragments to words again
+        pages_text = [page.replace("-\n", "") for page in pages_text]
+
+        # remove last bracket and placement artifacts of pdf patterns
+        pages_text = [
+            " ".join(re.split(r"\s\)\s*-?\d+(?:\.\d+)?\s*\(\s*", page))
+            for page in pages_text
+        ]
+
+        # extract info in oder to group modules easier
+        pages_info = [
+            {
+                "index": index,
+                "module_code": (split := page.split("\n", 1))[0].split("Modul ", 1)[1],
+                "text": "\n".join(split[1].split("\n")[:-2]),
+            }
+            for index, page in enumerate(pages_text)
+        ]
+
+        # group pages into modules
+        modules_raw_r = [
+            list(group)
+            for _, group in groupby(pages_info, key=lambda x: x["module_code"])
+        ]
+
+        # remove unnecessary information
+        modules_raw = [
+            {
+                "module_code": (module_code := group[0]["module_code"]),
+                "content": decode(
+                    "Modul " + module_code + "\n".join(i["text"] for i in group)
+                ),
+            }
+            for group in modules_raw_r
+        ]
+
+        return modules_raw

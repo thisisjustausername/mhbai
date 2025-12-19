@@ -39,3 +39,21 @@ CREATE TABLE IF NOT EXISTS unia.mhbs_modules_link (
     pages JSONB, 
     UNIQUE (mhb_id, module_id)
     );
+
+-- create table for ai extracted module information
+CREATE TABLE IF NOT EXISTS unia.modules_ai_extracted (
+    id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    module_code TEXT UNIQUE NOT NULL,
+    ects INTEGER,
+    lecturer TEXT,
+    contents JSONB, 
+    goals JSONB, 
+    requirements JSONB, 
+    expense JSONB,
+    success_requirements JSONB,
+    weekly_hours INTEGER,
+    recommended_semester INTEGER,
+    exams JSONB, 
+    module_parts JSONB
+)
