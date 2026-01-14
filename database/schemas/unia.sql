@@ -43,8 +43,8 @@ CREATE TABLE IF NOT EXISTS unia.mhbs_modules_link (
 -- create table for ai extracted module information
 CREATE TABLE IF NOT EXISTS unia.modules_ai_extracted (
     id SERIAL PRIMARY KEY,
-    title TEXT NOT NULL,
-    module_code TEXT UNIQUE NOT NULL,
+    title TEXT,
+    module_code TEXT NOT NULL, -- not unique since for each module multiple versions exist
     ects INTEGER,
     lecturer TEXT,
     contents JSONB, 
@@ -54,6 +54,34 @@ CREATE TABLE IF NOT EXISTS unia.modules_ai_extracted (
     success_requirements JSONB,
     weekly_hours INTEGER,
     recommended_semester INTEGER,
-    exams JSONB, 
+    exams JSONB,
+    module_parts JSONB,
+    raw_module_id INTEGER REFERENCES unia.modules_raw(id) NOT NULL,
+);
+
+CREATE TABLE IF NOT EXISTS unia.modules_raw (
+    id SERIAL PRIMARY KEY,
+    module_code TEXT NOT NULL,
+    content TEXT, 
+    content_md5 TEXT GENERATED ALWAYS AS (md5(content)) STORED,
+    UNIQUE (module_code, content_md5)
+);
+
+
+-- create backup-table for already ai extracted module information
+CREATE TABLE IF NOT EXISTS unia.modules_ai_extracted_backup (
+    id SERIAL PRIMARY KEY,
+    title TEXT,
+    module_code TEXT NOT NULL, -- not unique since for each module multiple versions exist
+    ects INTEGER,
+    lecturer TEXT,
+    contents JSONB, 
+    goals JSONB, 
+    requirements JSONB, 
+    expense JSONB,
+    success_requirements JSONB,
+    weekly_hours INTEGER,
+    recommended_semester INTEGER,
+    exams JSONB,
     module_parts JSONB
-)
+);

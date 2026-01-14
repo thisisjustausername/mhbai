@@ -288,6 +288,10 @@ def select(                                                                 # py
             data = cursor.fetchone()
         else:
             data = [list(i) for i in cursor.fetchall()]
+        # map the data to the keywords if keywords are explicitly specified
+        if keywords is not None and "*" not in keywords:
+            result = dict(zip(keywords, data)) if answer_type == ANSWER_TYPE.SINGLE_ANSWER else [dict(zip(keywords, vals)) for vals in data] # type: ignore
+        return Result(data=result)
 
     # add select max of key condition
     elif select_max_of_key != "":
@@ -300,7 +304,7 @@ def select(                                                                 # py
         query += f" WHERE {specific_where}"
         if order_by is not None:
             query += f" ORDER BY {order_by[0]} {order_by[1].value}"
-
+    
     # add order by condition
     if variables is None:
         cursor.execute(query)
@@ -312,10 +316,12 @@ def select(                                                                 # py
         data = cursor.fetchone()
     else:
         data = [list(i) for i in cursor.fetchall()]
-
+    
     # map the data to the keywords if keywords are explicitly specified
     if keywords is not None and "*" not in keywords:
         result = dict(zip(keywords, data)) if answer_type == ANSWER_TYPE.SINGLE_ANSWER else [dict(zip(keywords, vals)) for vals in data] # type: ignore
+    elif "*" in keywords:
+        result = data
     return Result(data=result)
 
 
@@ -362,7 +368,7 @@ def insert(
         # add returning_column
         if returning_column is not None:
             query += f" RETURNING {returning_column}"
-
+        
         # run query
         cursor.execute(query, vals)
         cursor.connection.commit()
