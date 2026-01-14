@@ -275,7 +275,7 @@ def search_text_blocks(
     seen_set = set()
     new_texts = []
     for i in junks_text:
-        if not i in seen_set:
+        if i not in seen_set:
             seen_set.add(i)
             new_texts.append(i)
     text = "\n".join(new_texts)
@@ -675,6 +675,7 @@ class Modules:
                 "text": "\n".join(split[1].split("\n")[:-2]),
             }
             for index, page in enumerate(pages_text)
+            if page.split("\n", 1)[0].split("Modul ", 1).__len__() > 1
         ]
 
         # group pages into modules
