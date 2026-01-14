@@ -1,8 +1,23 @@
+#
+# This file is part of mhbai.
+#
+# For usage please contact the developer.
+#
+# This file is Copyright-protected.
+
+# Description: extract modules from module handbooks
+# Status: PROTOTYPING
+# FileID: Ai-ex-0003
+
+"""
+extract modules from module handbooks
+"""
+
 import pdfplumber
 import re
 import ollama
 from pydantic import BaseModel
-import json
+
 
 prompt = '''
 Sie sind ein Extraktionsmodell, das Daten aufteilt. In Folgender PDF sind Module eines Modulhandbuchs. Am Anfang steht meist ein Inhaltsverzeichnis, danach beginnen die Module. Sie müssen die PDF in Module unterteilen. Jedes Modul ist zusammenhängend. Ignorieren Sie das Inhaltsverzecihnis. Ihre Ausgabe ist der Text 1:1 wie in der Angabe nur als Liste unterteilt in einzelne Module. Jedes Modul hat einen eigenen Modul-Code.
@@ -106,35 +121,35 @@ Beispielausgabe:
 
 from pydantic import BaseModel
 import ollama
+
+
 class ModulesList(BaseModel):
     extracted_data: list[str]
+
 
 # def extract_raw_modules(pdf_path: str) -> list[str]:
 
 full_text = []
 with pdfplumber.open("pdfs/1.pdf") as pdf:
     for page in pdf.pages:
-        text = page.extract_text(
-            x_tolerance=2,
-            y_tolerance=2,
-            layout=True
-        )
+        text = page.extract_text(x_tolerance=2, y_tolerance=2, layout=True)
         if text:
             full_text.append(text)
 
 full_text = [t for t in full_text if t.strip() != ""]
 final_text = "\n\n".join(full_text)
-final_text = re.sub(r'\s*\n\s*', '\n', final_text)
+final_text = re.sub(r"\s*\n\s*", "\n", final_text)
 
 
 class ModuleExtraction(BaseModel):
     modules: list[str]
 
+
 response = ollama.chat(
-    model="llama3.3:70b", 
+    model="llama3.3:70b",
     messages=[
         {
-            "role":  "system", 
+            "role": "system",
             "content": """Sie sind ein Extraktionsmodell, das Daten aufteilt. 
             In Folgender PDF sind Module eines Modulhandbuchs. 
             Am Anfang steht meist ein Inhaltsverzeichnis, danach beginnen die Module. 
@@ -142,20 +157,17 @@ response = ollama.chat(
             Jedes Modul ist zusammenhängend. 
             Ignorieren Sie das Inhaltsverzeichnis. 
             Ihre Ausgabe ist der Text 1:1 wie in der Angabe nur als Liste unterteilt in einzelne Module. 
-            Jedes Modul hat einen eigenen Modul-Code."""
-        }, 
-        {
-            "role": "user", 
-            "content": f"Extract data from: \n\n{full_text}"
-        }
-    ], 
-    format=ModuleExtraction. model_json_schema(),
+            Jedes Modul hat einen eigenen Modul-Code.""",
+        },
+        {"role": "user", "content": f"Extract data from: \n\n{full_text}"},
+    ],
+    format=ModuleExtraction.model_json_schema(),
     options={
         "temperature": 0,
-        "top_p": 0.1, 
-        "repeat_penalty":  1.1  # Changed from 0.8 (should be > 1)
-    }
+        "top_p": 0.1,
+        "repeat_penalty": 1.1,  # Changed from 0.8 (should be > 1)
+    },
 )
 
 # Access the response
-print(response['message']['content'])
+print(response["message"]["content"])
