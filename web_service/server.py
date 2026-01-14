@@ -17,15 +17,19 @@ import json
 from itertools import groupby
 app = Flask(__name__)
 
+# initialize global variables
+# TODO: remove
 global overlaps
 global mhb_data
 
+# load the lookup data to get all modules from a mhb without recomputing the pdf
 with open("web_service/uni_augsburg_look_up.json", "r") as file:
     mhb_data = json.load(file)
 
-
+# load the links information to get the file names from the urls
 with open("web_scraping/scrape_uni_augsburg/links_information.json", "r") as file:
     links_data =  json.load(file)
+
 
 @app.route("/")
 def home():
@@ -34,22 +38,28 @@ def home():
     """
     return render_template("home.html")
 
+
 @app.route("/compareFast", methods=["POST"])
 def compareFast():
     """
     compares without using datatypes MHB or Overlaps
     """
+    # get the mhb links / file names
     data = request.get_json()
     file_name_1 = data.get('mhb1')
     file_name_2 = data.get('mhb2')
 
+    # store urls / file names in a list
     file_names = [file_name_1, file_name_2]
 
     # allows to input either filenames (with or without .pdf at the end) or urls
     file_names = [get_file_name(i) if "/" in i else i for i in file_names]
     file_names = [i + ".pdf" if not ".pdf" in i else i for i in file_names]
+    
+    # if any file is not present raise an exception
     if any([False if i in os.listdir("pdfs") else True for i in file_names]):
         Exception("No valid pdf files")
+
 
     # mhbs = [MHB("pdfs/" + i) for i in file_names]
     modules = [prt.Modules("pdfs_2/" + i) for i in file_names]
@@ -192,6 +202,13 @@ def get_file_name(url: str) -> str:
     if url not in links_data.keys():
         return url.split("/")[-1]
     return links_data[url]
+
+
+def compare_elusive():
+    """
+    Compares two mhbs using ai and regex
+    """
+
 
 @app.route("/export", methods=["GET"])
 def export():
