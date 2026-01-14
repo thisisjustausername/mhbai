@@ -32,10 +32,12 @@ class Status(Enum):
     FULL_ERROR = -1
 
 
-# NOTE: This code isn't save, because json.dumps can consume a big amount of cpu and memory for the wrong data
+# NOTE: This code isn't save, because json.dumps can consume a big amount of cpu and memory
+# for the wrong data
 def _is_json_serializable(value: Any) -> bool:
     """
-    NOTE: This code IS NOT SAVE, because json.dumps can consume a big amount of cpu and memory for the wrong data
+    NOTE: This code IS NOT SAVE, because json.dumps can consume a big amount of cpu and memory
+    for the wrong data
     Check if a value is JSON-serializable.
 
     Args:
@@ -48,6 +50,7 @@ def _is_json_serializable(value: Any) -> bool:
         return True
     except (TypeError, OverflowError):
         return False
+
 
 @dataclass
 class Message:
@@ -82,19 +85,25 @@ class Message:
             "type": self.type,
             "category": self.category,
             "info": self.info,
-            "details": {key: value if _is_json_serializable(value) else str(value) for key, value in self.details.items()} if self.details else None,
-            "code": self.code
+            "details": {
+                key: value if _is_json_serializable(value) else str(value)
+                for key, value in self.details.items()
+            }
+            if self.details
+            else None,
+            "code": self.code,
         }
 
 
-T = TypeVar("T") # success type
-E = TypeVar("E") # error type
+T = TypeVar("T")  # success type
+E = TypeVar("E")  # error type
 
 
 @dataclass
 class Response(Generic[T, E]):
     """
-    Response class representing the result of an operation, which can be either a success with data or an error.
+    Response class representing the result of an operation, which can be either a success with
+    data or an error.
 
     Attributes:
         _data (Optional[T]): The successful result data.
@@ -102,11 +111,13 @@ class Response(Generic[T, E]):
         _status (Status): The status of the response indicating success or error.
     """
 
-    def __init__(self, 
-                 success_list: T | None = None, 
-                 error_list: E | None = None, 
-                 message : Message | None = None, 
-                 status: Status | None = None) -> None:
+    def __init__(
+        self,
+        success_list: T | None = None,
+        error_list: E | None = None,
+        message: Message | None = None,
+        status: Status | None = None,
+    ) -> None:
         """
         Initialize a Response object.
 
@@ -122,14 +133,17 @@ class Response(Generic[T, E]):
         self._error = error_list if error_list is not None else []
         self._status = status
         if status is None:
-            if (error_list is None or len(error_list) == 0) and (message is None or "error" not in message.type.lower()): # type: ignore
+            if (error_list is None or len(error_list) == 0) and (  # type: ignore
+                message is None or "error" not in message.type.lower()
+            ):
                 self._status = Status.FULL_SUCCESS
-            elif (success_list is None or len(success_list) == 0) and (message is None or "error" in message.type.lower()): # type: ignore
+            elif (success_list is None or len(success_list) == 0) and (  # type: ignore
+                message is None or "error" in message.type.lower()
+            ):
                 self._status = Status.FULL_ERROR
             else:
                 self._status = Status.PARTIAL_SUCCESS
         self.message = message
-
 
     @property
     def success_list(self) -> T:
@@ -141,7 +155,6 @@ class Response(Generic[T, E]):
         """
         return self._data  # type: ignore
 
-
     @property
     def error_list(self) -> E:
         """
@@ -152,7 +165,6 @@ class Response(Generic[T, E]):
         """
         return self._error  # type: ignore
 
-
     @property
     def status(self) -> Status:
         """
@@ -161,8 +173,8 @@ class Response(Generic[T, E]):
         Returns:
             Status: The status of the response.
         """
-        return self._status # type: ignore
-    
+        return self._status  # type: ignore
+
     def to_json(self) -> dict:
         """
         Convert the Response object to a JSON-serializable dictionary.
@@ -173,6 +185,6 @@ class Response(Generic[T, E]):
         return {
             "success_list": self._data,
             "error_list": str(self._error),
-            "status": self._status.name, # type: ignore
-            "message": self.message.to_json() if self.message else None
+            "status": self._status.name,  # type: ignore
+            "message": self.message.to_json() if self.message else None,
         }

@@ -13,7 +13,7 @@
 # TODO: implement .succes Enum datatype of success values: FULL_SUCCESS, PARTIAL_SUCCESS, ERROR
 
 from dataclasses import dataclass
-from typing import Generic, TypeVar, Optional
+from typing import Any, Generic, TypeVar, Optional
 
 Data = TypeVar("Data") # success type
 Error = TypeVar("Error") # error type
@@ -25,14 +25,16 @@ class Result(Generic[Data, Error]):
     Especially useful for database operations.
     """
 
-    def __init__(self, data: Optional[Data] = None, error: Optional[Error] = None, stack_trace: Optional[str] = None) -> None:
+    def __init__(self, data: Data | None = None, error: Error | None = None, stack_trace: str | None = None, additional_information: Any = None) -> None:
         """
         Initialization of the Result object.
 
         Args:
-            data (Optional[Data]): The successful result data.
-            error (Optional[Error]): The error information if the operation failed.
-            stack_trace: Optional[str] = None
+            data (Data | None): The successful result data.
+            error (Error | None): The error information if the operation failed.
+            stack_trace: str | None = None
+            additional_information: Any = None
+
         Returns:
             None
         """
@@ -42,6 +44,7 @@ class Result(Generic[Data, Error]):
         self._data = data
         self._error = error
         self._stack_trace = stack_trace
+        self._additional_information: Any = None
 
     @property
     def is_success(self) -> bool:
