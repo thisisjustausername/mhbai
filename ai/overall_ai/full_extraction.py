@@ -30,12 +30,15 @@ from pdf_reader import pdf_reader_toc as prt
 from datatypes.result import Result
 
 
-def extract_modules_from_files(files: list[str]) -> set[tuple[str, Any]]:
+def extract_modules_from_files(
+    files: list[str], module_detailed: bool = False
+) -> set[tuple[str, Any]] | list[dict[str, str | dict[str, str | int | None]]]:
     """
     extracts raw module data from mhbs
 
     Args:
         files (list[str]): mhbs as pdfs to extract the raw modules from
+        module_detailed (bool): whether to extract all module information to the module
 
     Returns:
         set[tuple[str, Any]]: set of modules, each module is made up of two tuples:
@@ -43,12 +46,23 @@ def extract_modules_from_files(files: list[str]) -> set[tuple[str, Any]]:
     """
     # create a set to store unique modules
     modules_set = set()
-
+    modules_detailed_list = []
     # extract modules from each file
     for file in files:
         # try creating Modules object
         try:
             modules: prt.Modules = prt.Modules(pdf_path=file)
+            if module_detailed:
+                for i in modules.toc_module_codes():
+                    try:
+                        data = modules.data_to_module(i)
+                        modules_detailed_list.append(
+                            {"file": file, "module_code": i, "data": data}
+                        )
+                    except Exception as e:
+                        print(e)
+                        pass
+                continue
         except Exception:
             print(f"Error processing file {file}")
             continue
@@ -58,6 +72,8 @@ def extract_modules_from_files(files: list[str]) -> set[tuple[str, Any]]:
         # remove duplicates
         modules_set.update(set(tuple(i.items()) for i in modules_raw))  # type: ignore
 
+    if module_detailed:
+        return modules_detailed_list
     return modules_set  # type: ignore
 
 
@@ -80,6 +96,7 @@ def save_to_db(cursor, module: dict[str, Any]) -> bool:
     return True
 
 
+# TODO: load the mhbs from database instead of fixed path
 @db.cursor_handling(manually_supply_cursor=False)
 def load_pdf_modules(
     pdf_folder: str, save_path: str | None = None, from_db: bool = True, cursor=None
@@ -105,7 +122,7 @@ def load_pdf_modules(
     if from_db is True:
         result = db.select(
             cursor=cursor,  # type: ignore
-            table="unia.raw_modules",
+            table="unia.modules_raw",
             keywords=["id", "module_code", "content"],
         )
         if result.is_error:
@@ -169,7 +186,7 @@ def save_raw(raw_modules: list[dict[str, str]], cursor=None) -> Result:
         Result: Result object indicating success or error
     """
     query = f"""INSERT INTO unia.modules_raw (module_code, content)
-               VALUES {', '.join(['%s' for i in range(len(raw_modules))])}
+               VALUES {", ".join(["%s" for i in range(len(raw_modules))])}
                 RETURNING id;"""
 
     variables = [tuple(i.values()) for i in raw_modules]
@@ -189,7 +206,6 @@ def remove_already_computed(modules):
     pass
 
 
-@db.cursor_handling(manually_supply_cursor=False)
 def handle_single_module(module: Any, module_text: str) -> Result:
     """
     handle everything for single module
@@ -200,45 +216,21 @@ def handle_single_module(module: Any, module_text: str) -> Result:
         module_text (str): raw module text to extract data from
 
     Returns:
-        Response[Any, Any]: response object containing either nothing or error information
+        Result: Result object containing either data or error information
     """
     try:
         result = emi(module_text=module_text)  # type: ignore
     except Exception as e:
         return Result(error=str(e), additional_information=module)
-    # append extracted data to module dict
+    # extract data and check it briefly
     module["extracted_data"] = result.model_dump()
-    if module["extracted_data"]["title"] is None:
-        module["extracted_data"]["title"] = module["module_code"]
-    # save to results
-    results.append(module)
-
-    # save to database
-    db_module = {
-        key: Json(value)
-        if isinstance(value, dict) or isinstance(value, list)
-        else value
-        for key, value in module["extracted_data"].items()
-    }
-    db_module["raw_module_id"] = module["id"]
-    db_res = db.insert(
-        cursor=cursor,  # type: ignore
-        table="unia.modules_ai_extracted",
-        values=db_module,
-        returning_column="id",
-    )
-    # if error occurs, log module for later inspection
-    if db_res.is_error:
-        print(f"\n{db_res.error}")
-        print(
-            f"\nError saving module {module.get('module_code', 'unknown')} to database."
-        )
-        return Result(error=str(db_res.error), additional_information=module)
+    if module["extracted_data"]["module_code"] is None:
+        module["extracted_data"]["module_code"] = module["module_code"]
 
     return Result(data=module)
 
 
-# @db.cursor_handling(manually_supply_cursor=False)
+@db.cursor_handling(manually_supply_cursor=False)
 def extract_module_data(
     modules: list[dict[str, Any]], save_path: str | None = None, cursor=None
 ) -> list[dict[str, Any]]:
@@ -265,34 +257,48 @@ def extract_module_data(
             result = handle_single_module(module, module_text=module["content"])
             # NEWLY IGNORED
             # result = emi(module_text=module["content"])  # type: ignore
-        except:
+        except Exception as e:
+            print(e)
             continue
         # NEWLY ADDED
-        if result.is_error:
-            errors.append(result.additional_information)
-            continue
-        results.append(result.data)
-        # NEWLY IGNORED
-        """
+        try:
+            if result.is_error:
+                errors.append(result.additional_information)
+                continue
+            results.append(result.data)
+        except Exception as e:
+            print(e)
+
         # append extracted data to module dict
-        module["extracted_data"] = result.model_dump()
+        module = result.data
         # save to results
         results.append(module)
 
-        # save to database
-        db_module = {key: Json(value) if isinstance(value, dict) or isinstance(value, list) else value for key, value in module["extracted_data"].items()}
-        db_res = db.insert(
-            cursor=cursor, # type: ignore
-            table="unia.modules_ai_extracted",
-            values=db_module,
-            returning_column="id"
-        )
-        # if error occurs, log module for later inspection
-        if db_res.is_error:
-            errors.append(module)
-            print(f"\n{db_res.error}")
-            print(f"\nError saving module {module.get('module_code', 'unknown')} to database.")
-        """
+        try:
+            # save to database
+            db_module = {
+                key: Json(value)
+                if isinstance(value, dict) or isinstance(value, list)
+                else value
+                for key, value in module["extracted_data"].items()
+            }
+            db_module["raw_module_id"] = module["id"]
+
+            db_res = db.insert(
+                cursor=cursor,  # type: ignore
+                table="unia.modules_ai_extracted",
+                values=db_module,
+                returning_column="id",
+            )
+            # if error occurs, log module for later inspection
+            if db_res.is_error:
+                errors.append(module)
+                print(f"\n{db_res.error}")
+                print(
+                    f"\nError saving module {module.get('module_code', 'unknown')} to database."
+                )
+        except Exception as e:
+            print(e)
 
     # save results to json files if path is provided
     if save_path is not None:

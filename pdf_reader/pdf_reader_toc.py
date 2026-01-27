@@ -8,10 +8,11 @@
 # Status: IN DEVELOPMENT
 # FileID: Re-ex-0002
 
+from io import BytesIO
 from pdf_reader import pdf_extractor as extr
 import re
 from itertools import groupby
-from typing import Any
+from typing import Annotated, Any
 
 
 def decode(text: str) -> str:
@@ -286,13 +287,23 @@ def search_text_blocks(
 
 
 class Modules:
-    def __init__(self, pdf_path: str):
+    def __init__(
+        self,
+        pdf_path: Annotated[str | None, "Explicit with pdf_file"] = None,
+        pdf_file: Annotated[BytesIO | None, "Explicit with pdf_path"] = None,
+    ):
         """
         Args:
             pdf_path: path to pdf file
+            pdf_file: file-like object of the pdf file
         """
-        self.path: str = pdf_path
-        self.pdf: extr.Pdf = extr.Pdf(pdf_path=self.path)
+        if all(i is None for i in [pdf_path, pdf_file]):
+            raise ValueError("Either pdf_path or pdf_file must be provided.")
+        if all(i is not None for i in [pdf_path, pdf_file]):
+            raise ValueError("Only one of pdf_path or pdf_file must be provided.")
+        self.path: str | None = pdf_path
+        self.file: BytesIO | None = pdf_file
+        self.pdf: extr.Pdf = extr.Pdf(pdf_path=self.path, pdf_file=self.file)
         self.content: list = self.pdf.extract_objects()
         self.stream_data: list = [
             i["data"] for i in self.content if i["information"] == "success"

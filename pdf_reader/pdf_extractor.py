@@ -8,23 +8,30 @@
 # Status: IN DEVELOPMENT
 # FileID: Re-ex-0001
 
+from io import BytesIO
 import json
 import re
 import zlib
+from typing import Annotated
 
 class Pdf:
     """
     reads pdfs and extracts information
     """
 
-    def __init__(self, pdf_path: str):
+    def __init__(self, pdf_path: Annotated[str | None, "Explicit with pdf_file"], pdf_file: Annotated[BytesIO | None, "Explicit with pdf_path"] = None):
         """
         initializes class variables
         Args:
             pdf_path (str): path to pdf file
         """
-        self.path: str = pdf_path
-        self.content: bytes = self.read_content()
+        if all(i is None for i in [pdf_path, pdf_file]):
+            raise ValueError("Either pdf_path or pdf_file must be provided.")
+        if all(i is not None for i in [pdf_path, pdf_file]):
+            raise ValueError("Only one of pdf_path or pdf_file must be provided.")
+        self.path: str | None = pdf_path
+        self.file: BytesIO | None = pdf_file
+        self.content: bytes = self.read_content() if self.path is not None else self.file.read() # type: ignore
 
     def read_content(self) -> bytes:
         """
@@ -32,7 +39,7 @@ class Pdf:
         Returns: 
             bytes: the content of the pdf
         """
-        with open(self.path, 'rb') as file:
+        with open(self.path, 'rb') as file: # type: ignore
             data = file.read()
         return data
 

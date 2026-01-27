@@ -16,7 +16,6 @@ Database interaction module
 This module provides functions to connect to a PostgreSQL database and perform basic operations such as
 selecting, inserting, updating, and deleting records. It also includes decorators for cursor management and error handling."""
 
-
 from collections.abc import Callable
 from enum import Enum
 from functools import wraps
@@ -30,15 +29,16 @@ import psycopg2 as pg
 from psycopg2.extensions import cursor
 
 from datatypes.result import Result
+from database.pool import pool, get_cursor, close_cursor
 
 
 load_dotenv()
 
-USER = os.getenv("USERDB") # (like the linux user name!)
+USER = os.getenv("USERDB")  # (like the linux user name!)
 PASSWORD = os.getenv("PASSWORD")
-HOST = os.getenv("HOST") # localhost
-PORT = os.getenv("PORT") # 5432
-DBNAME = os.getenv("DBNAME") # mhbs
+HOST = os.getenv("HOST")  # localhost
+PORT = os.getenv("PORT")  # 5432
+DBNAME = os.getenv("DBNAME")  # mhbs
 
 
 class ANSWER_TYPE(str, Enum):
@@ -50,10 +50,10 @@ class ANSWER_TYPE(str, Enum):
         SINGLE_ANSWER: single answer expected
         LIST_ANSWER: list of answers expected
     """
+
     NO_ANSWER = "NO_ANSWER"
     SINGLE_ANSWER = "SINGLE_ANSWER"
     LIST_ANSWER = "LIST_ANSWER"
-
 
     @staticmethod
     def is_valid(value):
@@ -71,9 +71,9 @@ class ORDER(str, Enum):
         ASC: ascending order
         DESC: descending order
     """
+
     ASC = "ASC"
     DESC = "DESC"
-
 
     @staticmethod
     def is_valid(value):
@@ -94,15 +94,19 @@ def full_pack(func: Callable[..., Any]):
     Returns:
         function: wrapped function
     """
+
     def wrapped(*args, **kwargs):
         _, internal_cursor = connect()
         result = func(internal_cursor, *args, **kwargs)
-        close(cursor=internal_cursor) # type: ignore
+        close(cursor=internal_cursor)  # type: ignore
         return result
+
     return wrapped
 
 
-def cursor_handling(*, manually_supply_cursor: bool = False) -> Callable[..., Any]:
+def cursor_handling(
+    *, manually_supply_cursor: bool = False, use_pool: bool = True
+) -> Callable[..., Any]:
     """
     decorator to handle cursor opening and closing
     specify whether the cursor is supplied manually
@@ -116,7 +120,7 @@ def cursor_handling(*, manually_supply_cursor: bool = False) -> Callable[..., An
     def decorator(func: Callable[..., Any]):
         """
         wrapper function to make sure cursor is closed after function call
-        
+
 
         Args:
             func (func): function
@@ -145,31 +149,39 @@ def cursor_handling(*, manually_supply_cursor: bool = False) -> Callable[..., An
 
             # check whether cursor is a valid keyword argument
             try:
-                _ = bound.arguments['cursor']
+                _ = bound.arguments["cursor"]
             except KeyError:
-                raise ValueError(f"cursor must be a valid keyword argument of the function {func.__name__}") # pylint: disable=raise-missing-from, line-too-long
+                raise ValueError(
+                    f"cursor must be a valid keyword argument of the function {func.__name__}"
+                )  # pylint: disable=raise-missing-from, line-too-long
 
             # set cursor based on whether it is supplied manually or not
 
             # if cursor is not supplied manually and is None, create a new one
-            if ((internal_cursor := bound.arguments.get('cursor', None)) is None
-                and manually_supply_cursor is False):
+            if (
+                internal_cursor := bound.arguments.get("cursor", None)
+            ) is None and manually_supply_cursor is False:
                 # connect to db
-                internal_cursor = connect()
+                internal_cursor = get_cursor() if use_pool else connect()
 
             # if cursor is supplied manually but manually_supply_cursor is False, raise error
             elif internal_cursor is None and manually_supply_cursor is True:
-                raise ValueError(f"cursor must be supplied manually for function {func.__name__} but is None")
+                raise ValueError(
+                    f"cursor must be supplied manually for function {func.__name__} but is None"
+                )
 
             # if cursor is supplied manually and manually_supply_cursor is True, respond with user warning and create a new cursor
             elif internal_cursor is not None and manually_supply_cursor is False:
-                warnings.warn(f"cursor is supplied manually for function {func.__name__} but manually_supply_cursor is set to False; the manually set cursor will be IGNORED", UserWarning)
+                warnings.warn(
+                    f"cursor is supplied manually for function {func.__name__} but manually_supply_cursor is set to False; the manually set cursor will be IGNORED",
+                    UserWarning,
+                )
 
                 # set close_cursor to True since the cursor is only used locally
                 close_cursor = True
 
                 # connect to db
-                internal_cursor = connect()
+                internal_cursor = get_cursor() if use_pool else connect()
 
             # if manually_supply_cursor is not of type bool, raise error
             elif isinstance(manually_supply_cursor, bool) is False:
@@ -184,8 +196,12 @@ def cursor_handling(*, manually_supply_cursor: bool = False) -> Callable[..., An
                 # if cursor was created in this function, close it
                 if close_cursor is True:
                     # close the cursor after the function call
-                    close(cursor=internal_cursor) # type: ignore
+                    # fmt: off
+                    close_cursor(cursor=internal_cursor) if use_pool else close(cursor=internal_cursor)  # type: ignore
+                    # fmt: off
+
         return wrapped
+
     return decorator
 
 
@@ -198,12 +214,14 @@ def catch_exception(func):
     Args:
         func (func): function
     """
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
             return Result(data=func(*args, **kwargs))
-        except Exception as e:                                              # pylint: disable=broad-exception-caught
+        except Exception as e:  # pylint: disable=broad-exception-caught
             return Result(error=e, stack_trace=traceback.format_exc())
+
     return wrapper
 
 
@@ -220,37 +238,38 @@ def connect(**kwargs):
     """
     if len(kwargs) > 0:
         return pg.connect(**kwargs).cursor()
-    return pg.connect(user=USER, password=PASSWORD, host=HOST,
-                                 port=PORT, database=DBNAME).cursor()
+    return pg.connect(
+        user=USER, password=PASSWORD, host=HOST, port=PORT, database=DBNAME
+    ).cursor()
 
 
-# TODO can't return success: False right now
-# TODO for arguments as list might not be completely implemented
+# TODO: can't return success: False right now
+# TODO: for arguments as list might not be completely implemented
 # TODO: specific_where and variables don't work together
 # @catch_exception
-def select(                                                                 # pylint: disable=too-many-branches, too-many-positional-arguments, too-many-arguments
-        cursor: cursor,                                                     # pylint: disable=redefined-outer-name
-        table: str,
-        answer_type: ANSWER_TYPE = ANSWER_TYPE.LIST_ANSWER,
-        keywords: tuple[str] | list[str] = ("*",),
-        conditions: dict[str, Any] | None = None,
-        negated_conditions: dict[str, Any] | None = None,
-        select_max_of_key: str = "",
-        specific_where: str = "",
-        variables: list[str] | None = None,
-        order_by: tuple[str, ORDER] | None = None
-    ) -> Result[Any, Exception]:
+def select(  # pylint: disable=too-many-branches, too-many-positional-arguments, too-many-arguments
+    cursor: cursor,  # pylint: disable=redefined-outer-name
+    table: str,
+    type_of_answer: ANSWER_TYPE = ANSWER_TYPE.LIST_ANSWER,
+    keywords: tuple[str] | list[str] = ("*",),
+    conditions: dict[str, Any] | None = None,
+    negated_conditions: dict[str, Any] | None = None,
+    select_max_of_key: str = "",
+    specific_where: str = "",
+    variables: list[str] | None = None,
+    order_by: tuple[str, ORDER] | None = None,
+) -> Result[Any, Exception]:
     """
     read_table \n
     read data from a table
-    
+
     Args:
         cursor (from): cursor for db
         table (str): table to select from
         keywords (tuple[str] | list[str]): columns, that should be selected, if empty, get all
         conditions (dict): under which conditions (key: column, value: value) values should be selected, if empty, no conditions
         negated_conditions (dict): under which conditions (key: column, value: value) values should NOT be selected, if empty, no negated conditions
-        answer_type (ANSWER_TYPE): specify whether one or more answers are to be received, therefore it changes, whether list or single object will be returned
+        type_of_answer (ANSWER_TYPE): specify whether one or more answers are to be received, therefore it changes, whether list or single object will be returned
         select_max_of_key (bool): conditions must be empty, otherwise it won't be used
         specific_where (str): select_max_of_key must be empty as well as conditions must be empty, else specific_where is ignored, allows to pass in a unique where statement (WHERE is already in the string),
         variables (list | None): list of variables that should be passed into the specific_where statement
@@ -259,13 +278,22 @@ def select(                                                                 # py
         Result: result object with data or error
     """
 
-    # check, whether answer_type is valid
-    if not ANSWER_TYPE.is_valid(answer_type) or answer_type == ANSWER_TYPE.NO_ANSWER:
-        raise ValueError("parameter answer_type of the function must be of enum type LIST_ANSWER and not SINGLE_ANSWER")
+    # check, whether type_of_answer is valid
+    if (
+        not ANSWER_TYPE.is_valid(type_of_answer)
+        or type_of_answer == ANSWER_TYPE.NO_ANSWER
+    ):
+        raise ValueError(
+            "parameter type_of_answer of the function must be of enum type LIST_ANSWER and not SINGLE_ANSWER"
+        )
 
     # specific_where and variables can't be used together
-    if specific_where == "" and variables is not None:
-        raise ValueError("if specific_where is empty, variables must be None as well")
+    if specific_where != "" and (
+        conditions is not None or negated_conditions is not None
+    ):
+        raise ValueError(
+            "specific_where and conditions or negated_conditions are explicit"
+        )
 
     # initialize variables
     keywords = list(keywords)
@@ -274,8 +302,13 @@ def select(                                                                 # py
     result = {"success": False, "data": None, "error": None}
 
     # build query
-    all_conditions = {key: {"value": value, "negated": False} for key, value in conditions.items()} | {key: {"value": value, "negated": True} for key, value in negated_conditions.items()}
-    query = f"""SELECT {', '.join(keywords)} FROM {table}"""
+    all_conditions = {
+        key: {"value": value, "negated": False} for key, value in conditions.items()
+    } | {
+        key: {"value": value, "negated": True}
+        for key, value in negated_conditions.items()
+    }
+    query = f"""SELECT {", ".join(keywords)} FROM {table}"""
 
     # add conditions if any
     if len(all_conditions) > 0:
@@ -284,13 +317,17 @@ def select(                                                                 # py
             query += f" ORDER BY {order_by[0]} {order_by[1].value}"
         cursor.execute(query, tuple(i["value"] for i in all_conditions.values()))
         # get data based on answer type
-        if answer_type == ANSWER_TYPE.SINGLE_ANSWER:
+        if type_of_answer == ANSWER_TYPE.SINGLE_ANSWER:
             data = cursor.fetchone()
         else:
             data = [list(i) for i in cursor.fetchall()]
         # map the data to the keywords if keywords are explicitly specified
         if keywords is not None and "*" not in keywords:
-            result = dict(zip(keywords, data)) if answer_type == ANSWER_TYPE.SINGLE_ANSWER else [dict(zip(keywords, vals)) for vals in data] # type: ignore
+            result = (
+                dict(zip(keywords, data))  # type: ignore
+                if type_of_answer == ANSWER_TYPE.SINGLE_ANSWER
+                else [dict(zip(keywords, vals)) for vals in data]  # type: ignore
+            )  # type: ignore
         return Result(data=result)
 
     # add select max of key condition
@@ -304,7 +341,13 @@ def select(                                                                 # py
         query += f" WHERE {specific_where}"
         if order_by is not None:
             query += f" ORDER BY {order_by[0]} {order_by[1].value}"
-    
+        if specific_where.count(" %s") != (
+            len(variables) if variables is not None else 0
+        ):
+            raise ValueError(
+                "number of placeholders must match the number of provided variables"
+            )
+
     # add order by condition
     if variables is None:
         cursor.execute(query)
@@ -312,14 +355,18 @@ def select(                                                                 # py
         cursor.execute(query, variables)
 
     # get data based on answer type
-    if answer_type == ANSWER_TYPE.SINGLE_ANSWER:
+    if type_of_answer == ANSWER_TYPE.SINGLE_ANSWER:
         data = cursor.fetchone()
     else:
         data = [list(i) for i in cursor.fetchall()]
-    
+
     # map the data to the keywords if keywords are explicitly specified
     if keywords is not None and "*" not in keywords:
-        result = dict(zip(keywords, data)) if answer_type == ANSWER_TYPE.SINGLE_ANSWER else [dict(zip(keywords, vals)) for vals in data] # type: ignore
+        result = (
+            dict(zip(keywords, data))  # type: ignore
+            if type_of_answer == ANSWER_TYPE.SINGLE_ANSWER
+            else [dict(zip(keywords, vals)) for vals in data]  # type: ignore
+        )  # type: ignore
     elif "*" in keywords:
         result = data
     return Result(data=result)
@@ -329,10 +376,11 @@ def select(                                                                 # py
 # TODO: parametrize returning_column
 # @catch_exception
 def insert(
-    cursor: cursor,                                                         # pylint: disable=redefined-outer-name
+    cursor: cursor,  # pylint: disable=redefined-outer-name
     table: str,
     values: dict[str, Any] | list[str],
-    returning_column: str | None = None) -> Result[Any, Exception]:
+    returning_column: str | None = None,
+) -> Result[Any, Exception]:
     """
     insert data into table
 
@@ -358,17 +406,17 @@ def insert(
         # build parametrized query
         if isinstance(values, list):
             query = f"""INSERT INTO {table}
-                        VALUES ({', '.join('%s' for _ in range(len(values)))})"""
+                        VALUES ({", ".join("%s" for _ in range(len(values)))})"""
             vals = values
         elif isinstance(values, dict):
-            query = f"""INSERT INTO {table} ({', '.join(values.keys())})
-                    VALUES ({', '.join('%s' for _, _ in enumerate(values.keys()))})"""
+            query = f"""INSERT INTO {table} ({", ".join(values.keys())})
+                    VALUES ({", ".join("%s" for _, _ in enumerate(values.keys()))})"""
             vals = list(values.values())
 
         # add returning_column
         if returning_column is not None:
             query += f" RETURNING {returning_column}"
-        
+
         # run query
         cursor.execute(query, vals)
         cursor.connection.commit()
@@ -380,20 +428,21 @@ def insert(
         return Result()
 
     # rollback if error occurred
-    except Exception as e:                                                  # pylint: disable=broad-exception-caught
+    except Exception as e:  # pylint: disable=broad-exception-caught
         cursor.connection.rollback()
         return Result(error=e, stack_trace=traceback.format_exc())
 
 
 # for specific_where conditions must be empty, otherwise conditions will be ignored IMPORTANT what is being ignored differs from the other functions
-def update(                                                                 # pylint: disable=too-many-positional-arguments, too-many-arguments
-    cursor: cursor,                                                         # pylint: disable=redefined-outer-name
+def update(  # pylint: disable=too-many-positional-arguments, too-many-arguments
+    cursor: cursor,  # pylint: disable=redefined-outer-name
     table: str,
     returning_column: str | None = None,
     arguments: dict[str, Any] | None = None,
     conditions: dict[str, Any] | None = None,
     specific_where: str = "",
-    specific_set: str = "") -> Result[Any, Exception]:
+    specific_set: str = "",
+) -> Result[Any, Exception]:
     """
     updates values in a table \n
     already has try catch
@@ -429,15 +478,15 @@ def update(                                                                 # py
         if specific_set != "":
             query += f""" SET {specific_set}"""
         else:
-            query += f""" SET  {', '.join(
-                key + ' = %s' for _, key in enumerate(arguments.keys())
-            )}"""
+            query += f""" SET  {
+                ", ".join(key + " = %s" for _, key in enumerate(arguments.keys()))
+            }"""
 
         # where part
         if specific_where != "":
             query += " WHERE " + specific_where
         else:
-            query += f""" WHERE {' AND '.join(key + " = %s" for _, key in enumerate(conditions))}"""
+            query += f""" WHERE {" AND ".join(key + " = %s" for _, key in enumerate(conditions))}"""
 
         # returning part
         if returning_column is not None:
@@ -454,16 +503,17 @@ def update(                                                                 # py
         return Result()
 
     # rollback if error occurred
-    except Exception as e:                                                  # pylint: disable=broad-exception-caught
+    except Exception as e:  # pylint: disable=broad-exception-caught
         cursor.connection.rollback()
         return Result(error=e, stack_trace=traceback.format_exc())
 
 
-def remove(
-        cursor: cursor,                                                     # pylint: disable=redefined-outer-name
-        table: str,
-        conditions: dict[str, Any],
-        returning_column: str | None = None) -> Result[Any, Exception]:
+def delete(
+    cursor: cursor,  # pylint: disable=redefined-outer-name
+    table: str,
+    conditions: dict[str, Any],
+    returning_column: str | None = None,
+) -> Result[Any, Exception]:
     """
     removes data from table \n
     already has try catch
@@ -485,7 +535,7 @@ def remove(
     try:
         # build query
         query = f"""DELETE FROM {table}
-                    WHERE {' AND '.join(key + " = %s" for _, key in enumerate(conditions))}"""
+                    WHERE {" AND ".join(key + " = %s" for _, key in enumerate(conditions))}"""
 
         # returning part
         if returning_column is not None:
@@ -502,17 +552,17 @@ def remove(
         return Result()
 
     # rollback if error occurred
-    except Exception as e:                                                  # pylint: disable=broad-exception-caught
+    except Exception as e:  # pylint: disable=broad-exception-caught
         cursor.connection.rollback()
         return Result(error=e, stack_trace=traceback.format_exc())
 
 
 def custom_call(
-        cursor: cursor,                                                     # pylint: disable=redefined-outer-name
-        query: str,
-        type_of_answer: ANSWER_TYPE,
-        variables: list[Any] | tuple[Any] | None = None
-    ) -> Result[Any, Exception]:
+    cursor: cursor,  # pylint: disable=redefined-outer-name
+    query: str,
+    type_of_answer: ANSWER_TYPE,
+    variables: list[Any] | tuple[Any] | None = None,
+) -> Result[Any, Exception]:
     """
     send a custom query to the database
 
@@ -543,17 +593,19 @@ def custom_call(
         # would usually be better to check at the beginning,
         # but since code is used backend, function is mostly used correctly.
         # Therefore, it is more effective to check at the end if no other case matches
-        return Result(error="parameter type_of_answer of the function must be of enum type ANSWER_TYPE") # pylint: disable=line-too-long
+        return Result(
+            error="parameter type_of_answer of the function must be of enum type ANSWER_TYPE"
+        )  # pylint: disable=line-too-long
 
     # rollback if error occurred
-    except Exception as e:                                                  # pylint: disable=broad-exception-caught
+    except Exception as e:  # pylint: disable=broad-exception-caught
         cursor.connection.rollback()
         return Result(error=e, stack_trace=traceback.format_exc())
 
 
 # TODO can only return success True right now
 # @catch_exception
-def get_time(cursor: cursor) -> Result[Any, Exception]:                     # pylint: disable=redefined-outer-name
+def get_time(cursor: cursor) -> Result[Any, Exception]:  # pylint: disable=redefined-outer-name
     """
     returns the current berlin time
 
@@ -569,17 +621,18 @@ def get_time(cursor: cursor) -> Result[Any, Exception]:                     # py
     return Result(data=data[0] if data is not None else None)
 
 
-def close(cursor: cursor):                                                  # pylint: disable=redefined-outer-name
+def close(cursor: cursor):  # pylint: disable=redefined-outer-name
     """
     closes the current cursor
-    
+
     Args:
         cursor: cursor that should be closed
     """
     cursor.close()
-    conn = getattr(cursor, 'connection', None)
+    conn = getattr(cursor, "connection", None)
     if conn is not None:
         conn.close()
+
 
 if __name__ == "__main__":
     connect()

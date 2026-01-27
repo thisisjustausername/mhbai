@@ -77,16 +77,14 @@ class SearchParams:
 
 
 @db.cursor_handling(manually_supply_cursor=False)
-def load_data(
-    search_params: SearchParams, uni_a: bool = True, cursor=None, **kwargs
-) -> dict:
+def load_data(mhb_url: str, uni_a: bool = True, cursor=None, **kwargs) -> dict:
     """
     Load data from SQL database and reconstruct it into a dictionary.
 
     Args:
         cursor: Database cursor to execute SQL queries.
         uni_a (bool): Flag to determine the type of data to load.
-        search_params (SearchParams): SearchParams object containing search parameters.
+        mhb_url (str): ulr of the mhb file
         **kwargs (Any): values to search for in the database
     Returns:
         dict: Reconstructed data as a dictionary.
@@ -94,9 +92,7 @@ def load_data(
 
     if not uni_a:
         raise NotImplementedError("Only uni_a=True is implemented.")
-    result = load_unia_modules(
-        cursor=cursor,
-        search_params=search_params, **kwargs)
+    result = load_unia_modules(cursor=cursor, search_params=search_params, **kwargs)
     return result
 
 
@@ -142,13 +138,13 @@ def load_unia_modules(cursor, search_params: SearchParams, **kwargs) -> Result:
         raise UserWarning(
             f"Only these parameters are allowed to search by by now: {allowed_search_params}"
         )
-    
+
     result = db.select(
         cursor=cursor,
         table="unia.modules_ai_extracted",
         answer_type=db.ANSWER_TYPE.LIST_ANSWER,
         keywords=search_params.params,
-        conditions=kwargs
+        conditions=kwargs,
     )
 
     return result
@@ -158,4 +154,6 @@ if __name__ == "__main__":
     module_code = "KTH-3000"
     result = load_data(search_params=SearchParams(params=[]), module_code=module_code)
     import json
+
     print(json.dumps(result.data[0], indent=4))
+

@@ -214,21 +214,30 @@ Wichtig: Gebe nur Informationen wieder. Falls Informationen fehlen, lasse das en
 """
 
 
-def extract_module_info(module_text: str, local: bool = True) -> ModuleInfo:
+def extract_module_info(
+    module_text: str,
+    local: bool = True,
+    model: str = "llama3.2:3b",  # "llama3.3:70b"
+) -> ModuleInfo:
     """
     Extract structured module information from raw module text using an AI model.
     Args:
         module_text (str): The raw text of the module from which to extract information.
         local (bool): Whether to use a local model or a remote one. Defaults to True.
+        model (str): Specify the AI model to use.
 
     Returns:
         ModuleInfo: A Pydantic model containing the extracted module information.
     """
-    additional_params = {"host": "http://misit-183.informatik.uni-augsburg.de:11434/"} if not local else {}
+    additional_params = (
+        {"host": "http://misit-183.informatik.uni-augsburg.de:11434/"}
+        if not local
+        else {}
+    )
     try:
         response = ollama.chat(
             **additional_params,
-            model="llama3.3:70b",
+            model=model,
             messages=[
                 {"role": "system", "content": definition_model_position},
                 {"role": "user", "content": f"Extract data from: \n\n{module_text}"},
