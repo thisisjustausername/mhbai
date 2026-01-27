@@ -101,6 +101,16 @@ class Result(Generic[Data, Error]):
         return self._error  # type: ignore
     
     @property
+    def additional_information(self) -> Any:
+        """
+        Represents any additional information related to the result.
+
+        Returns:
+            Any: Additional information related to the result.
+        """
+        return self._additional_information
+    
+    @property
     def stack_trace(self) -> str:
         """
         Represents the stack trace if available.

@@ -13,6 +13,7 @@
 
 from dataclasses import dataclass
 from enum import Enum
+from re import S
 from typing import Generic, TypeVar, Any
 import json
 
@@ -113,40 +114,50 @@ class Response(Generic[T, E]):
 
     def __init__(
         self,
-        success_list: T | None = None,
-        error_list: E | None = None,
+        success_data: T | None = None,
+        error_data: E | None = None,
         message: Message | None = None,
+        user_warning: str | None = None,
         status: Status | None = None,
     ) -> None:
         """
         Initialize a Response object.
 
         Args:
-            success_list (T | None): The successful result data.
-            error_list (E | None): The error information if the operation failed.
+            success_data (T | None): The successful result data.
+            error_data (E | None): The error information if the operation failed.
             message (str | dict[str, Any] | None): Additional message or information.
+            user_warning (str | None): Optional user warning message.
             status (Status | None): The status of the response; if None, it will be set automatically
         Returns:
             None
         """
-        self._data = success_list if success_list is not None else []
-        self._error = error_list if error_list is not None else []
+        self._data = success_data if success_data is not None else []
+        self._error = error_data if error_data is not None else []
+        self._user_warning = user_warning
         self._status = status
         if status is None:
-            if (error_list is None or len(error_list) == 0) and (  # type: ignore
+            if (error_data is None or len(error_data) == 0) and (  # type: ignore
                 message is None or "error" not in message.type.lower()
             ):
                 self._status = Status.FULL_SUCCESS
-            elif (success_list is None or len(success_list) == 0) and (  # type: ignore
+            elif (success_data is None or len(success_data) == 0) and (  # type: ignore
                 message is None or "error" in message.type.lower()
             ):
                 self._status = Status.FULL_ERROR
             else:
                 self._status = Status.PARTIAL_SUCCESS
-        self.message = message
+        self.message = (
+            message
+            if message is not None
+            else Message(
+                name="Unknown",
+                type="success" if self.status != Status.FULL_ERROR else "error",
+            )
+        )
 
     @property
-    def success_list(self) -> T:
+    def data(self) -> T:
         """
         Get the list of successful results.
 
@@ -156,7 +167,7 @@ class Response(Generic[T, E]):
         return self._data  # type: ignore
 
     @property
-    def error_list(self) -> E:
+    def error(self) -> E:
         """
         Get the list of error results.
 
@@ -175,6 +186,26 @@ class Response(Generic[T, E]):
         """
         return self._status  # type: ignore
 
+    @property
+    def user_warning(self) -> str | None:
+        """
+        Get the user warning message if any.
+
+        Returns:
+            str | None: The user warning message or None if not set.
+        """
+        return self._user_warning
+
+    @property
+    def is_success(self) -> bool:
+        return self._status == Status.FULL_SUCCESS
+
+    @property
+    def is_error(self) -> bool:
+        return (
+            self._status == Status.FULL_ERROR or self.status == Status.PARTIAL_SUCCESS
+        )
+
     def to_json(self) -> dict:
         """
         Convert the Response object to a JSON-serializable dictionary.
@@ -183,8 +214,8 @@ class Response(Generic[T, E]):
             dict: A dictionary representation of the Response object.
         """
         return {
-            "success_list": self._data,
-            "error_list": str(self._error),
+            "success_data": self._data,
+            "error_data": str(self._error),
             "status": self._status.name,  # type: ignore
             "message": self.message.to_json() if self.message else None,
         }
