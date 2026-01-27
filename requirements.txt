@@ -16,4 +16,6 @@ ollama
 crawl4ai
 mypy
 pylint
-
+torch
+waitress
+bcrypt
