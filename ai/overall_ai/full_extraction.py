@@ -16,6 +16,8 @@ extract data from these models
 store the data in a database
 """
 
+# TODO: add mhb_id to raw modules when saving to db
+
 import math
 import json
 import os
@@ -31,7 +33,7 @@ from datatypes.result import Result
 
 
 def extract_modules_from_files(
-    files: list[str], module_detailed: bool = False
+    files: list[str], module_detailed: bool = False, remove_duplicates: bool = True
 ) -> set[tuple[str, Any]] | list[dict[str, str | dict[str, str | int | None]]]:
     """
     extracts raw module data from mhbs
@@ -39,13 +41,14 @@ def extract_modules_from_files(
     Args:
         files (list[str]): mhbs as pdfs to extract the raw modules from
         module_detailed (bool): whether to extract all module information to the module
+        remove_duplicates (bool): whether to remove duplicate modules
 
     Returns:
-        set[tuple[str, Any]]: set of modules, each module is made up of two tuples:
-                              (("module_code", <module_code>), ("content": <content>))
+        set[tuple[str, Any]] | list[dict[str, str | dict[str, str | int | None]]]: set or list of modules, each module is made up of two tuples:
+                              (("module_code", <module_code>), ("content": <content>)) for set, otherwise list of dicts
     """
     # create a set to store unique modules
-    modules_set = set()
+    modules_list = []
     modules_detailed_list = []
     # extract modules from each file
     for file in files:
@@ -67,15 +70,14 @@ def extract_modules_from_files(
             print(f"Error processing file {file}")
             continue
         # get raw module text pages from Modules object
-        modules_raw = modules.raw_module_texts()
+        modules_raw = [module | {"mhb_id": int(file.split("/")[-1].split(".pdf")[0])} for module in modules.raw_module_texts()]
 
         # remove duplicates
-        modules_set.update(set(tuple(i.items()) for i in modules_raw))  # type: ignore
+        modules_list.extend(modules_raw)
 
     if module_detailed:
         return modules_detailed_list
-    return modules_set  # type: ignore
-
+    return modules_list if not remove_duplicates else set(tuple(i.items()) for i in modules_list)
 
 def save_to_db(cursor, module: dict[str, Any]) -> bool:
     """
@@ -99,7 +101,7 @@ def save_to_db(cursor, module: dict[str, Any]) -> bool:
 # TODO: load the mhbs from database instead of fixed path
 @db.cursor_handling(manually_supply_cursor=False)
 def load_pdf_modules(
-    pdf_folder: str, save_path: str | None = None, from_db: bool = True, cursor=None
+    pdf_folder: str, save_path: str | None = None, from_db: bool = True, cursor=None, remove_duplicates: bool = True
 ) -> list[dict[str, Any]]:
     """
     load all raw modules from all pdfs in a folder
@@ -111,6 +113,7 @@ def load_pdf_modules(
                                 if not specified, data won't be saved persistently;
                                 If save_path == "": then data will be saved to DATABASE
         from_db (bool): True when loading data from db, False when computing data freshly
+        remove_duplicates (bool): whether to remove duplicate modules
         cursor: specified by decorator
 
     Returns:
@@ -141,7 +144,7 @@ def load_pdf_modules(
 
     # extract raw modules from each file
     print(f"Extracting raw module data from {len(files)} mhbs.")
-    modules_set = set()
+    modules_add = set() if remove_duplicates else []
 
     # with multiprocessing
     cpu_count = multiprocessing.cpu_count()
@@ -150,15 +153,15 @@ def load_pdf_modules(
     with multiprocessing.Pool(processes=cpu_count) as pool:
         results = [
             pool.apply_async(
-                extract_modules_from_files, args=(files[i : i + urls_per_job],)
+                extract_modules_from_files, args=(files[i : i + urls_per_job], False, remove_duplicates)
             )
             for i in range(0, len(files), urls_per_job)
         ]
         for result in results:
             data = result.get()
-            modules_set.update(data)
+            modules_add.update(data) if remove_duplicates else modules_add.extend(data) # type: ignore
 
-    modules = list(dict(i) for i in modules_set)
+    modules: list[dict[str, Any]] = list(dict(i) for i in modules_add) if remove_duplicates else modules_add  # type: ignore
     if save_path is not None and save_path != "":
         with open(os.path.expanduser(save_path), "w", encoding="utf-8") as file:
             json.dump(modules, file, indent=4)
@@ -174,31 +177,56 @@ def load_pdf_modules(
 
 
 @db.cursor_handling(manually_supply_cursor=False)
-def save_raw(raw_modules: list[dict[str, str]], cursor=None) -> Result:
+def save_raw(raw_modules: list[dict[str, str]], cursor=None, bulk: bool = True) -> Result:
     """
     saves the raw module data to db
 
     Args:
         raw_modules (list[dict[str, str]]): dictionary with raw module data: module_code: str, content: str
+        bulk (bool): whether there is too large data to switch to transactions (bulk = True) or whether data is small enough to be inserted in one transaction (bulk = False)
         cursor: specified by decorator
 
     Returns:
         Result: Result object indicating success or error
     """
-    query = f"""INSERT INTO unia.modules_raw (module_code, content)
-               VALUES {", ".join(["%s" for i in range(len(raw_modules))])}
+    if not bulk:
+        query = f"""INSERT INTO unia.modules_raw (module_code, content)
+                VALUES {", ".join(["%s" for _ in range(len(raw_modules))])}
+                    RETURNING id;"""
+        
+        variables = [tuple(i.values()) for i in raw_modules]
+
+        result = db.custom_call(
+            cursor=cursor,  # type: ignore
+            query=query,
+            variables=variables,
+            type_of_answer=db.ANSWER_TYPE.NO_ANSWER,
+        )
+        return result
+
+    batch_size = 1000
+    all_ids = []
+    with cursor as cur: # type: ignore
+        for i in range(0, len(raw_modules), batch_size):
+            batch = raw_modules[i:i + batch_size]
+            
+            query = f"""INSERT INTO unia.modules_raw (module_code, content, mhb_id)
+                VALUES {", ".join(["%s" for _ in range(len(batch))])}
+                ON CONFLICT DO NOTHING
                 RETURNING id;"""
+            
+            variables = [tuple(i.values()) for i in batch]
 
-    variables = [tuple(i.values()) for i in raw_modules]
+            cur.execute(query, variables)
+            batch_ids = cur.fetchall()
+            all_ids.extend([row[0] for row in batch_ids])
+            
+            print(f"Inserted batch {i//batch_size + 1}: {len(batch)} rows")
+        cur.connection.commit()
+    if len(all_ids) != len(raw_modules):
+        print(f"Notice: {len(raw_modules) - len(all_ids)} duplicates were not inserted.")
 
-    result = db.custom_call(
-        cursor=cursor,  # type: ignore
-        query=query,
-        variables=variables,
-        type_of_answer=db.ANSWER_TYPE.NO_ANSWER,
-    )
-
-    return result
+    return Result(data=all_ids)
 
 
 @db.cursor_handling(manually_supply_cursor=False)

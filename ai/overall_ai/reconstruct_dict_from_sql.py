@@ -142,7 +142,7 @@ def load_unia_modules(cursor, search_params: SearchParams, **kwargs) -> Result:
     result = db.select(
         cursor=cursor,
         table="unia.modules_ai_extracted",
-        answer_type=db.ANSWER_TYPE.LIST_ANSWER,
+        type_of_answer=db.ANSWER_TYPE.LIST_ANSWER,
         keywords=search_params.params,
         conditions=kwargs,
     )
@@ -156,4 +156,3 @@ if __name__ == "__main__":
     import json
 
     print(json.dumps(result.data[0], indent=4))
-

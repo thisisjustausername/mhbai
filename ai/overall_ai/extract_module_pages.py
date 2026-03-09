@@ -119,9 +119,6 @@ Beispielausgabe:
 ]
 '''
 
-from pydantic import BaseModel
-import ollama
-
 
 class ModulesList(BaseModel):
     extracted_data: list[str]
