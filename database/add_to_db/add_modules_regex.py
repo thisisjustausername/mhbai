@@ -1,15 +1,32 @@
+# Copyright (c) 2025 Leon Gattermeyer
+#
+# This file is part of mhbai.
+#
+# For usage please contact the developer.
+#
+# This file is Copyright-protected.
+
+# Description: extract modules from module handbooks and extract data from these models as well as store the data using regex patterns
+# Status: VERSION 1.0
+# FileID: Db-ex-0001
+
+
+"""
+Extracts module information from PDF files in a specified folder and stores the extracted data into database.
+
+Run this script, if you are in the process of downloading new module handbooks and want to add the regex-extracted modules to the database.
+"""
+
+
 import os
 import multiprocessing
 import math
 from psycopg2.extras import Json
 from psycopg2.extensions import cursor as Cursor
-from typing import Any
 
 from database import database as db
 from ai.overall_ai.data_extraction import extract_module_info as emi
 from datatypes.response import Response as FuncRes, Message, Status
-from pdf_reader import pdf_reader_toc as prt
-from datatypes.result import Result
 from ai.overall_ai.full_extraction import extract_modules_from_files
 
 

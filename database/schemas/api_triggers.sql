@@ -45,17 +45,17 @@ $$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE TRIGGER set_uuid_hash_trigger
-    BEFORE INSERT ON unia.users -- only on insert
+    BEFORE INSERT ON api.users -- only on insert
     FOR EACH ROW EXECUTE FUNCTION set_uuid_hash();
 
 CREATE OR REPLACE TRIGGER check_user_constants
-    BEFORE UPDATE ON unia.users -- only on updates
+    BEFORE UPDATE ON api.users -- only on updates
     FOR EACH ROW EXECUTE FUNCTION check_user_constants();
 
 CREATE OR REPLACE TRIGGER set_session_id_trigger
-    BEFORE INSERT OR UPDATE ON unia.sessions
+    BEFORE INSERT OR UPDATE ON api.sessions
     FOR EACH ROW EXECUTE FUNCTION set_session_id();
 
 CREATE OR REPLACE TRIGGER set_reset_code_trigger
-    BEFORE INSERT ON unia.verification_codes
+    BEFORE INSERT ON api.verification_codes
     FOR EACH ROW EXECUTE FUNCTION set_reset_code();
