@@ -387,7 +387,7 @@ def validate_user_data(
             status=Status.FULL_ERROR,
         )
 
-    query = """SELECT email, user_name FROM users WHERE email = %s OR user_name = %s;"""
+    query = """SELECT email, user_name FROM api.users WHERE email = %s OR user_name = %s;"""
     result = db.custom_call(
         cursor=cursor,
         query=query,

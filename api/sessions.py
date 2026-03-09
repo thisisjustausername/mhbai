@@ -24,7 +24,7 @@ def create_session(cursor: cursor, user_id: int) -> FuncRes:
     expiration_time = db.select(
         cursor=cursor,
         keywords=["value"],
-        table="configurations",
+        table="api.configurations",
         conditions={"key": "session_expiration_days"},
         type_of_answer=db.ANSWER_TYPE.SINGLE_ANSWER,
     )
@@ -68,7 +68,7 @@ def create_session(cursor: cursor, user_id: int) -> FuncRes:
     # set the expiration_date
     result = db.insert(
         cursor=cursor,
-        table="sessions",
+        table="api.sessions",
         values={"user_id": user_id, "expiration_date": expiration_date},
         returning_column="session_id",
     )
@@ -126,7 +126,7 @@ def get_session(cursor: cursor, session_id: str) -> FuncRes:
     result = db.select(
         cursor=cursor,
         keywords=["session_id", "expiration_date"],
-        table="sessions",
+        table="api.sessions",
         type_of_answer=db.ANSWER_TYPE.SINGLE_ANSWER,
         specific_where="session_id = %s AND expiration_date > NOW()",
         variables=[session_id],
@@ -182,7 +182,7 @@ def remove_session(cursor: cursor, session_id: str) -> FuncRes:
 
     result = db.delete(
         cursor=cursor,
-        table="sessions",
+        table="api.sessions",
         conditions={"session_id": session_id},
         returning_column="session_id",
     )
@@ -271,7 +271,7 @@ def get_user(
     result = db.select(
         cursor=cursor,
         keywords=["u." + i for i in keywords],
-        table="sessions s JOIN users u ON s.user_id = u.id",
+        table="api.sessions s JOIN users u ON s.user_id = u.id",
         type_of_answer=db.ANSWER_TYPE.SINGLE_ANSWER,
         conditions={"s.session_id": session_id},
     )
@@ -340,7 +340,7 @@ def remove_user_sessions(cursor: cursor, user_id: int) -> FuncRes:
 
     result = db.delete(
         cursor=cursor,
-        table="sessions",
+        table="api.sessions",
         conditions={"user_id": user_id},
         returning_column="session_id",
     )
@@ -397,7 +397,7 @@ def check_session_id(cursor: cursor, session_id: int) -> FuncRes:
 
     result = db.select(
         cursor=cursor,
-        table="sessions",
+        table="api.sessions",
         conditions={"id": session_id},
         type_of_answer=db.ANSWER_TYPE.SINGLE_ANSWER,
     )
@@ -455,7 +455,7 @@ def get_session_ids(cursor: cursor, user_id: int, uuid: bool = False) -> FuncRes
     result = db.select(
         cursor=cursor,
         keywords=["id"] if uuid is False else ["session_id"],
-        table="sessions",
+        table="api.sessions",
         conditions={"user_id": user_id},
         type_of_answer=db.ANSWER_TYPE.LIST_ANSWER,
     )

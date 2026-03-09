@@ -633,7 +633,7 @@ def confirm_verification_code(
         )
     else:
         arguments["specific_where"] = (
-            "reset_code = %s AND created_at >= NOW() - ((SELECT value::int FROM configurations WHERE key = 'reset_code_expiration_minutes') * INTERVAL '1 minute') AND used = FALSE"
+            "reset_code = %s AND created_at >= NOW() - ((SELECT value::int FROM api.configurations WHERE key = 'reset_code_expiration_minutes') * INTERVAL '1 minute') AND used = FALSE"
         )
         arguments["variables"] = (reset_code,)
     result = db.select(
@@ -710,7 +710,7 @@ def get_users(
     cursor: cursor, user_uuids: list[str], keywords: list[str] | tuple[str] = ("id",)
 ) -> FuncRes:
     """
-    retrieves users from the table users
+    retrieves users from the table api.users
 
     Args:
         cursor: cursor for the connection
@@ -722,12 +722,12 @@ def get_users(
     keywords = list(keywords)
     # users_list = [(i, "email") if isinstance(i, str) and "@" in i else (i, "user_name") for i in information]
 
-    query = f"SELECT {', '.join(keywords)} FROM users WHERE user_uuid IN ({', '.join(['%s' for _ in range(len(user_uuids))])})"
+    query = f"SELECT {', '.join(keywords)} FROM api.users WHERE user_uuid IN ({', '.join(['%s' for _ in range(len(user_uuids))])})"
     result = db.custom_call(
         cursor=cursor,
         query=query,
         type_of_answer=db.ANSWER_TYPE.LIST_ANSWER,
-        variables=tuple(user_uuids),
+        variables=tuple(user_uuids), # type: ignore
     )
 
     if result.is_error is True:
