@@ -10,6 +10,7 @@
 
 
 import math
+import sys
 import psycopg2
 import requests
 import json
@@ -77,7 +78,7 @@ def fetch_valid_urls(url_list=["https://mhb.uni-augsburg.de/"], final_links=[]) 
     return fetch_valid_urls(new_urls, final_links)
 
 
-def fetch_pdf(cursor: db.cursor, web_url: str, adapt_file_names: bool = False) -> tuple[str, bytes]:
+def fetch_pdf(cursor: db.cursor, web_url: str, adapt_file_names: bool = False) -> None:
     """
     fetches the pdf from the given web url
 
@@ -86,7 +87,7 @@ def fetch_pdf(cursor: db.cursor, web_url: str, adapt_file_names: bool = False) -
         web_url (str): url of the pdf to fetch
         adapt_file_names (bool): whether to adapt file names in order to reduce conflicts
     Returns:
-        tuple[str, bytes]: file name and content of the pdf
+        None
     """
 
     # fetch file
@@ -98,7 +99,7 @@ def fetch_pdf(cursor: db.cursor, web_url: str, adapt_file_names: bool = False) -
     if adapt_file_names is True:
         file_name = web_url.split("/")[-2].replace("+", "_").replace(" ", "_") + "__"
     
-    file_name += pdf.headers.get('Content-Disposition').split('filename=', 1)[1].replace('"', '')
+    file_name += pdf.headers.get('Content-Disposition').split('filename=', 1)[1].replace('"', '') # type: ignore
 
     # insert data into database
     result = db.insert(cursor=cursor, table="unia.mhbs", values={"web_url": web_url, "pdf_name": file_name, "folder": "~/mhbai/pdfs/"}, returning_column="id")
@@ -131,7 +132,7 @@ def download_pdfs(new_links: list, new_only: bool = False, adapt_file_names: boo
 
     # if only new links should be downloaded, filter the new_links list
     if new_only is True:
-        result = db.select(cursor=cursor, table="unia.mhbs", keywords=["web_url"], answer_type=db.ANSWER_TYPE.LIST_ANSWER) # type: ignore
+        result = db.select(cursor=cursor, table="unia.mhbs", keywords=["web_url"], type_of_answer=db.ANSWER_TYPE.LIST_ANSWER)
         if result.is_error:
             raise Exception(f"Error fetching existing mhb links from database: {result.error}")
         existing_links = [i["web_url"] for i in result.data]
@@ -163,10 +164,13 @@ def download_async(new_links: list[str], new_only: bool = False, adapt_file_name
     
     # if only new links should be downloaded, filter the new_links list
     if new_only is True:
-        result = db.select(cursor=cursor, table="unia.mhbs", keywords=["web_url"], answer_type=db.ANSWER_TYPE.LIST_ANSWER) # type: ignore
+        # fetch existing mhbs from database
+        result = db.select(cursor=cursor, table="unia.mhbs", keywords=["web_url"], type_of_answer=db.ANSWER_TYPE.LIST_ANSWER) # type: ignore
         if result.is_error:
             raise Exception(f"Error fetching existing mhb links from database: {result.error}")
         existing_links = [i["web_url"] for i in result.data]
+
+        # get new mhbs only
         new_links = [i for i in new_links if i not in existing_links]
 
     # nothing to do
@@ -186,17 +190,20 @@ def download_async(new_links: list[str], new_only: bool = False, adapt_file_name
         for result in results:
             result.wait()
 
-@DeprecationWarning
-def do_everything():
+def do_everything(new_only: bool = True) -> None:
     """
     combines subfunctions by extracting all mhb links and then downloading all mhbs
+
+    Args:
+        new_only (bool): whether to only download new links
+    
+    Returns:
+        None
     """
 
     data = fetch_valid_urls()
-    download_pdfs(data)
+    download_async(data, new_only=new_only)
 
-
-@DeprecationWarning
 def check_url(url: str) -> bool:
     """
     checks, whether the url is safe to use
@@ -222,7 +229,7 @@ def download_all_pdfs():
         data = json.load(file)
     for index, i in enumerate(data):
         pdf = requests.get(i)
-        with open(f"pdfs/{pdf.headers.get('Content-Disposition').split("filename=",1)[1]}", "wb") as file:
+        with open(f"pdfs/{pdf.headers.get('Content-Disposition').split("filename=",1)[1]}", "wb") as file: # type: ignore
             file.write(pdf.content)
         print(index)
 
@@ -241,7 +248,7 @@ def add_new_pdfs():
     
     new_links = [i for i in data if i not in old_data]
 
-    download_pdfs(new_links)
+    download_async(new_links)
 
 '''    
 # use this to download all mhb pdfs for university of augsburg timed with the pdf urls already fetched
@@ -249,10 +256,12 @@ def add_new_pdfs():
 download_all_pdfs()
 end = time.time()
 print(end - start)"""
-
-# use this to fetch and download all mhb pdfs for university of augsburg
-# do_everything()
-
-# use this to only download new mhb pdfs for university of augsburg
-add_new_pdfs()
 '''
+
+if __name__ == "__main__":
+    download_new_only: bool | None = bool(int(sys.argv[1])) if len(sys.argv) > 1 else None # convert to int first, otherwise True when string supplied
+
+    if download_new_only is None:
+        raise UserWarning("Please specify whether to download only new pdfs (1/0) as first argument.")
+
+    do_everything(new_only=download_new_only)
