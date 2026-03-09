@@ -22,10 +22,12 @@ from web_scraping.universal.scrape import Scraper
 from datatypes.result import Result
 from datatypes.response import Response, Message
 
+
 class Daad(Scraper):
     """
     Scrape detailed information from hochschulkompass.de
     """
+
     def __init__(self, *args, **kwargs):
         # initialize parent class
         super().__init__(*args, **kwargs)
@@ -50,7 +52,10 @@ class Daad(Scraper):
             list[str]: List of URLs to scrape
         """
 
-        urls = [f"https://api.daad.de/api/ajax/hsk/list/de?hec-degree-type=25,37,5&hec-p={i+1}" for i in range(1118)]
+        urls = [
+            f"https://api.daad.de/api/ajax/hsk/list/de?hec-degree-type=25,37,5&hec-p={i + 1}"
+            for i in range(1118)
+        ]
 
         if new_only:
             try:
@@ -59,15 +64,21 @@ class Daad(Scraper):
                 return self.urls
             except FileNotFoundError:
                 pass
-        
+
         self.urls = urls
         return self.urls
-    
-    
+
     @override
     @db.cursor_handling(manually_supply_cursor=False)
     @typechecked
-    def process_urls(self, urls: list, offset: int = 0, delay: float = 0, printing: bool = True, cursor: psycopg2.extensions.cursor | None = None) -> Response:
+    def process_urls(
+        self,
+        urls: list,
+        offset: int = 0,
+        delay: float = 0,
+        printing: bool = True,
+        cursor: psycopg2.extensions.cursor | None = None,
+    ) -> Response:
         """
         Overrides method process_urls from parent class Scraper since this version doesn't use selenium but requests.
 
@@ -88,13 +99,13 @@ class Daad(Scraper):
         elements = []
         error_list = []
         message = None
-    
+
         # process each url page
         for index, element in enumerate(urls):
             try:
                 # scrape data for current url
-                result = self.scrape_url(cursor=cursor, url=element) # type: ignore
-                
+                result = self.scrape_url(cursor=cursor, url=element)  # type: ignore
+
                 # test result for error
                 if result.is_error:
                     # for debugging purposes
@@ -114,7 +125,7 @@ class Daad(Scraper):
                 # print progress
                 if printing:
                     print(index + offset)
-            
+
             # catch errors
             except requests.ConnectionError as e:
                 print("Connection error occurred: ", e)
@@ -125,7 +136,7 @@ class Daad(Scraper):
                     category="rate limit",
                     info="A connection error occurred while fetching data.",
                     details={"exception": str(e)},
-                    code=None
+                    code=None,
                 )
                 break
             except Exception as exception:
@@ -133,15 +144,15 @@ class Daad(Scraper):
                 if printing:
                     print(f"Error occurred: {exception}")
                 error_list.append(element)
-            
+
             # sleep for the given delay
             time.sleep(delay)
-        
+
         # TODO: save data in database
         raise NotImplementedError("Saving data to database not implemented yet.")
 
         # return result
-        return Response(success_list=elements, error_list=error_list, message=message)
+        return Response(success_data=elements, error_data=error_list, message=message)
 
     @typechecked
     def scrape_url(self, cursor: psycopg2.extensions.cursor, url: str) -> Result:
@@ -162,25 +173,36 @@ class Daad(Scraper):
 
         # check result for errors
         if result.status_code != 200:
-            raise Exception(f"Failed to fetch data from {url} with status code {result.status_code}")
-        
+            raise Exception(
+                f"Failed to fetch data from {url} with status code {result.status_code}"
+            )
+
         # parse JSON data from the response
         data = result.json()
 
         # extract course information from JSON data
-        courses = [{
-            "web_id": i["id"], 
-            "type_of_institution": i["institutionTypeId"],
-            "web_url": i["link"]["url"], 
-            "logo_url": i["logo"]["src"]["large"] if i["logo"] is not None else None,
-            "degree": (sub := i["items"])[0]["text"], 
-            "duration": duration.split(" Semester")[0] if "Semester" in (duration := sub[1]["text"]) else str(int(int(duration.split(" Monate")[0]) / 6)) if "Monate" in duration else None, 
-            "city": sub[2]["text"], 
-            "study_type": sub[3]["text"], 
-            "title": i["headline"], 
-            "university": i["subline"], 
-            "source": "daad.de"
-        } for i in data["results"]["items"]]
+        courses = [
+            {
+                "web_id": i["id"],
+                "type_of_institution": i["institutionTypeId"],
+                "web_url": i["link"]["url"],
+                "logo_url": i["logo"]["src"]["large"]
+                if i["logo"] is not None
+                else None,
+                "degree": (sub := i["items"])[0]["text"],
+                "duration": duration.split(" Semester")[0]
+                if "Semester" in (duration := sub[1]["text"])
+                else str(int(int(duration.split(" Monate")[0]) / 6))
+                if "Monate" in duration
+                else None,
+                "city": sub[2]["text"],
+                "study_type": sub[3]["text"],
+                "title": i["headline"],
+                "university": i["subline"],
+                "source": "daad.de",
+            }
+            for i in data["results"]["items"]
+        ]
 
         # create query for inserting course information into database
         query = f"""
@@ -196,38 +218,44 @@ class Daad(Scraper):
                 degree, 
                 duration, 
                 study_type)
-            VALUES {', '.join(['(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)' for _ in range(len(courses))])}"""
-            # ON CONFLICT (source_url) DO NOTHING"""
+            VALUES {", ".join(["(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)" for _ in range(len(courses))])}"""
+        # ON CONFLICT (source_url) DO NOTHING"""
 
         # setting variables for sql-injection save insert
         variables = [
             [
-                i["university"], 
-                i["type_of_institution"], 
-                i["city"], 
-                i["logo_url"], 
-                i["web_id"], 
-                i["source"] + i["web_url"], 
-                i["source"], 
-                i["title"], 
-                i["degree"], 
-                i["duration"], 
-                i["study_type"].split(", ")
-            ] for i in courses]
+                i["university"],
+                i["type_of_institution"],
+                i["city"],
+                i["logo_url"],
+                i["web_id"],
+                i["source"] + i["web_url"],
+                i["source"],
+                i["title"],
+                i["degree"],
+                i["duration"],
+                i["study_type"].split(", "),
+            ]
+            for i in courses
+        ]
         variables = [e for i in variables for e in i]
 
         # execute database insertion
-        response = db.custom_call(cursor=cursor, query=query, type_of_answer=db.ANSWER_TYPE.NO_ANSWER, variables=variables)
-        
+        response = db.custom_call(
+            cursor=cursor,
+            query=query,
+            type_of_answer=db.ANSWER_TYPE.NO_ANSWER,
+            variables=variables,
+        )
+
         # check if there was an error during database insertion
         if response.is_error is True:
             return response
-        
+
         # return the result containing course information
         result = Result(data=courses)
         return result
-    
-    
+
     def _fetch_universities(self) -> list[dict[str, str]]:
         """
         Private method
@@ -246,37 +274,40 @@ class Daad(Scraper):
 
         # extract the data
         data = response.text
-        
+
         # clean the data
         data = data.split("\n")
         header = data[0].split("\t")
         universities = [line.split("\t") for line in data[1:] if line]
 
-        rename_dict = {"Hs-Nr.": "hs_nr",                                # used
-                    "Hochschulkurzname": "short_name",                   # unused
-                    "Hochschulname": "name",                             # used
-                    "Adressname der Hochschule": "address_name",         # unused
-                    "Hochschultyp": "type",                              # unknown
-                    "Trägerschaft": "holder_type",                       # unknown
-                    "Bundesland": "state",                               # unused
-                    "Anzahl Studierende": "students",                    # unused
-                    "Gründungsjahr": "founded",                          # unused
-                    "Promotionsrecht": "doctoral_rights",                # unused
-                    "Habilationsrecht": "habilitation_rights",           # unused
-                    "Straße": "street",                                  # unused
-                    "Postleitzahl (Hausanschrift)": "postal_code",       # unused
-                    "Ort (Hausanschrift)": "city",                       # used
-                    "Telefonvorwahl": "phone_area_code",                 # unused
-                    "Telefon": "phone_number",                           # unused
-                    "Fax": "fax_number",                                 # unused
-                    "Home Page": "website",                              # used
-                    "Mitglied HRK": "hrk_member"                         # unused
-                    }
+        rename_dict = {
+            "Hs-Nr.": "hs_nr",  # used
+            "Hochschulkurzname": "short_name",  # unused
+            "Hochschulname": "name",  # used
+            "Adressname der Hochschule": "address_name",  # unused
+            "Hochschultyp": "type",  # unknown
+            "Trägerschaft": "holder_type",  # unknown
+            "Bundesland": "state",  # unused
+            "Anzahl Studierende": "students",  # unused
+            "Gründungsjahr": "founded",  # unused
+            "Promotionsrecht": "doctoral_rights",  # unused
+            "Habilationsrecht": "habilitation_rights",  # unused
+            "Straße": "street",  # unused
+            "Postleitzahl (Hausanschrift)": "postal_code",  # unused
+            "Ort (Hausanschrift)": "city",  # used
+            "Telefonvorwahl": "phone_area_code",  # unused
+            "Telefon": "phone_number",  # unused
+            "Fax": "fax_number",  # unused
+            "Home Page": "website",  # used
+            "Mitglied HRK": "hrk_member",  # unused
+        }
 
-        clean_data = [{rename_dict.get(h, h): u for h, u in zip(header, uni)} for uni in universities]
+        clean_data = [
+            {rename_dict.get(h, h): u for h, u in zip(header, uni)}
+            for uni in universities
+        ]
 
         return clean_data
-    
 
     @typechecked
     def _compare_university_names(self, fetched_name: str, db_name: str) -> bool:
@@ -294,29 +325,40 @@ class Daad(Scraper):
         db_name = db_name.lower()
 
         # check for exact match or substring match
-        if fetched_name == db_name or fetched_name in db_name or db_name in fetched_name:
+        if (
+            fetched_name == db_name
+            or fetched_name in db_name
+            or db_name in fetched_name
+        ):
             return True
-        
+
         # turn en-dashes and em-dashes into hyphens
         fetched_name = fetched_name.replace("—", "-").replace("–", "-")
         db_name = db_name.replace("—", "-").replace("–", "-")
 
         # check for exact match or substring match again
-        if fetched_name == db_name or fetched_name in db_name or db_name in fetched_name:
+        if (
+            fetched_name == db_name
+            or fetched_name in db_name
+            or db_name in fetched_name
+        ):
             return True
-        
+
         # if no match found, return false
         return False
-    
 
     @typechecked
-    def add_data_complicated_universities(self, db_unis: list[dict[str, str | int]], fetched_unis: dict[str, dict[str, str | int]]) -> Response | Exception:
+    def add_data_complicated_universities(
+        self,
+        db_unis: list[dict[str, str | int]],
+        fetched_unis: dict[str, dict[str, str | int]],
+    ) -> Response | Exception:
         """
         Submethod of add_data_universities to handle complicated cases.
         This method is called after the main method add_data_universities.
         Since this method takes longer than the simple compare compare algorithm, only call this for the complicated cases.
         NOTE: this method is not fully implemented yet. It is ignored, that for a university, multiple results can be found.
-        
+
         Returns:
             Response: Response object indicating success or failure of the operation.
         """
@@ -325,62 +367,75 @@ class Daad(Scraper):
 
         # create a possible combinations without duplicates
         # combinations = {(db_uni dict, fetched_uni dict), ...}
-        combinations = set() # use set to remove duplicates
+        combinations = set()  # use set to remove duplicates
         for db_uni in db_unis:
             for fetched_uni_k, fetched_uni_v in fetched_unis.items():
                 fetched_uni_v["name"] = fetched_uni_k
-                combinations.add((frozenset(db_uni.items()), frozenset(fetched_uni_v.items()))) # list of all combinations of db_unis and fetched_unis (only names of fetched_unis)
+                combinations.add(
+                    (frozenset(db_uni.items()), frozenset(fetched_uni_v.items()))
+                )  # list of all combinations of db_unis and fetched_unis (only names of fetched_unis)
 
-        combinations = [(dict(i[0]), dict(i[1])) for i in combinations] # convert frozensets back to dicts
-        combinations = set() # use set to remove duplicates
+        combinations = [
+            (dict(i[0]), dict(i[1])) for i in combinations
+        ]  # convert frozensets back to dicts
+        combinations = set()  # use set to remove duplicates
         for db_uni in db_unis:
             for fetched_uni_k, fetched_uni_v in fetched_unis.items():
                 fetched_uni_v["name"] = fetched_uni_k
-                combinations.add((frozenset(db_uni.items()), frozenset(fetched_uni_v.items()))) # list of all combinations of db_unis and fetched_unis (only names of fetched_unis)
+                combinations.add(
+                    (frozenset(db_uni.items()), frozenset(fetched_uni_v.items()))
+                )  # list of all combinations of db_unis and fetched_unis (only names of fetched_unis)
 
-        combinations = [(dict(i[0]), dict(i[1])) for i in combinations] # convert frozensets back to dicts
+        combinations = [
+            (dict(i[0]), dict(i[1])) for i in combinations
+        ]  # convert frozensets back to dicts
         # initialize matches
-        matches = [] # create list since no duplicates can exist
+        matches = []  # create list since no duplicates can exist
 
         for i in combinations:
-            if self._compare_university_names(fetched_name=i[1]["name"], db_name=i[0]["name"]):
-                matches.append(i)        
+            if self._compare_university_names(
+                fetched_name=i[1]["name"], db_name=i[0]["name"]
+            ):
+                matches.append(i)
 
         # matches should only contain 1:1 relations but due to counting unclean matches as matches, this relation condition might me broken
         # therefore allow 1:n relations so each db_uni can only appear once but fetched_uni can appear multiple times (since e.g. a university has multiple locations can exist, that has only one entry in fetched_unis, since multiple citys are being combined)
-        
+
         # new dict that contains db_unis grouped by name
         grouped_db_unis = {}
-        
+
         for uni in matches:
             if uni[0]["id"] not in grouped_db_unis:
                 grouped_db_unis[uni[0]["id"]] = [uni]
                 continue
             grouped_db_unis[uni[0]["id"]].append(uni)
-        
+
         # new dict that contains db_unis grouped by name
         grouped_db_unis = {}
-        
+
         for uni in matches:
             if uni[0]["name"] not in grouped_db_unis:
                 grouped_db_unis[uni[0]["name"]] = [uni]
                 continue
             grouped_db_unis[uni[0]["name"]].append(uni)
-        
+
         for matches in grouped_db_unis.values():
             print(json.dumps(matches, indent=4))
         print(grouped_db_unis)
 
         # check whether multiple fetched universities exist for one database university
         if any(len(matches) > 1 for matches in grouped_db_unis.values()):
-            raise NotImplementedError("Handling multiple fetched universities for one database university not implemented yet.")
-        
-        return Response(success_list=list(grouped_db_unis.keys()))
-            
-    
+            raise NotImplementedError(
+                "Handling multiple fetched universities for one database university not implemented yet."
+            )
+
+        return Response(success_data=list(grouped_db_unis.keys()))
+
     @db.cursor_handling(manually_supply_cursor=False)
     @typechecked
-    def add_data_universities(self, cursor: psycopg2.extensions.cursor | None = None) -> Response:
+    def add_data_universities(
+        self, cursor: psycopg2.extensions.cursor | None = None
+    ) -> Response:
         """
         Implements abstract method from parent class Scraper.
 
@@ -394,35 +449,45 @@ class Daad(Scraper):
         """
 
         # get universities from db
-        result = db.select(cursor=cursor, # type: ignore
-                           table="all_unis.universities", 
-                           answer_type=db.ANSWER_TYPE.LIST_ANSWER, 
-                           keywords=["id", "name", "city"], 
-                           specific_where="source = 'daad.de' AND website IS NULL")
-        
+        result = db.select(
+            cursor=cursor,  # type: ignore
+            table="all_unis.universities",
+            type_of_answer=db.ANSWER_TYPE.LIST_ANSWER,
+            keywords=["id", "name", "city"],
+            specific_where="source = 'daad.de' AND website IS NULL",
+        )
+
         # handle database error
         if result.is_error:
-            return Response(message=Message(
-                name="DatabaseError",
-                type="Error",
-                category="database",
-                info="Failed to fetch universities from database.",
-                details={"exception": result.error, "stack_trace": result.stack_trace},
-                code=None
-            ))
-        
+            return Response(
+                message=Message(
+                    name="DatabaseError",
+                    type="Error",
+                    category="database",
+                    info="Failed to fetch universities from database.",
+                    details={
+                        "exception": result.error,
+                        "stack_trace": result.stack_trace,
+                    },
+                    code=None,
+                )
+            )
+
         universities = result.data
-        
+
         # fetch universities from the Hochschulkompass
         fetched_unis = self._fetch_universities()
-        
+
         # restructure and extract important data
-        fetched_unis = {uni["name"] : {
-            "website": uni["website"],
-            "hs_nr": uni["hs_nr"], 
-            "city": uni["city"]
-        } for uni in fetched_unis}
-        
+        fetched_unis = {
+            uni["name"]: {
+                "website": uni["website"],
+                "hs_nr": uni["hs_nr"],
+                "city": uni["city"],
+            }
+            for uni in fetched_unis
+        }
+
         # extract universities
         universities = result.data
 
@@ -432,19 +497,21 @@ class Daad(Scraper):
         # combine db data and fetched data
         for uni in universities:
             # if no city matched, just match university name (for uni that has locations in multiple cities)
-            if uni["name"] in fetched_unis and fetched_unis[uni["name"]]["city"] in uni["city"].split(", "): # very unclean but it works
+            if uni["name"] in fetched_unis and fetched_unis[uni["name"]]["city"] in uni[
+                "city"
+            ].split(", "):  # very unclean but it works
                 updated_unis[uni["id"]] = {
                     "website": fetched_unis[uni["name"]]["website"],
-                    "hs_nr": fetched_unis[uni["name"]]["hs_nr"], 
-                    "city_check_successful": True
+                    "hs_nr": fetched_unis[uni["name"]]["hs_nr"],
+                    "city_check_successful": True,
                 }
             elif uni["name"] in fetched_unis:
                 updated_unis[uni["id"]] = {
                     "website": fetched_unis[uni["name"]]["website"],
-                    "hs_nr": fetched_unis[uni["name"]]["hs_nr"], 
-                    "city_check_successful": False
+                    "hs_nr": fetched_unis[uni["name"]]["hs_nr"],
+                    "city_check_successful": False,
                 }
-        
+
         # remove duplicates where city check was unsuccessful
         clean_updated_unis = {}
         for key, value in updated_unis.items():
@@ -462,7 +529,7 @@ class Daad(Scraper):
             SET website = data.website,
                 hs_nr = data.hs_nr
             FROM (VALUES
-                {', '.join(['(%s, %s, %s)' for _ in range(len(updated_unis))])}
+                {", ".join(["(%s, %s, %s)" for _ in range(len(updated_unis))])}
             ) AS data(id, website, hs_nr)
             WHERE all_unis.universities.id = data.id;
         """
@@ -472,8 +539,9 @@ class Daad(Scraper):
             [
                 uni_id,
                 updated_unis[uni_id]["website"],
-                int(updated_unis[uni_id]["hs_nr"])
-            ] for uni_id in updated_unis
+                int(updated_unis[uni_id]["hs_nr"]),
+            ]
+            for uni_id in updated_unis
         ]
         variables = [e for i in variables for e in i]
 
@@ -481,79 +549,99 @@ class Daad(Scraper):
         if len(variables) != 0:
             # execute update query
             result = db.custom_call(
-                cursor=cursor, # type: ignore
-                query=query, 
+                cursor=cursor,  # type: ignore
+                query=query,
                 variables=variables,
-                type_of_answer=db.ANSWER_TYPE.NO_ANSWER
+                type_of_answer=db.ANSWER_TYPE.NO_ANSWER,
             )
         # if easy universities to update, update database
         if len(variables) != 0:
             # execute update query
             result = db.custom_call(
-                cursor=cursor, # type: ignore
-                query=query, 
+                cursor=cursor,  # type: ignore
+                query=query,
                 variables=variables,
-                type_of_answer=db.ANSWER_TYPE.NO_ANSWER
+                type_of_answer=db.ANSWER_TYPE.NO_ANSWER,
             )
 
             # handle database error
             if result.is_error:
-                return Response(message=Message(
+                return Response(
+                    message=Message(
+                        name="DatabaseError",
+                        type="Error",
+                        category="database",
+                        info="Failed to update universities in database.",
+                        details={
+                            "exception": result.error,
+                            "stack_trace": result.stack_trace,
+                        },
+                        code=None,
+                    )
+                )
+
+        # get universities from db again, but with updated values
+        result = db.select(
+            cursor=cursor,  # type: ignore
+            table="all_unis.universities",
+            type_of_answer=db.ANSWER_TYPE.LIST_ANSWER,
+            keywords=["id", "name", "city"],
+            specific_where="source = 'daad.de' AND website IS NULL",
+        )
+
+        # handle database error
+        if result.is_error:
+            return Response(
+                message=Message(
                     name="DatabaseError",
                     type="Error",
                     category="database",
-                    info="Failed to update universities in database.",
-                    details={"exception": result.error, "stack_trace": result.stack_trace},
-                    code=None
-                ))
+                    info="Failed to fetch universities from database.",
+                    details={
+                        "exception": result.error,
+                        "stack_trace": result.stack_trace,
+                    },
+                    code=None,
+                )
+            )
 
-        # get universities from db again, but with updated values
-        result = db.select(cursor=cursor, # type: ignore
-                           table="all_unis.universities", 
-                           answer_type=db.ANSWER_TYPE.LIST_ANSWER, 
-                           keywords=["id", "name", "city"], 
-                           specific_where="source = 'daad.de' AND website IS NULL")
-        
-        # handle database error
-        if result.is_error:
-            return Response(message=Message(
-                name="DatabaseError",
-                type="Error",
-                category="database",
-                info="Failed to fetch universities from database.",
-                details={"exception": result.error, "stack_trace": result.stack_trace},
-                code=None
-            ))
-        
         universities = result.data
 
         # get universities from db again, but with updated values
-        result = db.select(cursor=cursor, # type: ignore
-                           table="all_unis.universities", 
-                           answer_type=db.ANSWER_TYPE.LIST_ANSWER, 
-                           keywords=["id", "name", "city"], 
-                           specific_where="source = 'daad.de' AND website IS NULL")
-        
+        result = db.select(
+            cursor=cursor,  # type: ignore
+            table="all_unis.universities",
+            type_of_answer=db.ANSWER_TYPE.LIST_ANSWER,
+            keywords=["id", "name", "city"],
+            specific_where="source = 'daad.de' AND website IS NULL",
+        )
+
         # handle database error
         if result.is_error:
-            return Response(message=Message(
-                name="DatabaseError",
-                type="Error",
-                category="database",
-                info="Failed to fetch universities from database.",
-                details={"exception": result.error, "stack_trace": result.stack_trace},
-                code=None
-            ))
-        
+            return Response(
+                message=Message(
+                    name="DatabaseError",
+                    type="Error",
+                    category="database",
+                    info="Failed to fetch universities from database.",
+                    details={
+                        "exception": result.error,
+                        "stack_trace": result.stack_trace,
+                    },
+                    code=None,
+                )
+            )
+
         universities = result.data
-        
+
         # handle complicated cases, that do not match 1:1
-        self.add_data_complicated_universities(db_unis=universities, fetched_unis=fetched_unis)
-        
+        self.add_data_complicated_universities(
+            db_unis=universities, fetched_unis=fetched_unis
+        )
+
         # return success response
-        return Response(success_list=list(updated_unis.keys()))
-            
-            
+        return Response(success_data=list(updated_unis.keys()))
+
     def _fetch_university_info(self) -> list[dict[str, str]]:
         """
         Fetches the list of universities from the Hochschulkompass TXT download endpoint.
@@ -571,7 +659,7 @@ class Daad(Scraper):
 
         # extract the data
         data = response.text
-        
+
         # clean the data
         data = data.split("\n")
         header = data[0].split("\t")
@@ -580,7 +668,6 @@ class Daad(Scraper):
         clean_data = [{h: u for h, u in zip(header, uni)} for uni in universities]
 
         return clean_data
-        
 
 
 if __name__ == "__main__":

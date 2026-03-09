@@ -28,6 +28,7 @@ from database import database as db
 from datatypes.result import Result
 from datatypes.response import Response, Message
 
+
 class Scraper(ABC):
     """
     Universal scraper class
@@ -48,7 +49,6 @@ class Scraper(ABC):
         self.error_file = self.set_error_file()
         self.urls = self.generate_urls(new_only=new_only)
 
-
     @abstractmethod
     def set_error_file(self) -> str:
         """
@@ -59,9 +59,16 @@ class Scraper(ABC):
         """
         pass
 
-
     @db.cursor_handling(manually_supply_cursor=False)
-    def process_urls(self, urls: list, offset: int = 0, delay: float = 0, printing: bool = True, raspi: bool = False, cursor: psycopg2.extensions.cursor | None = None) -> Response:
+    def process_urls(
+        self,
+        urls: list,
+        offset: int = 0,
+        delay: float = 0,
+        printing: bool = True,
+        raspi: bool = False,
+        cursor: psycopg2.extensions.cursor | None = None,
+    ) -> Response:
         """
         Process a list of URLs to scrape course information.
         Each url is a page of a website containing multiple courses of study.
@@ -92,17 +99,19 @@ class Scraper(ABC):
         except:
             if printing:
                 print("Error occurred for whole url list")
-            return Response(success_list=[], error_list=urls)
-        
+            return Response(success_data=[], error_data=urls)
+
         # initialize variables
         elements = []
         error_list = []
-    
+
         # process each url page
         for index, element in enumerate(urls):
             try:
                 # scrape data for current url
-                result = self.scrape_url(driver=driver, wait=wait, cursor=cursor, url=element) # type: ignore
+                result = self.scrape_url(
+                    driver=driver, wait=wait, cursor=cursor, url=element
+                )  # type: ignore
 
                 # if result data contains data from multiple courses, add list, if data only contains data of a single course, append data
                 if result.is_error is True:
@@ -112,20 +121,19 @@ class Scraper(ABC):
                     elements += result.data
                 else:
                     elements.append(result.data)
-            
+
             # catch errors
             except Exception as exception:
                 # handle error for current url
                 if printing:
                     print(f"Error occurred: {exception}")
                 error_list.append(element)
-            
+
             # sleep for the given delay
             time.sleep(delay)
         # close driver
         driver.quit()
-        return Response(success_list=elements, error_list=error_list)
-    
+        return Response(success_data=elements, error_data=error_list)
 
     @abstractmethod
     @typechecked
@@ -139,11 +147,16 @@ class Scraper(ABC):
             list[str]: List of URLs to scrape
         """
         pass
-    
 
     @abstractmethod
     @typechecked
-    def scrape_url(self, driver: webdriver.Chrome, wait: WebDriverWait, cursor: psycopg2.extensions.cursor, url: str) -> Result:
+    def scrape_url(
+        self,
+        driver: webdriver.Chrome,
+        wait: WebDriverWait,
+        cursor: psycopg2.extensions.cursor,
+        url: str,
+    ) -> Result:
         """
         extract course link and information from list page
 
@@ -157,21 +170,21 @@ class Scraper(ABC):
         """
         pass
 
-    
     @abstractmethod
     @typechecked
     def add_data_universities(self) -> Response:
         """
         Scrape information of universities and store them in the database.
-        
+
         Returns:
             Result: Result object indicating success or failure of the operation.
         """
         pass
 
-
     @typechecked
-    def fetch_async(self, urls_per_job: int = 30, printing: bool = True, raspi: bool = False) -> Response:
+    def fetch_async(
+        self, urls_per_job: int = 30, printing: bool = True, raspi: bool = False
+    ) -> Response:
         """
         This method is deprecated since the synchronous fetching method is faster due to avoiding rate limits.
         Fetch data from a list of URLs asynchronously.
@@ -194,7 +207,6 @@ class Scraper(ABC):
         # start pool
         # with multiprocessing.Pool(processes=processes) as pool:
         with ctx.Pool(processes=processes) as pool:
-
             # initialize variables
             all_elements = []
             all_errors = []
@@ -202,7 +214,13 @@ class Scraper(ABC):
             message = None
 
             # distribute jobs and collect results
-            results = [pool.apply_async(self.process_urls, args=(self.urls[i:i + urls_per_job], i, printing)) for i in range(0, len(self.urls), urls_per_job)]
+            results = [
+                pool.apply_async(
+                    self.process_urls,
+                    args=(self.urls[i : i + urls_per_job], i, printing),
+                )
+                for i in range(0, len(self.urls), urls_per_job)
+            ]
             # gather results
             for result in results:
                 response = result.get()
@@ -211,11 +229,11 @@ class Scraper(ABC):
                 all_elements += elements
                 all_errors += error_list
                 messages.append(response.message)
-        
+
         # save errors
         with open(self.error_file, "w") as f:
-                json.dump(all_errors, f, indent=4)
-        
+            json.dump(all_errors, f, indent=4)
+
         # check for rate limit messages
         if any(msg is not None and msg.category == "rate limit" for msg in messages):
             message = Message(
@@ -224,10 +242,12 @@ class Scraper(ABC):
                 category="rate limit",
                 info="One or more processes hit a rate limit during fetching.",
                 details=None,
-                code=None
+                code=None,
             )
-        
-        return Response(success_list=all_elements, error_list=all_errors, message=message)
+
+        return Response(
+            success_data=all_elements, error_data=all_errors, message=message
+        )
 
     @typechecked
     def fetch_sync(self, delay: float = 0, printing: bool = True) -> Response:
@@ -242,25 +262,45 @@ class Scraper(ABC):
         """
 
         # process all urls
-        response = self.process_urls(urls=self.urls, offset=0, delay=delay, printing=printing)
+        response = self.process_urls(
+            urls=self.urls, offset=0, delay=delay, printing=printing
+        )
 
         # save errors
         with open(self.error_file, "w") as f:
-                json.dump(response.error_list, f, indent=4)
-        
+            json.dump(response.error_list, f, indent=4)
+
         # return data
         return response
 
-
     @typechecked
+    @overload
+    def main(
+        self,
+        async_fetch: Literal[True],
+        rate_limit_delay: int = 3,
+        printing: bool = True,
+        raspi: bool = False,
+    ) -> Response: ...
 
     @overload
-    def main(self, async_fetch: Literal[True], rate_limit_delay: int = 3, printing: bool = True, raspi: bool = False) -> Response: ...
+    def main(
+        self,
+        async_fetch: Literal[False],
+        rate_limit_delay: int = 3,
+        printing: bool = True,
+        raspi: bool = False,
+        delay: float = 0,
+    ) -> Response: ...
 
-    @overload
-    def main(self, async_fetch: Literal[False], rate_limit_delay: int = 3, printing: bool = True, raspi: bool = False, delay: float = 0) -> Response: ...
-
-    def main(self, async_fetch: bool = True, rate_limit_delay: int = 3, printing: bool = True, raspi: bool = False, delay: Annotated[float, "Explicit with async_fetch = True"] = 0) -> Response:
+    def main(
+        self,
+        async_fetch: bool = True,
+        rate_limit_delay: int = 3,
+        printing: bool = True,
+        raspi: bool = False,
+        delay: Annotated[float, "Explicit with async_fetch = True"] = 0,
+    ) -> Response:
         """
         Main method to start the scraping process.
 
@@ -279,7 +319,7 @@ class Scraper(ABC):
             fetch = lambda: self.fetch_async(printing=printing, raspi=raspi)
         else:
             fetch = lambda: self.fetch_sync(delay=delay, printing=printing)
-        
+
         # fetch data
         while True:
             # fetch data
@@ -287,11 +327,18 @@ class Scraper(ABC):
             self.urls = self.generate_urls(new_only=True)
 
             # check for rate limit errors
-            if len(response.error_list) > 0 and (msg := response.message) is not None and msg.category == "rate limit":
+            if (
+                len(response.error) > 0
+                and (msg := response.message) is not None
+                and msg.category == "rate limit"
+            ):
                 if printing:
-                    print(f"Rate limit hit, waiting for {rate_limit_delay} minute{'s' if rate_limit_delay != 1 else ''} at {(datetime.now() + timedelta(minutes=rate_limit_delay)).strftime('%H:%M:%S')}...")
+                    print(
+                        f"Rate limit hit, waiting for {rate_limit_delay} minute{'s' if rate_limit_delay != 1 else ''} at {(datetime.now() + timedelta(minutes=rate_limit_delay)).strftime('%H:%M:%S')}..."
+                    )
                 time.sleep(rate_limit_delay * 60)
                 continue
             else:
                 break
         return response
+
