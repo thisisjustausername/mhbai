@@ -9,10 +9,10 @@
 			Contact Us
 		</h2>
 		<p class="mb-8 text-center font-light text-gray-500 sm:text-xl lg:mb-16 dark:text-gray-400">
-			Sie sind an MHBAI interessiert und wollen es an Ihrer Universität, Hochschule oder Ihrem
+			Sie sind an moduleCheck interessiert und wollen es an Ihrer Universität, Hochschule oder Ihrem
 			Unternehmen nutzen?<br />Dann treten Sie mit uns in Kontakt.<br />Wir helfen Ihnen bei der
 			Einrichtung und stehen Ihnen bei Fragen zur Verfügung.<br />Und das Beste: Das ist ebenso
-			<span class="font-bold text-rose-600 dark:text-fuchsia-400">kostenlos</span> wie MHBAI selbst.
+			<span class="font-bold text-rose-600 dark:text-fuchsia-400">kostenlos</span> wie moduleCheck selbst.
 		</p>
 		<form action="#" class="space-y-8">
 			<div>
@@ -65,7 +65,7 @@
 				<label
 					for="information"
 					class="mb-2 block text-sm font-medium text-gray-900 dark:text-gray-300"
-					>Angabe Ihrer geplanten Nutzung von MHBAI sowie weiterer Informationen</label
+					>Angabe Ihrer geplanten Nutzung von moduleCheck sowie weiterer Informationen</label
 				>
 				<textarea
 					id="message"

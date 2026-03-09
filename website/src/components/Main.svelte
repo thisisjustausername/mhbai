@@ -15,9 +15,9 @@
 		>
 			<h2 class="mb-8 text-2xl font-bold dark:text-gray-200">Das Tool für den Modulvergleich</h2>
 			<p class="dark:text-gray-300">
-				<span class="font-bold text-blue-900 dark:text-fuchsia-400">MHBAI</span>
-				(Modul-Hand-Buch-Artificial-Intelligence) ist ein intelligentes Tool,<br />das mithilfe
-				verschiedenster Verfahren sowie künstlicher Intelligenz<br />Module
+				<span class="font-bold text-blue-900 dark:text-fuchsia-400">moduleCheck</span>
+				ist ein intelligentes Tool,<br />das mithilfe verschiedenster Verfahren sowie künstlicher
+				Intelligenz<br />Module
 				<span class="font-bold text-blue-900 dark:text-fuchsia-400">vergleichen</span>,
 				<span class="font-bold text-blue-900 dark:text-fuchsia-400">vervollständigen</span> und
 				<span class="font-bold text-blue-900 dark:text-fuchsia-400">ergänzen</span> kann.
@@ -36,7 +36,7 @@
 				Die nächste Generation der Modulverwaltung
 			</h2>
 			<p class="mb-4 dark:text-gray-200">
-				MHBAI besitzt zahlreiche Anwendungsfälle in der <span
+				moduleCheck besitzt zahlreiche Anwendungsfälle in der <span
 					class="font-bold text-blue-900 dark:text-fuchsia-400"
 					>Modul- und Studiengangserstellung</span
 				>, dem
@@ -47,7 +47,7 @@
 					>automatisierten Bearbeiten von Masteranträgen</span
 				> und vielen weiteren Gebieten.
 			</p>
-			<p class="dark:text-gray-200">MHBAI erledigt Anwendungen für</p>
+			<p class="dark:text-gray-200">moduleCheck erledigt Anwendungen für</p>
 			<ul class="list-disc px-5 font-bold text-blue-900 dark:text-fuchsia-400">
 				<li>Prüfungsämter</li>
 				<li>Studierendenberatungen</li>
@@ -63,7 +63,7 @@
       p-6 shadow-[inset_0_0_30px_#991b1b60]
       dark:border-cyan-400 dark:bg-blue-600/20 dark:shadow-[inset_0_0_20px_#1e40af]"
 		>
-			<h2 class="mb-8 text-2xl font-bold dark:text-gray-200">Was kann MHBAI?</h2>
+			<h2 class="mb-8 text-2xl font-bold dark:text-gray-200">Was kann moduleCheck?</h2>
 			<p class="mb-4 dark:text-gray-200">
 				VIELES! Wir versuchen uns kurz zu halten und die wichtigsten Punkte zu nennen 😏.
 			</p>
@@ -109,8 +109,8 @@
 				Für Bildungseinrichtungen und Unternehmen
 			</h2>
 			<p class="dark:text-gray-200">
-				MHBAI eignet sich für Ihre Universität, Hochschule oder Ihr Unternehmen? Dann treten Sie
-				gerne mit uns in
+				moduleCheck eignet sich für Ihre Universität, Hochschule oder Ihr Unternehmen? Dann treten
+				Sie gerne mit uns in
 				<a href="/contact" class="font-bold text-fuchsia-700 underline dark:text-fuchsia-400"
 					>KONTAKT</a
 				>.

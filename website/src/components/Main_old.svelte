@@ -1,4 +1,3 @@
-
 <script lang="ts">
 </script>
 
@@ -12,7 +11,7 @@
 				Das Tool für den Modulvergleich
 			</h2>
 			<p class="text-gray-600 dark:text-gray-400">
-				<span class="font-bold text-rose-600 dark:text-fuchsia-400">MHBAI</span>
+				<span class="font-bold text-rose-600 dark:text-fuchsia-400">moduleCheck</span>
 				(Modul-Hand-Buch-Artificial-Intelligence) ist ein intelligentes Tool,<br />das mithilfe
 				verschiedenster Verfahren sowie künstlicher Intelligenz<br />Module
 				<span class="font-bold text-rose-600 dark:text-fuchsia-400">vergleichen</span>,
@@ -27,7 +26,7 @@
 				Die nächste Generation der Modulverwaltung
 			</h2>
 			<p class="mb-4 text-gray-600 dark:text-gray-400">
-				MHBAI besitzt zahlreiche Anwendungsfälle in der <span
+				moduleCheck besitzt zahlreiche Anwendungsfälle in der <span
 					class="font-bold text-rose-600 dark:text-fuchsia-400"
 					>Modul- und Studiengangserstellung</span
 				>, dem
@@ -38,7 +37,7 @@
 					>automatisierten Bearbeiten von Masteranträgen</span
 				> und vielen weiteren Gebieten.
 			</p>
-			<p class="text-gray-600 dark:text-gray-400">MHBAI ist erledigt Anwendungen für</p>
+			<p class="text-gray-600 dark:text-gray-400">moduleCheck ist erledigt Anwendungen für</p>
 			<ul class="list-disc px-5 font-bold text-rose-600 dark:text-fuchsia-400">
 				<li>Prüfungsämter</li>
 				<li>Studierendenberatungen</li>
@@ -52,7 +51,9 @@
 		<div
 			class="mx-auto max-w-3xl rounded-2xl border-3 border-red-500 bg-amber-300 p-6 dark:border-red-300 dark:bg-red-600/30"
 		>
-			<h2 class="mb-12 text-2xl font-bold text-gray-800 dark:text-gray-200">Was kann MHBAI?</h2>
+			<h2 class="mb-12 text-2xl font-bold text-gray-800 dark:text-gray-200">
+				Was kann moduleCheck?
+			</h2>
 			<p class="mb-4 text-gray-600 dark:text-gray-400">
 				VIELES! Wir versuchen uns kurz zu halten und die wichtigsten Punkte zu nennen 😏.
 			</p>
@@ -91,8 +92,8 @@
 				Für Bildungseinrichtungen und Unternehmen
 			</h2>
 			<p class="text-gray-600 dark:text-gray-400">
-				MHBAI eignet sich für Ihre Universität, Hochschule oder Ihr Unternehmen? Dann treten Sie
-				gerne mit uns in
+				moduleCheck eignet sich für Ihre Universität, Hochschule oder Ihr Unternehmen? Dann treten
+				Sie gerne mit uns in
 				<a href="/contact" class="font-bold underline dark:text-fuchsia-400">KONTAKT</a>.
 			</p>
 		</div>

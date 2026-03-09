@@ -27,6 +27,6 @@
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </svelte:head>
-<div class="full">
+<div class="full dark:bg-black dark:text-white">
 	{@render children()}
 </div>

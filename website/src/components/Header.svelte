@@ -17,9 +17,16 @@
   bg-linear-to-b from-fuchsia-900 to-transparent px-6 py-4 backdrop-blur-2xl duration-200"
 >
 	<h1 class="ton-medium">
-		<b style="font-family: 'Montserrat'" class="text-font-bold text-3xl dark:text-white">MHBAI</b>
+		<b
+			class="inline-block [background-image:linear-gradient(to_bottom,_#ffffff00_50%,_#d946ef_100%),_linear-gradient(to_right,rgb(255_0_255)_37%,rgb(255_165_0)_85%,rgb(255_192_79)100%)]
+    bg-clip-text
+    font-montserrat text-3xl font-semibold text-transparent
+    dark:bg-[linear-gradient(to_right,rgb(173_0_124)_46%,rgb(4_230_236)_80%,rgb(180_244_246)_100%)]"
+			>moduleCheck</b
+		>
 		<b class="text-xs dark:text-fuchsia-700"> by Leon Gattermeyer</b>
 	</h1>
+
 	<div class="hidden items-center gap-4 sm:flex">
 		{#each tabs as tab}
 			<a
