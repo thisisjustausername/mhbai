@@ -10,7 +10,6 @@
 # Status: VERSION 1.0
 # FileID: Dt-x-0001
 
-# TODO: implement .succes Enum datatype of success values: FULL_SUCCESS, PARTIAL_SUCCESS, ERROR
 
 from dataclasses import dataclass
 from typing import Any, Generic, TypeVar, Optional
