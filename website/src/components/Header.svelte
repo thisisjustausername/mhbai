@@ -5,6 +5,7 @@
 		{ name: 'Home', link: '/' },
 		{ name: 'Login', link: '/login' },
 		{ name: 'Ausprobieren', link: '/try' },
+		{ name: 'Modulbibliothek', link: '/module-library' },
 		{ name: 'Kontakt', link: '/contact' },
 		{ name: 'About me', link: '/about' }
 	];
@@ -14,7 +15,7 @@
 
 <header
 	class="sticky top-0 z-10 flex items-center justify-between border-transparent
-  bg-linear-to-b from-fuchsia-900 to-transparent px-6 py-4 backdrop-blur-2xl duration-200"
+  bg-linear-to-b from-fuchsia-900 to-transparent px-6 py-8 backdrop-blur-2xl duration-200"
 >
 	<h1 class="ton-medium">
 		<b

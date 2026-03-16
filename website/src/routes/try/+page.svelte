@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Header from '../../components/Header.svelte';
-	import Main from './components/Main.svelte';
 	import SingleMHB from './components/SingleMHB.svelte';
 	// import Footer from './components/Footer.svelte';
 	import Upload from './components/Upload.svelte';
@@ -38,7 +37,6 @@
 			result = await get_mhb_info(file);
 			state = 2;
 		} catch (err) {
-			console.error(err); // TODO: remove this after dev
 			state = 0;
 		} finally {
 			uploadedFile.set(null);
