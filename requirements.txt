@@ -19,3 +19,5 @@ pylint
 torch
 waitress
 bcrypt
+pytz
+tabulate
