@@ -1,0 +1,58 @@
+<script lang="ts">
+const { module } = $props<{ module }>();
+</script>
+
+<div class="w-full mb-15 rounded-2xl border-3 dark:border-fuchsia-800/60 dark:bg-[#5a045a70]">
+	<h2 class="mt-2 mb-3 text-center font-semibold">
+		{module.module_code}
+	</h2>
+
+	<div
+		class="grid grid-cols-[min-content_2px_1fr] gap-x-4 gap-y-3 border-fuchsia-900/10 px-6 py-4 text-left break-words whitespace-pre-line"
+	>
+		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Titel</p>
+		<p class="col-start-3">{module.title}</p>
+
+		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Modul-Code</p>
+		<p class="col-start-3">{module.module_code}</p>
+
+		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">ECTS</p>
+		<p class="col-start-3">{module.ects}</p>
+
+		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Vortragende</p>
+		<p class="col-start-3">{module.lecturer}</p>
+
+		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Inhalte</p>
+		<p class="col-start-3">{module.contents?.length ? module.contents.join('\n') : '-'}</p>
+
+		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Ziele</p>
+		<p class="col-start-3">{module.goals?.length ? module.goals.join('\n') : '-'}</p>
+
+		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Voraussetzungen</p>
+		<p class="col-start-3">{module.requirements?.length ? module.requirements.join('\n') : '-'}</p>
+
+		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Aufwand (Aufwand, Inhalt)</p>
+		<p class="col-start-3">{module.expense?.length ? module.expense.map((expense) => expense.hours + ', ' + expense.activity).join('\n') : '-'}</p>	
+
+		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Bestehensvoraussetzungen</p>
+		<p class="col-start-3">{module.success_requirements?.length ? module.success_requirements.join('\n') : '-'}</p>
+
+		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Wochenstunden</p>
+		<p class="col-start-3">{module.weekly_hours}</p>
+
+		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Empfohlenes Semester</p>
+		<p class="col-start-3">{module.recommended_semester}</p>
+
+		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Prüfungsleistungen (Typ, Dauer)</p>
+		<p class="col-start-3">{module.exams?.length ? module.exams.map((exam) => exam.exam_type + ', ' + exam.duration).join('\n') : '-'}</p>
+
+		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Modulteile (Titel, SWS, Sprache, Lehrmethoden)</p>
+		<p class="col-start-3">{module.module_parts?.length ? module.module_parts.map((part) => part.title + ', ' + part.sws + ', ' + part.language + ', ' + part.teaching_methods).join('\n') : '-'}</p>
+
+		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Validität</p>
+		<p class="col-start-3">{Number(module.correctness_score*100).toFixed(0) + ' %'}</p>
+
+
+		<div class="col-start-2 row-start-1 row-end-[15] w-[2px] bg-fuchsia-900/80"></div>
+	</div>
+</div>
