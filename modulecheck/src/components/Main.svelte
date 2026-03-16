@@ -58,7 +58,7 @@
 				<li>Prüfungsämter</li>
 				<li>Studierendenberatungen</li>
 				<li>Studierende</li>
-				<li>Studiengangsleiter</li>
+				<li>Studiengangsleitungen</li>
 				<li>Studiengangsvergleichsportale</li>
 			</ul>
 			<p class="dark:text-gray-200">und zahlreiche weitere Bereiche.</p>
@@ -87,7 +87,7 @@
 				</li>
 				<li class="mb-1.5">Automatisierte Bearbeitung von Masteranträgen</li>
 				<li class="mb-1.5">
-					KI-Chatberatung zur Beratung von Studenten bezüglich der Studiengangswahl /
+					KI-Chatberatung für Studierende bezüglich Studiengangswahl /
 					Studiengangswechsel, etc.
 				</li>
 			</ul>

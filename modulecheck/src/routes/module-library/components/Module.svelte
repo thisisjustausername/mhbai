@@ -2,13 +2,15 @@
 const { module } = $props<{ module }>();
 </script>
 
-<div class="w-full mb-15 rounded-2xl border-3 dark:border-fuchsia-800/60 dark:bg-[#5a045a70]">
-	<h2 class="mt-2 mb-3 text-center font-semibold">
+<div class="w-full mb-15 rounded-2xl dark:border-1 dark:from-blue-800/10 dark:to-blue-800/10
+bg-gradient-to-br from-fuchsia-700 to-cyan-400 p-[2px] dark:p-[0px] 
+shadow-[_0_0_20px_rgba(0,0,0,0.5)] dark:border-cyan-400 dark:shadow-[inset_0_0_40px_#1e40af]">
+	<h2 class="mt-2 mb-3 text-center font-semibold mt-8">
 		{module.module_code}
 	</h2>
 
 	<div
-		class="grid grid-cols-[min-content_2px_1fr] gap-x-4 gap-y-3 border-fuchsia-900/10 px-6 py-4 text-left break-words whitespace-pre-line"
+		class="grid grid-cols-[min-content_2px_1fr] gap-x-4 gap-y-4 border-fuchsia-900/10 px-10 mb-8 text-left break-words whitespace-pre-line"
 	>
 		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Titel</p>
 		<p class="col-start-3">{module.title}</p>
@@ -53,6 +55,6 @@ const { module } = $props<{ module }>();
 		<p class="col-start-3">{Number(module.correctness_score*100).toFixed(0) + ' %'}</p>
 
 
-		<div class="col-start-2 row-start-1 row-end-[15] w-[2px] bg-fuchsia-900/80"></div>
+		<div class="col-start-2 row-start-1 row-end-[15] w-[2px] bg-fuchsia-900/80 dark:bg-cyan-800/70"></div>
 	</div>
 </div>
