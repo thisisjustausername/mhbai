@@ -229,9 +229,25 @@ def save_raw(raw_modules: list[dict[str, str]], cursor=None, bulk: bool = True) 
     return Result(data=all_ids)
 
 
+# TODO: Test this
 @db.cursor_handling(manually_supply_cursor=False)
-def remove_already_computed(modules):
-    pass
+def fetch_uncomputed_raw_modules(cursor=None) -> Result:
+    """
+    fetches all raw modules from the database that have not been computed yet (i.e. do not have a matching entry in the modules_ai_extracted table)
+
+    Args:
+        cursor: specified by decorator
+
+    Returns:
+        Result: Result object containing either data or error information
+    """
+    result = db.select(
+        cursor=cursor,  # type: ignore
+        table="unia.modules_raw",
+        keywords=["id", "module_code", "content"],
+        specific_where="id NOT IN (SELECT raw_module_id FROM unia.modules_ai_extracted)"
+    )
+    return result
 
 
 def handle_single_module(module: Any, module_text: str) -> Result:
