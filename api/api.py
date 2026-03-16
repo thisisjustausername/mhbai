@@ -16,6 +16,7 @@ Flask api for website
 
 import time
 import json
+import re
 from flask import Flask, Response, request
 from psycopg2.extensions import cursor as Cursor
 
@@ -387,7 +388,9 @@ def validate_user_data(
             status=Status.FULL_ERROR,
         )
 
-    query = """SELECT email, user_name FROM api.users WHERE email = %s OR user_name = %s;"""
+    query = (
+        """SELECT email, user_name FROM api.users WHERE email = %s OR user_name = %s;"""
+    )
     result = db.custom_call(
         cursor=cursor,
         query=query,
@@ -670,3 +673,167 @@ def get_mhb_info() -> Response:
         mimetype="application/json",
     )
     return response
+
+
+@app.route("/get-modules", methods=["GET"])
+@db.cursor_handling(manually_supply_cursor=False)
+def get_module(cursor: Cursor | None = None) -> Response:
+    """
+    API endpoint to get module information based on search query.
+
+    Args:
+        cursor (Cursor | None): cursor object for database; AUTOMATICALLY SUPPLIED BY DECORATOR
+    Returns:
+        Response: Flask Response object containing module information.
+    """
+    # get data from request
+    search_query = request.args.get("module", None)
+
+    if search_query is None or search_query.strip() == "":
+        response = Response(
+            response=json.dumps({"message": "No valid search query provided"}),
+            status=400,
+            mimetype="application/json",
+        )
+        return response
+
+    search = search_query.strip().lower()
+    name = ""
+    if re.match(r"^[a-zöäü]{3}-?[0-9]{4}$", search):
+        name = "module_code"
+    else:
+        name = "title"
+
+    if name == "module_code" and len(search_query) == 7:  # if search doesn't contain a -
+        search_query = search_query[:3] + "-" + search_query[3:]
+
+    query = f"""
+        SELECT 
+            ai.raw_module_id, 
+            ai.title, 
+            ai.module_code, 
+            ai.ects, 
+            ai.lecturer, 
+            ai.contents, 
+            ai.goals, 
+            ai.requirements, 
+            ai.expense, 
+            ai.success_requirements, 
+            ai.weekly_hours, 
+            ai.recommended_semester, 
+            ai.exams, 
+            ai.module_parts, 
+
+            modules.id AS module_id, 
+            modules.title AS module_title, 
+            modules.module_code AS module_code, 
+            modules.ects AS module_ects, 
+            modules.content AS module_content, 
+            modules.goals AS module_goals, 
+            modules.pages AS module_pages, 
+            modules.mhb_id AS module_mhb_id, 
+
+            raw.content AS raw_content,
+
+            CASE 
+                WHEN ai.module_code IS NULL THEN 0.5
+                WHEN ai.module_code = modules.module_code THEN 1
+                ELSE 0
+            END AS correct_module_code,
+            CASE 
+                WHEN ai.ects IS NULL THEN 0.5
+                WHEN ai.ects = modules.ects THEN 1
+                ELSE 0
+            END AS correct_ects,
+            CASE 
+                WHEN ai.title IS NULL THEN 0.5
+                WHEN ai.title = modules.title THEN 1
+                ELSE 0
+            END AS correct_title
+
+        FROM unia.modules_ai_extracted AS ai
+        JOIN unia.modules_raw AS raw ON ai.raw_module_id = raw.id
+        JOIN unia.modules AS modules ON raw.mhb_id = modules.mhb_id AND raw.module_code = modules.module_code
+        WHERE {"raw.module_code ILIKE %s OR ai.module_code ILIKE %s" if name == "module_code" else "modules.title ILIKE %s OR ai.title ILIKE %s"} 
+        ORDER BY raw.mhb_id;
+        """
+
+    result = db.custom_call(
+        cursor=cursor,  # type: ignore
+        query=query,
+        variables=[f"%{search_query}%" for _ in range(2)],
+        type_of_answer=db.ANSWER_TYPE.LIST_ANSWER,
+    )
+
+    if result.is_error:
+        return Response(
+            response=json.dumps({"message": "Error occured in the backend"}),
+            status=500,
+            content_type="application/json",
+        )
+
+    modules = []
+    for mod in result.data:
+        columns = [
+            "raw_module_id",
+            "ai_title",
+            "ai_module_code",
+            "ai_ects",
+            "ai_lecturer",
+            "ai_contents",
+            "ai_goals",
+            "ai_requirements",
+            "ai_expense",
+            "ai_success_requirements",
+            "ai_weekly_hours",
+            "ai_recommended_semester",
+            "ai_exams",
+            "ai_module_parts",
+
+            "module_id",
+            "module_title",
+            "module_code",
+            "module_ects",
+            "module_content",
+            "module_goals",
+            "module_pages",
+            "module_mhb_id",
+
+            "raw_content",
+
+            "correct_module_code",
+            "correct_ects",
+            "correct_title"
+        ]
+
+        raw_module = {key: value for key, value in zip(columns, mod)}
+
+        # could be handled in sql (maybe is)
+        if raw_module["module_code"] is None and raw_module["ai_module_code"] is None:
+            continue
+
+        module = {
+            "module_code": raw_module["ai_module_code"] if raw_module["module_code"] is None else raw_module["module_code"],
+            "title": raw_module["ai_title"] if raw_module["module_title"] is None else raw_module["module_title"],
+            "ects": raw_module["ai_ects"] if raw_module["module_ects"] is None else raw_module["module_ects"],
+            "lecturer": raw_module["ai_lecturer"],
+            "contents": raw_module["ai_contents"],
+            "goals": raw_module["ai_goals"],
+            "requirements": raw_module["ai_requirements"],
+            "expense": raw_module["ai_expense"],
+            "success_requirements": raw_module["ai_success_requirements"],
+            "weekly_hours": raw_module["ai_weekly_hours"],
+            "recommended_semester": raw_module["ai_recommended_semester"],
+            "exams": raw_module["ai_exams"],
+            "module_parts": raw_module["ai_module_parts"],
+            "correct_module_code": float(raw_module["correct_module_code"]),
+            "correct_ects": float(raw_module["correct_ects"]),
+            "correct_title": float(raw_module["correct_title"]),
+            "correctness_score": float((raw_module["correct_module_code"] + raw_module["correct_ects"] + raw_module["correct_title"]) / 3)
+        }
+
+        modules.append(module)
+
+    return Response(
+        response=json.dumps(modules), status=200, mimetype="application/json"
+    )
