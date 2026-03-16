@@ -14,9 +14,9 @@
 This module provides functionality to extract structured module information from raw module text using an AI model.
 """
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 from typing import Any
-import ollama
+from ollama import Client, chat
 
 
 class exam_info(BaseModel):
@@ -235,8 +235,8 @@ def extract_module_info(
         else {}
     )
     try:
-        response = ollama.chat(
-            **additional_params,
+        client = Client(**additional_params)
+        response = client.chat(
             model=model,
             messages=[
                 {"role": "system", "content": definition_model_position},
