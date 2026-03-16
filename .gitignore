@@ -1,7 +1,7 @@
 # created by virtualenv automatically
 venv
 .idea
-__pycache__
+**/__pycache__
 testing
 pdfs
 lib
@@ -19,3 +19,4 @@ pdfs_2
 .vscode
 test*
 *.json
+*.pyc
