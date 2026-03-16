@@ -23,7 +23,8 @@ CREATE TABLE IF NOT EXISTS unia.mhbs (
     web_url TEXT NOT NULL UNIQUE,
     folder TEXT NOT NULL,
     pdf_name TEXT,
-    title TEXT);
+    title TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW());
 
 
 -- stores regex extracted information about modules from the mhb pdfs
@@ -35,7 +36,8 @@ CREATE TABLE IF NOT EXISTS unia.modules (
     title TEXT NOT NULL, -- title of the module
     ects INTEGER, -- ects points of the module
     pages JSONB, -- pages in the mhb where the module is located
-    mhb_id INTEGER REFERENCES unia.mhbs(id) -- reference to the mhb where the module is located in
+    mhb_id INTEGER REFERENCES unia.mhbs(id), -- reference to the mhb where the module is located in
+    created_at TIMESTAMPTZ DEFAULT NOW()
     );
 
 
@@ -56,7 +58,8 @@ CREATE TABLE IF NOT EXISTS unia.modules_ai_extracted (
     recommended_semester INTEGER, -- recommended semester for the module
     exams JSONB, -- exams related to the module
     module_parts JSONB, -- parts of the module
-    raw_module_id INTEGER NOT NULL REFERENCES unia.modules_raw(id) -- reference to the raw module text from which this ai extracted module was created
+    raw_module_id INTEGER NOT NULL REFERENCES unia.modules_raw(id), -- reference to the raw module text from which this ai extracted module was created
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 
@@ -67,6 +70,7 @@ CREATE TABLE IF NOT EXISTS unia.modules_raw (
     module_code TEXT NOT NULL, -- module code of the module (extracted using regex, not unique since for each module multiple versions exist)
     content TEXT, -- full raw module text used for ai extraction
     content_md5 TEXT GENERATED ALWAYS AS (md5(content)) STORED, -- md5 hash of the content to ensure uniqueness (using less storage space than content)
+    created_at TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE (module_code, content_md5) -- ensure that for each module code the same raw content is not stored multiple times
 );
 
