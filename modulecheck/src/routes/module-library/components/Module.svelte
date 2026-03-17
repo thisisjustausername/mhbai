@@ -33,8 +33,8 @@ shadow-[_0_0_20px_rgba(0,0,0,0.5)] dark:border-cyan-400 dark:shadow-[inset_0_0_4
 		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Voraussetzungen</p>
 		<p class="col-start-3">{module.requirements?.length ? module.requirements.join('\n') : '-'}</p>
 
-		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Aufwand (Aufwand, Inhalt)</p>
-		<p class="col-start-3">{module.expense?.length ? module.expense.map((expense) => expense.hours + ', ' + expense.activity).join('\n') : '-'}</p>	
+		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Aufwand (Aufwand; Inhalt)</p>
+		<p class="col-start-3">{module.expense?.length ? module.expense.map((expense) => expense.hours + '; ' + expense.activity).join('\n') : '-'}</p>	
 
 		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Bestehensvoraussetzungen</p>
 		<p class="col-start-3">{module.success_requirements?.length ? module.success_requirements.join('\n') : '-'}</p>
@@ -45,11 +45,11 @@ shadow-[_0_0_20px_rgba(0,0,0,0.5)] dark:border-cyan-400 dark:shadow-[inset_0_0_4
 		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Empfohlenes Semester</p>
 		<p class="col-start-3">{module.recommended_semester}</p>
 
-		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Prüfungsleistungen (Typ, Dauer)</p>
-		<p class="col-start-3">{module.exams?.length ? module.exams.map((exam) => exam.exam_type + ', ' + exam.duration).join('\n') : '-'}</p>
+		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Prüfungsleistungen (Typ; Dauer)</p>
+		<p class="col-start-3">{module.exams?.length ? module.exams.map((exam) => exam.exam_type + '; ' + exam.duration).join('\n') : '-'}</p>
 
-		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Modulteile (Titel, SWS, Sprache, Lehrmethoden)</p>
-		<p class="col-start-3">{module.module_parts?.length ? module.module_parts.map((part) => part.title + ', ' + part.sws + ', ' + part.language + ', ' + part.teaching_methods).join('\n') : '-'}</p>
+		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Modulteile (Titel; Sprache; Lehrmethoden)</p>
+		<p class="col-start-3">{module.module_parts?.length ? module.module_parts.map((part) => part.title + '; ' + part.language + '; ' + part.teaching_methods).join('\n') : '-'}</p>
 
 		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Validität</p>
 		<p class="col-start-3">{Number(module.correctness_score*100).toFixed(0) + ' %'}</p>

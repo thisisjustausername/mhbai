@@ -2,7 +2,7 @@
 	import Header from '../../components/Header.svelte';
     let module: string = '';
     async function searchModule() {
-        const response = await fetch('/api/get-module', {
+        const response = await fetch('/api/get-modules', {
 			method: 'POST',
             headers: {
                 'Content-Type': 'text/plain'

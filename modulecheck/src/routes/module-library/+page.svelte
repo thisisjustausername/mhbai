@@ -51,9 +51,9 @@
 			<h2 class="mb-4 text-2xl font-bold dark:text-gray-200 text-center">Modulsuche erklärt</h2>
 
 			<ul class="list-disc dark:text-gray-200 pl-5">
-					<li class="mb-2">Modulcode: Geben Sie den Modulcode ein, um spezifische Module zu finden.
-					<br /><span class="italic">TIPP: Um alle Module einer Fakultät zu finden, suchen Sie nach dem Fakultätskürzel und fügen Sie ein Minuszeichen an (Bsp. Informatik: Inf-)</span></li>
-					<li>Titel: Geben Sie einen Teil des Modultitels ein, um Module zu finden.</li>
+					<li class="mb-2">Modulcode: Geben Sie den Modulcode ein; um spezifische Module zu finden.
+					<!-- <br /><span class="italic">TIPP: Um alle Module einer Fakultät zu finden; suchen Sie nach dem Fakultätskürzel und fügen Sie ein Minuszeichen an (Bsp. Informatik: Inf-)</span></li> -->
+					<li>Titel: Geben Sie einen Teil des Modultitels ein; um Module zu finden.</li>
 				</ul>
 		</div>
 		 </div>

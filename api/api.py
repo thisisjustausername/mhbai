@@ -675,6 +675,29 @@ def get_mhb_info() -> Response:
     return response
 
 
+def replace_none_with_dash(obj):
+    """
+    helper function to replace None values with a dash in a nested data structure (dicts, lists, tuples, sets).
+
+    Args:
+        obj: The input data structure which can be a dict, list, tuple, set,
+    Returns:
+        The same data structure with None values replaced by a dash.
+    """
+    if obj is None:
+        return "-"
+    elif isinstance(obj, dict):
+        return {k: replace_none_with_dash(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [replace_none_with_dash(item) for item in obj]
+    elif isinstance(obj, tuple):
+        return tuple(replace_none_with_dash(item) for item in obj)
+    elif isinstance(obj, set):
+        return {replace_none_with_dash(item) for item in obj}
+    else:
+        return obj
+
+
 @app.route("/get-modules", methods=["GET"])
 @db.cursor_handling(manually_supply_cursor=False)
 def get_module(cursor: Cursor | None = None) -> Response:
@@ -833,6 +856,8 @@ def get_module(cursor: Cursor | None = None) -> Response:
         }
 
         modules.append(module)
+
+    modules = replace_none_with_dash(modules)
 
     return Response(
         response=json.dumps(modules), status=200, mimetype="application/json"
