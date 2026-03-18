@@ -680,6 +680,67 @@ def replace_none_with_dash(obj):
         return {replace_none_with_dash(item) for item in obj}
     else:
         return obj
+    
+@app.route("/get-module/filters", methods=["GET"])
+def get_module_filters() -> Response:
+    """
+    API endpoint to get allowed filter values for specified filter
+
+    Returns:
+        Response: Flask Response object containing valid options for the specified filter.
+    """
+
+    filter = request.args.get("filter", None)
+    
+    filters_with_options = ["version", "subject"]
+    filters = filters_with_options if filter is None else [filter]
+    if filter is not None and filter not in filters_with_options:
+        response = Response(
+            response=json.dumps({"message": f"Filter '{filter}' does not have data dependent options"}),
+            status=400,
+            mimetype="application/json",
+        )
+        return response
+    
+    res = dict()
+    for f in filters:
+        if f == "version":
+            query = """SELECT DISTINCT version FROM unia.mhbs WHERE version IS NOT NULL ORDER BY version DESC;"""
+        else:
+            query = """SELECT DISTINCT UPPER(substring(module_code, 1, POSITION('-' IN module_code) - 1)) as subject FROM unia.modules_raw ORDER BY subject ASC;"""
+
+        result = db.custom_call(
+            query=query,
+            type_of_answer=db.ANSWER_TYPE.LIST_ANSWER
+        )
+
+        if result.is_error:
+            response = Response(
+                response=json.dumps({"message": "Error occured in the backend"}),
+                status=500,
+                content_type="application/json",
+            )
+            return response
+        
+        # NOTE: This can't happen, but still is added for safety
+        if result.data is None:
+            response = Response(
+                response=json.dumps({"message": "No data found for the specified filter"}),
+                status=404,
+                content_type="application/json",
+            )
+            return response
+        
+        if f == "version":
+            res[f] = [("W" if (winter := int(str(i[0])[-1]) == 1) else "S") + "S " + (year := str(i[0])[:-1]) + (("/" + str(int(year) + 1)) if winter else "") for i in result.data]
+        else:
+            res[f] = [a if "\\" not in (a := i[0]) else a.encode('latin1').decode('unicode_escape') for i in result.data]
+            
+    return Response(
+        response=json.dumps(res if filter is None else res[filter]),
+        status=200,
+        content_type="application/json"
+    )
 
 
 @app.route("/get-modules", methods=["POST"])
@@ -690,13 +751,25 @@ def get_module() -> Response:
     Returns:
         Response: Flask Response object containing module information.
     """
-    allowed_filters = ["module_code", "title", "ects", "lecturer", "requirements", "success_requirements", "weekly_hours", "recommended_semester", "exams", "version", "faculty"]
+    allowed_filters = {
+        "module_code": ("raw.module_code ILIKE %s OR ai.module_code ILIKE %s", lambda x: f"%s{x}%s", 2),
+        "title": ("modules.title ILIKE %s OR ai.title ILIKE %s", lambda x: f"%s{x}%s", 2),
+        "ects": ("modules.ects = %s OR ai.ects = %s", lambda x: x, 2),
+        "lecturer": ("ai.lecturer ILIKE %s", lambda x: f"%s{x}%s", 1),
+        "requirements": ("ai.requirements ILIKE %s", lambda x: f"%s{x}%s", 1),
+        "success_requirements": ("i.success_requirements ILIKE %s", lambda x: f"%s{x}%s", 1),
+        "weekly_hours": ("ai.weekly_hours = %s", lambda x: x, 1),
+        "recommended_semester": ("ai.recommended_semester = %s", lambda x: x, 1),
+        "exams": ("ai.exams ILIKE %s", lambda x: f"%s{x}%s", 1),
+        "version": ("", lambda x: x, 1),
+        "subject": ("raw.module_code ILIKE %s OR ai.module_code ILIKE %s", lambda x: f"%s{x}%s", 2)
+    }
 
     # get data from request
     filters = request.get_json()
-    if any(k not in allowed_filters for k in data.keys()):
+    if any(k not in allowed_filters.keys() for k in filters.keys()):
         response = Response(
-            response=json.dumps({"message": f"{', '.join(invalid := [k for k in data.keys() if k not in allowed_filters])} {('is' if len(invalid) == 1 else 'are')} not allowed as filter{'' if len(invalid) == 1 else 's'}. Allowed filters are: {', '.join(allowed_filters)}"}),
+            response=json.dumps({"message": f"{', '.join(invalid := [k for k in filters.keys() if k not in allowed_filters])} {('is' if len(invalid) == 1 else 'are')} not allowed as filter{'' if len(invalid) == 1 else 's'}. Allowed filters are: {', '.join(allowed_filters)}"}),
             status=400,
             mimetype="application/json",
         )

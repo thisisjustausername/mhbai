@@ -9,7 +9,7 @@
       py-8"
 	>
 		<!-- Info-Box -->
-		 <div class="mx-auto mb-15 max-w-3xl rounded-2xl dark:bg-gradient-tobr dark:from-black dark:to-black bg-gradient-to-br from-fuchsia-700 to-cyan-400 p-[2px] dark:p-[0px] shadow-[_10px_20px_40px_rgba(50,0,50,0.3)]
+		 <div class="mx-auto mb-15 max-w-3xl rounded-2xl dark:bg-gradient-to-br dark:from-black dark:to-black bg-gradient-to-br from-fuchsia-700 to-cyan-400 p-[2px] dark:p-[0px] shadow-[_10px_20px_40px_rgba(50,0,50,0.3)]
 	  dark:border-purple-400 dark:bg-purple-600/30 dark:shadow-[inset_0_0_20px_#9333ea]">
 		<div
 			class="rounded-2xl dark:border-3 dark:border-fuchsia-800 
