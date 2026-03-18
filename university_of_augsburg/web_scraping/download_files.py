@@ -17,8 +17,10 @@ import json
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 from multiprocessing import Pool, cpu_count
+import re
 
 from database import database as db
+from pdf_reader.pdf_extractor import Pdf
 
 
 def fetch_valid_urls(url_list=["https://mhb.uni-augsburg.de/"], final_links=[]) -> list[str]:
@@ -101,8 +103,18 @@ def fetch_pdf(cursor: db.cursor, web_url: str, adapt_file_names: bool = False) -
     
     file_name += pdf.headers.get('Content-Disposition').split('filename=', 1)[1].replace('"', '') # type: ignore
 
+    # compute year and Semester of the mhb
+    time_code = None
+    try:
+        pdf = Pdf(pdf_path=None, pdf_file=pdf.content).extract_objects()
+        index_match = next(i["data"] for i in pdf if re.search(r'.*? Tm \[(.*?[WS][omint]{3}ersemester \d{4}.*?)\] .*?', i["data"]))
+        year_semester = re.search(r'[WS][omint]{3}ersemester \d{4}.*? ', index_match).group(0)[:-1]
+        time_code = int(year_semester.split(" ")[-1].split("/")[0].split(")]")[0] + str(0 if year_semester.startswith("S") else 1))
+    except Exception as e:
+        pass
+
     # insert data into database
-    result = db.insert(cursor=cursor, table="unia.mhbs", values={"web_url": web_url, "pdf_name": file_name, "folder": "~/mhbai/pdfs/"}, returning_column="id")
+    result = db.insert(cursor=cursor, table="unia.mhbs", values={"web_url": web_url, "pdf_name": file_name, "folder": "~/mhbai/pdfs/", "version": time_code}, returning_column="id")
     if result.is_error:
         raise Exception(f"Error inserting mhb {web_url} into database: {result.error}")
     if result.data is None:

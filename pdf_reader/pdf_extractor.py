@@ -9,7 +9,6 @@
 # FileID: Re-ex-0001
 
 from io import BytesIO
-import json
 import re
 import zlib
 from typing import Annotated
@@ -19,7 +18,7 @@ class Pdf:
     reads pdfs and extracts information
     """
 
-    def __init__(self, pdf_path: Annotated[str | None, "Explicit with pdf_file"], pdf_file: Annotated[BytesIO | None, "Explicit with pdf_path"] = None):
+    def __init__(self, pdf_path: Annotated[str | None, "Explicit with pdf_file"], pdf_file: Annotated[BytesIO | bytes | None, "Explicit with pdf_path"] = None):
         """
         initializes class variables
         Args:

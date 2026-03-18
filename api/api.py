@@ -42,7 +42,6 @@ def login(cursor: Cursor | None = None) -> Response:
 
     Args:
         cursor (cursor | None): cursor for db connection, specified by decorator
-
     Returns:
         Response: flask Response object
     """
@@ -330,7 +329,6 @@ def validate_user_data(
         last_name (str): Last name of the user, cannot be empty or None.
         email (Email): Email of the user, must be of type Email.
         user_name (str): Username of the user, cannot be empty or None.
-
     Returns:
         dict: A dictionary with keys 'success' (bool), 'error' (str, optional), and 'status' (int).
               'success' is True if all validations pass, otherwise False with an appropriate error message.
@@ -698,7 +696,7 @@ def replace_none_with_dash(obj):
         return obj
 
 
-@app.route("/get-modules", methods=["GET"])
+@app.route("/get-modules", methods=["POST"])
 @db.cursor_handling(manually_supply_cursor=False)
 def get_module(cursor: Cursor | None = None) -> Response:
     """
@@ -709,26 +707,27 @@ def get_module(cursor: Cursor | None = None) -> Response:
     Returns:
         Response: Flask Response object containing module information.
     """
-    # get data from request
-    search_query = request.args.get("module", None)
+    allowed_filters = ["module_code", "title", "ects", "lecturer", "requirements", "success_requirements", "weekly_hours", "recommended_semester", "exams", "version", "faculty"]
 
-    if search_query is None or search_query.strip() == "":
+    # get data from request
+    filters = request.get_json()
+    if any(k not in allowed_filters for k in data.keys()):
         response = Response(
-            response=json.dumps({"message": "No valid search query provided"}),
+            response=json.dumps({"message": f"{', '.join(invalid := [k for k in data.keys() if k not in allowed_filters])} {('is' if len(invalid) == 1 else 'are')} not allowed as filter{'' if len(invalid) == 1 else 's'}. Allowed filters are: {', '.join(allowed_filters)}"}),
             status=400,
             mimetype="application/json",
         )
         return response
 
-    search = search_query.strip().lower()
-    name = ""
-    if re.match(r"^[a-zöäü]{3}-?[0-9]{4}$", search):
-        name = "module_code"
-    else:
-        name = "title"
-
-    if name == "module_code" and len(search_query) == 7:  # if search doesn't contain a -
-        search_query = search_query[:3] + "-" + search_query[3:]
+    if len(filters) == 0:
+        response = Response(
+            response=json.dumps({"message": "No search query provided"}),
+            status=400,
+            mimetype="application/json",
+        )
+        return response
+    
+    filters = {k: v for k, v in filters.items() if v is not None and v.strip() != ""}
 
     query = f"""
         SELECT 

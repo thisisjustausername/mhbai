@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS unia.mhbs (
     folder TEXT NOT NULL,
     pdf_name TEXT,
     title TEXT,
-    created_at TIMESTAMPTZ DEFAULT NOW());
+    created_at TIMESTAMPTZ DEFAULT NOW()),
+    version INTEGER;
 
 
 -- stores regex extracted information about modules from the mhb pdfs
