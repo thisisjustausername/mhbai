@@ -28,7 +28,6 @@ def create_signature(message: str | dict[str, Any]) -> FuncRes:
     Create a digital signature for a given message using Ed25519 private key.
 
     Args:
-        cursor: Database cursor to read the private key.
         message (str | dict): The message to be signed.
     Returns:
         dict: {"success": bool, "data": signature or error message}

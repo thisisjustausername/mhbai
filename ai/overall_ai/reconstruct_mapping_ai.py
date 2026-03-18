@@ -9,18 +9,16 @@ from database import database as db
 from ai.overall_ai.full_extraction import load_pdf_modules
 
 
-@db.cursor_handling(manually_supply_cursor=False)
-def read_data(cursor=None):
+def read_data() -> dict:
     """
     Fetch the raw and the computed data from the database
 
     Returns:
-
+        dict: dict containing the raw and computed data
     """
     result = db.select(
-        cursor=cursor,  # type: ignore
         table="unia.modules_ai_extracted",
-        keywords=[
+        columns=[
             "id",
             "title",
             "module_code",

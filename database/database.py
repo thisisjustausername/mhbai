@@ -1,15 +1,3 @@
-# Copyright (c) 2025 Leon Gattermeyer
-#
-# This file is part of mhbai.
-#
-# For usage please contact the developer.
-#
-# This file is Copyright-protected.
-
-# Description: connect to postgresql database and perform basic operations
-# Status: VERSION 1.0
-# FileID: Sc-da-0003
-
 """
 Database interaction module
 
@@ -25,11 +13,14 @@ import traceback
 from typing import Any
 import warnings
 from dotenv import load_dotenv
-import psycopg2 as pg
-from psycopg2.extensions import cursor
+import psycopg as pg
+from psycopg import Cursor
+from psycopg_pool import ConnectionPool
+from psycopg.rows import TupleRow
+from psycopg import sql
 
 from datatypes.result import Result
-from database.pool import pool, get_cursor, close_cursor
+from database.pool import create_pool, get_cursor, close_cursor
 
 
 load_dotenv()
@@ -38,7 +29,10 @@ USER = os.getenv("USERDB")  # (like the linux user name!)
 PASSWORD = os.getenv("PASSWORD")
 HOST = os.getenv("HOST")  # localhost
 PORT = os.getenv("PORT")  # 5432
-DBNAME = os.getenv("DBNAME")  # mhbs
+DBNAME = os.getenv("DBNAME")  # media-library
+
+# initialize pool
+pool: ConnectionPool = create_pool()
 
 
 class ANSWER_TYPE(str, Enum):
@@ -83,27 +77,6 @@ class ORDER(str, Enum):
         return value in ORDER._value2member_map_
 
 
-def full_pack(func: Callable[..., Any]):
-    """
-    full_pack \n
-    wrapper function to make just one function call for initializing,
-    closing and the actual function
-
-    Args:
-        func (func): function
-    Returns:
-        function: wrapped function
-    """
-
-    def wrapped(*args, **kwargs):
-        _, internal_cursor = connect()
-        result = func(internal_cursor, *args, **kwargs)
-        close(cursor=internal_cursor)  # type: ignore
-        return result
-
-    return wrapped
-
-
 def cursor_handling(
     *, manually_supply_cursor: bool = False, use_pool: bool = True
 ) -> Callable[..., Any]:
@@ -141,9 +114,9 @@ def cursor_handling(
             """
 
             # initialize cursor handling
-            close_cursor = manually_supply_cursor
+            to_close = not manually_supply_cursor
 
-            # bind all arguments and keywords to check for cursor
+            # bind all arguments and columns to check for cursor
             bound = inspect.signature(func).bind_partial(*args, **kwargs)
             bound.apply_defaults()
 
@@ -162,7 +135,7 @@ def cursor_handling(
                 internal_cursor := bound.arguments.get("cursor", None)
             ) is None and manually_supply_cursor is False:
                 # connect to db
-                internal_cursor = get_cursor() if use_pool else connect()
+                internal_cursor = get_cursor(pool=pool) if use_pool else connect()
 
             # if cursor is supplied manually but manually_supply_cursor is False, raise error
             elif internal_cursor is None and manually_supply_cursor is True:
@@ -177,11 +150,11 @@ def cursor_handling(
                     UserWarning,
                 )
 
-                # set close_cursor to True since the cursor is only used locally
-                close_cursor = True
+                # set to_close to True since a new cursor will be created and used
+                to_close = True
 
                 # connect to db
-                internal_cursor = get_cursor() if use_pool else connect()
+                internal_cursor = get_cursor(pool=pool) if use_pool else connect()
 
             # if manually_supply_cursor is not of type bool, raise error
             elif isinstance(manually_supply_cursor, bool) is False:
@@ -193,9 +166,9 @@ def cursor_handling(
                 return func(*args, **kwargs)
 
             finally:
-                # if cursor was created in this function, close it
-                if close_cursor is True:
-                    # close the cursor after the function call
+                # if cursor was created in this function, to_close it
+                if to_close is True:
+                    # to_close the cursor after the function call
                     # fmt: off
                     close_cursor(cursor=internal_cursor) if use_pool else close(cursor=internal_cursor)  # type: ignore
                     # fmt: off
@@ -206,6 +179,7 @@ def cursor_handling(
 
 
 # TODO right now for development and testing enabled, for website rather use failsafes (SAME AS IN often_used_db_calls.py)
+@DeprecationWarning
 def catch_exception(func):
     """
     catches errors
@@ -234,13 +208,42 @@ def connect(**kwargs):
     Args:
         kwargs (dict):
     Returns:
-        cursor: cursor to interact with db
+        Cursor: cursor to interact with db
     """
     if len(kwargs) > 0:
         return pg.connect(**kwargs).cursor()
     return pg.connect(
-        user=USER, password=PASSWORD, host=HOST, port=PORT, database=DBNAME
+        user=USER, password=PASSWORD, host=HOST, port=PORT, dbname=DBNAME
     ).cursor()
+
+def fetch(query: sql.Composable, type_of_answer: ANSWER_TYPE, variables: list[Any] | tuple[Any,...] | None = None, commit: bool = False) -> TupleRow | list[list[TupleRow]] | None | Exception:
+    """
+    fetches one record from the database based on the provided query and variables
+
+    Args:
+        query (str): the SQL query to execute
+        type_of_answer (ANSWER_TYPE): what answer to expect, fetchone if SINGLE_ANSWER, fetchall if LIST_ANSWER, else no fetch
+        variables (list | tuple | None): the variables to pass into the query, if any
+        commit (bool): whether to commit the transaction after executing the query, default False
+
+    Returns:
+        TupleRow | None | list[list[TupleRow]] | Exception: either no, the first or all records will be returned
+    """
+    with pool.connection() as conn:
+        with conn.cursor() as cursor:
+            try:
+                cursor.execute(query, variables) # type: ignore
+                if commit:
+                    conn.commit()
+                if type_of_answer == ANSWER_TYPE.SINGLE_ANSWER:
+                    return cursor.fetchone()
+                if type_of_answer == ANSWER_TYPE.LIST_ANSWER:
+                    return [list(i) for i in cursor.fetchall()]
+                return None
+            except Exception as e:
+                if commit:
+                    conn.rollback()
+                return e
 
 
 # TODO: can't return success: False right now
@@ -248,10 +251,9 @@ def connect(**kwargs):
 # TODO: specific_where and variables don't work together
 # @catch_exception
 def select(  # pylint: disable=too-many-branches, too-many-positional-arguments, too-many-arguments
-    cursor: cursor,  # pylint: disable=redefined-outer-name
     table: str,
     type_of_answer: ANSWER_TYPE = ANSWER_TYPE.LIST_ANSWER,
-    keywords: tuple[str] | list[str] = ("*",),
+    columns: tuple[str] | list[str] = ("*",),
     conditions: dict[str, Any] | None = None,
     negated_conditions: dict[str, Any] | None = None,
     select_max_of_key: str = "",
@@ -260,13 +262,12 @@ def select(  # pylint: disable=too-many-branches, too-many-positional-arguments,
     order_by: tuple[str, ORDER] | None = None,
 ) -> Result[Any, Exception]:
     """
-    read_table \n
+    select \n
     read data from a table
 
     Args:
-        cursor (from): cursor for db
         table (str): table to select from
-        keywords (tuple[str] | list[str]): columns, that should be selected, if empty, get all
+        columns (tuple[str] | list[str]): columns, that should be selected, if empty, get all
         conditions (dict): under which conditions (key: column, value: value) values should be selected, if empty, no conditions
         negated_conditions (dict): under which conditions (key: column, value: value) values should NOT be selected, if empty, no negated conditions
         type_of_answer (ANSWER_TYPE): specify whether one or more answers are to be received, therefore it changes, whether list or single object will be returned
@@ -296,7 +297,7 @@ def select(  # pylint: disable=too-many-branches, too-many-positional-arguments,
         )
 
     # initialize variables
-    keywords = list(keywords)
+    columns = list(columns)
     conditions = {} if conditions is None else conditions
     negated_conditions = {} if negated_conditions is None else negated_conditions
     result = {"success": False, "data": None, "error": None}
@@ -308,67 +309,64 @@ def select(  # pylint: disable=too-many-branches, too-many-positional-arguments,
         key: {"value": value, "negated": True}
         for key, value in negated_conditions.items()
     }
-    query = f"""SELECT {", ".join(keywords)} FROM {table}"""
+
+    query = sql.SQL("SELECT {cols} FROM {table}").format(
+        cols=sql.SQL(", ").join(map(sql.Identifier, columns)) if columns[0] != "*" else sql.SQL("*"),
+        table=sql.Identifier(table)
+    )
+
 
     # add conditions if any
     if len(all_conditions) > 0:
-        query += f" WHERE {' AND '.join([f'{key} {'!' if value_data['negated'] is True else ''}= %s' for key, value_data in all_conditions.items()])}"
+        query += sql.SQL(" WHERE ") + \
+            sql.SQL(' AND '.join([f'{{}} {'!' if value_data['negated'] is True else ''}= %s' 
+                for key, value_data in all_conditions.items()])) \
+        .format(*[sql.Identifier(key) for key in all_conditions.keys()])
         if order_by is not None:
-            query += f" ORDER BY {order_by[0]} {order_by[1].value}"
-        cursor.execute(query, tuple(i["value"] for i in all_conditions.values()))
+            query += sql.SQL(" ORDER BY {} {}").format(sql.Identifier(order_by[0], order_by[1].value))
         # get data based on answer type
-        if type_of_answer == ANSWER_TYPE.SINGLE_ANSWER:
-            data = cursor.fetchone()
-        else:
-            data = [list(i) for i in cursor.fetchall()]
-        # map the data to the keywords if keywords are explicitly specified
-        if keywords is not None and "*" not in keywords:
+        data = fetch(query=query, type_of_answer=type_of_answer, variables=tuple(i["value"] for i in all_conditions.values()), commit=False)
+        if data is None: data = []
+        # map the data to the columns if columns are explicitly specified
+        if columns is not None and "*" not in columns:
             result = (
-                dict(zip(keywords, data))  # type: ignore
+                dict(zip(columns, data))  # type: ignore
                 if type_of_answer == ANSWER_TYPE.SINGLE_ANSWER
-                else [dict(zip(keywords, vals)) for vals in data]  # type: ignore
-            )  # type: ignore
+                else [dict(zip(columns, vals)) for vals in data]  # type: ignore
+            )
+        if isinstance(data, Exception):
+            return Result(error=data, stack_trace=traceback.format_exc())
         return Result(data=result)
 
     # add select max of key condition
     elif select_max_of_key != "":
-        query += f" WHERE {select_max_of_key} = (SELECT MAX({select_max_of_key}) FROM {table}) LIMIT 1"
-        if order_by is not None:
-            query += f" ORDER BY {order_by[0]} {order_by[1].value}"
-
+        query += sql.SQL(" WHERE {max_key} = (SELECT MAX({max_key}) FROM {table}) LIMIT 1").format(max_key=sql.Identifier(select_max_of_key), table=sql.Identifier(table))
+        
     # add specific where condition
     elif specific_where != "":
-        query += f" WHERE {specific_where}"
-        if order_by is not None:
-            query += f" ORDER BY {order_by[0]} {order_by[1].value}"
+        query += sql.SQL(f" WHERE {specific_where}").format(specific_where=sql.Identifier(specific_where)) # type: ignore
         if specific_where.count(" %s") != (
             len(variables) if variables is not None else 0
         ):
             raise ValueError(
                 "number of placeholders must match the number of provided variables"
             )
-
-    # add order by condition
-    if variables is None:
-        cursor.execute(query)
-    else:
-        cursor.execute(query, variables)
+    if order_by is not None:
+        query += sql.SQL(" ORDER BY {} {}").format(sql.Identifier(order_by[0], order_by[1].value))
 
     # get data based on answer type
-    if type_of_answer == ANSWER_TYPE.SINGLE_ANSWER:
-        data = cursor.fetchone()
-    else:
-        data = [list(i) for i in cursor.fetchall()]
-
-    # map the data to the keywords if keywords are explicitly specified
-    if keywords is not None and "*" not in keywords:
+    data = fetch(query=query, type_of_answer=type_of_answer, variables=variables, commit=False)
+    # map the data to the columns if columns are explicitly specified
+    if columns is not None and "*" not in columns:
         result = (
-            dict(zip(keywords, data))  # type: ignore
+            dict(zip(columns, data))  # type: ignore
             if type_of_answer == ANSWER_TYPE.SINGLE_ANSWER
-            else [dict(zip(keywords, vals)) for vals in data]  # type: ignore
-        )  # type: ignore
-    elif "*" in keywords:
+            else [dict(zip(columns, vals)) for vals in data]  # type: ignore
+        )
+    elif "*" in columns:
         result = data
+    if isinstance(data, Exception):
+        return Result(error=data, stack_trace=traceback.format_exc())
     return Result(data=result)
 
 
@@ -376,16 +374,15 @@ def select(  # pylint: disable=too-many-branches, too-many-positional-arguments,
 # TODO: parametrize returning_column
 # @catch_exception
 def insert(
-    cursor: cursor,  # pylint: disable=redefined-outer-name
     table: str,
-    values: dict[str, Any] | list[str],
+    values: dict[str, Any] | list[str] | None,
     returning_column: str | None = None,
 ) -> Result[Any, Exception]:
     """
     insert data into table
 
     Args:
-        cursor (cursor): cursor for interaction with db
+        cursor (Cursor): cursor for interaction with db
         table (str): table to insert into, if empty set all
         values (dict | list): values that should be entered (key: column, value: value), if empty, no conditions, if values is of type list, then list has to contain all values that have to be entered
         returning_column (int): returns the column; IMPORTANT: returning_column is not being parametrized
@@ -395,50 +392,44 @@ def insert(
 
     # initialize variables
     if values is None:
-        values = {}
+        values = dict()
     if returning_column == "":
         returning_column = None
     query = ""
     vals = []
 
-    # try insert
-    try:
-        # build parametrized query
-        if isinstance(values, list):
-            query = f"""INSERT INTO {table}
-                        VALUES ({", ".join("%s" for _ in range(len(values)))})"""
-            vals = values
-        elif isinstance(values, dict):
-            query = f"""INSERT INTO {table} ({", ".join(values.keys())})
-                    VALUES ({", ".join("%s" for _, _ in enumerate(values.keys()))})"""
-            vals = list(values.values())
+    # build parametrized query
+    if isinstance(values, list):
+        query = sql.SQL("INSERT INTO {table} VALUES (").format(
+            table=sql.Identifier(table)
+        ) + sql.SQL(", ").join(sql.Placeholder() * len(values)) + sql.SQL(")")
+        vals = values
+    elif isinstance(values, dict):
+        query = sql.SQL("INSERT INTO {table} ({cols}) VALUES ({vals})").format(
+            table=sql.Identifier(table),
+            cols=sql.SQL(", ").join(map(sql.Identifier, values.keys())),
+            vals=sql.SQL(", ").join(sql.Placeholder() for _ in values.keys())
+        )
+        vals = list(values.values())
 
-        # add returning_column
-        if returning_column is not None:
-            query += f" RETURNING {returning_column}"
+    # add returning_column
+    if returning_column is not None:
+        query += sql.SQL(" RETURNING {returning_column}").format(returning_column=sql.Identifier(returning_column))
 
-        # run query
-        cursor.execute(query, vals)
-        cursor.connection.commit()
+    # run query
+    data = fetch(query=query, type_of_answer=ANSWER_TYPE.SINGLE_ANSWER if returning_column is not None else ANSWER_TYPE.NO_ANSWER, variables=vals, commit=True)
 
-        # return data if requested
-        if returning_column is not None:
-            data = cursor.fetchone()
-            return Result(data=data)
-        return Result()
-
-    # rollback if error occurred
-    except Exception as e:  # pylint: disable=broad-exception-caught
-        cursor.connection.rollback()
-        return Result(error=e, stack_trace=traceback.format_exc())
+    # return data if requested
+    if isinstance(data, Exception):
+        return Result(error=data, stack_trace=traceback.format_exc())
+    return Result(data=data)
 
 
 # for specific_where conditions must be empty, otherwise conditions will be ignored IMPORTANT what is being ignored differs from the other functions
 def update(  # pylint: disable=too-many-positional-arguments, too-many-arguments
-    cursor: cursor,  # pylint: disable=redefined-outer-name
     table: str,
     returning_column: str | None = None,
-    arguments: dict[str, Any] | None = None,
+    columns: dict[str, Any] | None = None,
     conditions: dict[str, Any] | None = None,
     specific_where: str = "",
     specific_set: str = "",
@@ -448,13 +439,12 @@ def update(  # pylint: disable=too-many-positional-arguments, too-many-arguments
     already has try catch
 
     Args:
-        cursor (cursor): cursor to interact with db
         table (str): table to insert into, if empty set all
-        arguments (dict | None): values that should be entered (key: column, value: value)
+        columns (dict | None): values that should be entered (key: column, value: value)
         conditions (dict | None): specify to insert into the correct row
         specific_where (str): conditions must be empty, otherwise conditions will be ignored, specifies where should be set,
                               IMPORTANT what is being ignored differs from the other functions
-        specific_set (str): arguments must be empty, otherwise arguments will be ignored,
+        specific_set (str): columns must be empty, otherwise columns will be ignored,
                             specifies what should be set
         returning_column (str): returns the specified column, returns just a single column
     Returns:
@@ -462,54 +452,37 @@ def update(  # pylint: disable=too-many-positional-arguments, too-many-arguments
     """
 
     # initialize variables
-    if arguments is None:
-        arguments = {}
+    if columns is None:
+        columns = {}
     if conditions is None:
         conditions = {}
     if returning_column == "":
         returning_column = None
 
-    # try update
-    try:
-        # build query
-        query = f"""UPDATE {table}"""
+    # build query
+    query = sql.SQL("UPDATE {table} SET {setter}").format(
+        table=sql.Identifier(table),
+        setter=(sql.SQL(specific_set) if specific_set != "" else sql.SQL(", ").join([sql.SQL("{key} = {placeholder}").format(key=sql.Identifier(key), placeholder=sql.Placeholder()) for key in columns.keys()])) # type: ignore
+    )
 
-        # set part
-        if specific_set != "":
-            query += f""" SET {specific_set}"""
-        else:
-            query += f""" SET  {
-                ", ".join(key + " = %s" for _, key in enumerate(arguments.keys()))
-            }"""
+    # where part
+    if specific_where != "":
+        query += sql.SQL(" WHERE {specific_where}").format(specific_where=sql.SQL(specific_where)) # type: ignore
+    else:
+        query += sql.SQL(" WHERE {w}").format(w=sql.SQL(" AND ").join([sql.SQL("{key} = {placeholder}").format(key=sql.Identifier(key), placeholder=sql.Placeholder()) for _, key in enumerate(conditions)]))
 
-        # where part
-        if specific_where != "":
-            query += " WHERE " + specific_where
-        else:
-            query += f""" WHERE {" AND ".join(key + " = %s" for _, key in enumerate(conditions))}"""
+    # returning part
+    if returning_column is not None:
+        query += sql.SQL(" RETURNING {returning_column}").format(returning_column=sql.Identifier(returning_column))
 
-        # returning part
-        if returning_column is not None:
-            query += f" RETURNING {returning_column}"
-
-        # execute query
-        cursor.execute(query, list(arguments.values()) + list(conditions.values()))
-        cursor.connection.commit()
-
-        # get data if requested
-        if returning_column is not None:
-            data = cursor.fetchone()
-            return Result(data=data)
-        return Result()
-
-    # rollback if error occurred
-    except Exception as e:  # pylint: disable=broad-exception-caught
-        cursor.connection.rollback()
-        return Result(error=e, stack_trace=traceback.format_exc())
+    # execute query
+    data = fetch(query=query, type_of_answer=ANSWER_TYPE.SINGLE_ANSWER if returning_column is not None else ANSWER_TYPE.NO_ANSWER, variables=list(columns.values()) + list(conditions.values()))
+    if isinstance(data, Exception):
+        return Result(error=data, stack_trace=traceback.format_exc())
+    return Result(data=data)
 
 
 def delete(
-    cursor: cursor,  # pylint: disable=redefined-outer-name
     table: str,
     conditions: dict[str, Any],
     returning_column: str | None = None,
@@ -519,7 +492,6 @@ def delete(
     already has try catch
 
     Args:
-        cursor (cursor): cursor to interact with db
         table (str): table to insert into, if empty set all
         conditions (dict): specify from which row to remove the data
         returning_column (str): returns the specified column, returns just a single value
@@ -531,97 +503,63 @@ def delete(
     if returning_column == "":
         returning_column = None
 
-    # try remove
-    try:
-        # build query
-        query = f"""DELETE FROM {table}
-                    WHERE {" AND ".join(key + " = %s" for _, key in enumerate(conditions))}"""
+    # build query
+    query = sql.SQL("DELETE FROM {table} WHERE ").format(table=sql.Identifier(table))
+    query += sql.SQL(" AND ").join(sql.SQL("{key} = {placeholder}").format(key=sql.Identifier(key), placeholder=sql.Placeholder()) for key in conditions.keys())
 
-        # returning part
-        if returning_column is not None:
-            query += f" RETURNING {returning_column}"
+    # returning part
+    if returning_column is not None:
+        query += sql.SQL(" RETURNING {returning_column}").format(returning_column=sql.Identifier(returning_column))
 
-        # execute query
-        cursor.execute(query, list(conditions.values()))
-        cursor.connection.commit()
+    data = fetch(query=query, type_of_answer=ANSWER_TYPE.SINGLE_ANSWER if returning_column is not None else ANSWER_TYPE.NO_ANSWER, variables=list(conditions.values()), commit=True)
 
-        # get data if requested
-        if returning_column is not None:
-            data = cursor.fetchone()
-            return Result(data=data)
-        return Result()
+    if isinstance(data, Exception):
+        return Result(error=data, stack_trace=traceback.format_exc())
 
-    # rollback if error occurred
-    except Exception as e:  # pylint: disable=broad-exception-caught
-        cursor.connection.rollback()
-        return Result(error=e, stack_trace=traceback.format_exc())
+    return Result(data=data)
 
 
 def custom_call(
-    cursor: cursor,  # pylint: disable=redefined-outer-name
     query: str,
     type_of_answer: ANSWER_TYPE,
-    variables: list[Any] | tuple[Any] | None = None,
+    variables: list[Any] | tuple[Any,...] | None = None,
 ) -> Result[Any, Exception]:
     """
     send a custom query to the database
 
     Args:
-        cursor (cursor): cursor to interact with db
         query (str):
         type_of_answer (ANSWER_TYPE): what answer to expect
-        variables (list | None): list of variables that should be passed into the query
+        variables (list | tuple | None): list of variables that should be passed into the query
     Returns:
         Result: result object with data or error
     """
+    commit = query.startswith("SELECT") is False
+    data = fetch(query=query, type_of_answer=type_of_answer, variables=variables, commit=commit) # type: ignore
 
-    # try custom call
-    try:
-        # execute query
-        cursor.execute(query, variables)
-
-        # Always commit (TODO: Filter SELECT statements)
-        if query.startswith("SELECT") is False:
-            cursor.connection.commit()
-
-        if type_of_answer == ANSWER_TYPE.NO_ANSWER:
-            return Result()
-        if type_of_answer == ANSWER_TYPE.SINGLE_ANSWER:
-            return Result(data=cursor.fetchone())
-        if type_of_answer == ANSWER_TYPE.LIST_ANSWER:
-            return Result(data=cursor.fetchall())
-        # would usually be better to check at the beginning,
-        # but since code is used backend, function is mostly used correctly.
-        # Therefore, it is more effective to check at the end if no other case matches
-        return Result(
-            error="parameter type_of_answer of the function must be of enum type ANSWER_TYPE"
-        )  # pylint: disable=line-too-long
-
-    # rollback if error occurred
-    except Exception as e:  # pylint: disable=broad-exception-caught
-        cursor.connection.rollback()
-        return Result(error=e, stack_trace=traceback.format_exc())
+    if isinstance(data, Exception):
+        return Result(error=data, stack_trace=traceback.format_exc())
+    return Result(data=data)
 
 
 # TODO can only return success True right now
 # @catch_exception
-def get_time(cursor: cursor) -> Result[Any, Exception]:  # pylint: disable=redefined-outer-name
+def get_time() -> Result[Any, Exception]:
     """
     returns the current berlin time
 
-    Args:
-        cursor (cursor): cursor to interact with db
     Returns:
-    Result: result object with data or error
+        Result: result object with data or error
     """
     # execute query
-    query = """SELECT NOW() AT TIME ZONE 'Europe/Berlin' AS current_time"""
-    cursor.execute(query)
-    data = cursor.fetchone()
+    query = sql.SQL("SELECT NOW() AT TIME ZONE 'Europe/Berlin' AS current_time")
+    data = fetch(query=query, type_of_answer=ANSWER_TYPE.SINGLE_ANSWER, variables=None, commit=False)
+    if isinstance(data, Exception):
+        return Result(error=data, stack_trace=traceback.format_exc())
     return Result(data=data[0] if data is not None else None)
 
 
-def close(cursor: cursor):  # pylint: disable=redefined-outer-name
+def close(cursor: Cursor):
     """
     closes the current cursor
 

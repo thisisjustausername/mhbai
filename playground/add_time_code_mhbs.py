@@ -4,8 +4,7 @@ from database import database as db
 import os
 
 
-cursor = db.connect()
-mhbs = db.select(cursor=cursor, table="unia.mhbs", keywords=["folder", "id"])
+mhbs = db.select(table="unia.mhbs", columns=["folder", "id"])
 if mhbs.is_error:
     raise UserWarning("Error occurred in db")
 
@@ -37,9 +36,8 @@ for a in mhbs:
         continue
 
     res = db.update(
-        cursor=cursor,
         table="unia.mhbs",
-        arguments={"version": time_code},
+        columns={"version": time_code},
         conditions={"id": a[0]},
         returning_column="id",
     )

@@ -18,7 +18,6 @@ import time
 import json
 import re
 from flask import Flask, Response, request
-from psycopg2.extensions import cursor as Cursor
 
 from datatypes.response import Response as FuncRes, Status, Message
 from pdf_reader import pdf_reader_toc as prt
@@ -35,13 +34,10 @@ app = Flask(__name__)
 
 
 @app.route("/auth/login", methods=["POST"])
-@db.cursor_handling(manually_supply_cursor=False)
-def login(cursor: Cursor | None = None) -> Response:
+def login() -> Response:
     """
     checks, whether a user exists and whether user is logged in (if exists and not logged in, session is created)
 
-    Args:
-        cursor (cursor | None): cursor for db connection, specified by decorator
     Returns:
         Response: flask Response object
     """
@@ -99,7 +95,6 @@ def login(cursor: Cursor | None = None) -> Response:
 
     # get user data from table
     result = users.get_user(
-        cursor=cursor,  # type: ignore
         keywords=["id", "password_hash", "user_role"],
         user_identifier=UserIdentifier(
             identifier=Identifier.EMAIL,
@@ -150,7 +145,7 @@ def login(cursor: Cursor | None = None) -> Response:
         return response
 
     # create a new session
-    result = sessions.create_session(cursor=cursor, user_id=user[0])  # type: ignore
+    result = sessions.create_session(user_id=user[0])  # type: ignore
 
     if result.is_error:
         response = Response(
@@ -177,8 +172,7 @@ def login(cursor: Cursor | None = None) -> Response:
 
 
 @app.route("/auth/signup", methods=["POST"])
-@db.cursor_handling(manually_supply_cursor=True)
-def signup_data(cursor: Cursor | None = None):
+def signup_data() -> Response:
     """
     create a new user
     """
@@ -239,7 +233,7 @@ def signup_data(cursor: Cursor | None = None):
     check_info = user_info.copy()
     del check_info["password"]
     # check whether user data is unique
-    result = validate_user_data(cursor=cursor, **check_info)
+    result = validate_user_data(**check_info)
     if result.is_error:
         response = Response(
             response=json.dumps(
@@ -270,7 +264,6 @@ def signup_data(cursor: Cursor | None = None):
         additional_data["method"] = "create"
 
     result = users.create_verification_code(
-        cursor=cursor,  # type: ignore
         user_id=None,
         additional_data=additional_data,  # type: ignore
     )
@@ -310,7 +303,6 @@ def signup_data(cursor: Cursor | None = None):
 
 
 def validate_user_data(
-    cursor,
     user_role: UserRole,
     organization: str,
     first_name: str,
@@ -322,7 +314,6 @@ def validate_user_data(
     Validate user data for signup.
 
     Args:
-        cursor: database cursor
         user_role (UserRole): Role of the user, must be one of UserRole except 'admin'.
         organization (str): Organization of the user, cannot be empty or None.
         first_name (str): First name of the user, cannot be empty or None.
@@ -390,7 +381,6 @@ def validate_user_data(
         """SELECT email, user_name FROM api.users WHERE email = %s OR user_name = %s;"""
     )
     result = db.custom_call(
-        cursor=cursor,
         query=query,
         variables=[email.email, user_name],
         type_of_answer=db.ANSWER_TYPE.LIST_ANSWER,
@@ -456,8 +446,7 @@ def validate_user_data(
 
 
 @app.route("/auth/verify_signup", methods=["POST"])
-@db.cursor_handling(manually_supply_cursor=False)
-def verify_signup(cursor: Cursor | None = None):
+def verify_signup() -> Response:
     """
     verifies the signup
     """
@@ -478,7 +467,6 @@ def verify_signup(cursor: Cursor | None = None):
 
     # verify token
     result = users.confirm_verification_code(
-        cursor=cursor,  # type: ignore
         reset_code=token,
         additional_data=True,
         expiration_minutes=30,  # type: ignore
@@ -509,12 +497,11 @@ def verify_signup(cursor: Cursor | None = None):
         user_data["password_hash"] = user_info["password_hash"]
         user_data["user_name"] = user_info["user_name"]
         result = users.update_user(
-            cursor=cursor,  # type: ignore
             user_email=user_info["email"],
             **user_data,  # type: ignore
         )
     else:
-        result = users.add_user(cursor=cursor, returning_column="id", **user_info)  # type: ignore
+        result = users.add_user(returning_column="id", **user_info)  # type: ignore
     # if server error occurred, return error
     if result.is_error:
         response = Response(
@@ -527,7 +514,7 @@ def verify_signup(cursor: Cursor | None = None):
     user_id = result.data
 
     # create a new session
-    result = sessions.create_session(cursor=cursor, user_id=user_id)  # type: ignore
+    result = sessions.create_session(user_id=user_id)  # type: ignore
 
     if result.is_error:
         response = Response(
@@ -554,8 +541,7 @@ def verify_signup(cursor: Cursor | None = None):
 
 
 @app.route("/auth/logout", methods=["POST"])
-@db.cursor_handling(manually_supply_cursor=False)
-def logout(cursor: Cursor | None = None):
+def logout() -> Response:
     """
     removes the session id
     """
@@ -571,7 +557,7 @@ def logout(cursor: Cursor | None = None):
         return response
 
     # remove session from table
-    result = sessions.remove_session(cursor=cursor, session_id=session_id)  # type: ignore
+    result = sessions.remove_session(session_id=session_id)
 
     # if nothing could be removed, return error
     if result.is_error:
@@ -697,13 +683,10 @@ def replace_none_with_dash(obj):
 
 
 @app.route("/get-modules", methods=["POST"])
-@db.cursor_handling(manually_supply_cursor=False)
-def get_module(cursor: Cursor | None = None) -> Response:
+def get_module() -> Response:
     """
     API endpoint to get module information based on search query.
 
-    Args:
-        cursor (Cursor | None): cursor object for database; AUTOMATICALLY SUPPLIED BY DECORATOR
     Returns:
         Response: Flask Response object containing module information.
     """
@@ -781,7 +764,6 @@ def get_module(cursor: Cursor | None = None) -> Response:
         """
 
     result = db.custom_call(
-        cursor=cursor,  # type: ignore
         query=query,
         variables=[f"%{search_query}%" for _ in range(2)],
         type_of_answer=db.ANSWER_TYPE.LIST_ANSWER,

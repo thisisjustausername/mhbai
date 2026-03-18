@@ -1,12 +1,11 @@
 from io import BytesIO
 import hashlib
-from psycopg2.extensions import cursor as Cursor
 from pdf_reader import pdf_reader_toc as prt
 from database import database as db
 from datatypes.response import Response as FuncRes, Message, Status
 
 
-def get_raw_module_matching(cursor: Cursor, file: BytesIO) -> FuncRes:
+def get_raw_module_matching(file: BytesIO) -> FuncRes:
     """
     Fetches raw module data from a PDF file and matches it with entries in the database.
 
@@ -15,7 +14,6 @@ def get_raw_module_matching(cursor: Cursor, file: BytesIO) -> FuncRes:
     based on the content hash. It returns a FuncRes object indicating the result of the operation.
 
     Args:
-        cursor (Cursor): Database cursor used for executing queries.
         file (BytesIO): PDF file containing module data.
 
     Returns:
@@ -34,10 +32,9 @@ def get_raw_module_matching(cursor: Cursor, file: BytesIO) -> FuncRes:
 
     # works without module code since content is already unique
     result = db.select(
-        cursor=cursor,  # type: ignore
         table="unia.modules_raw",
         type_of_answer=db.ANSWER_TYPE.LIST_ANSWER,
-        keywords=["id, module_code, content, content_md5"],
+        columns=["id, module_code, content, content_md5"],
         specific_where=f"content_md5 IN ({', '.join('%s' for i in range(len(hashed_contents)))})",
         variables=hashed_contents,
     )
@@ -91,6 +88,5 @@ def get_raw_module_matching(cursor: Cursor, file: BytesIO) -> FuncRes:
     )
 
 
-@db.cursor_handling(manually_supply_cursor=False)
-def get_mhb_modules(file: BytesIO, cursor: Cursor | None) -> FuncRes:
+def get_mhb_modules(file: BytesIO) -> FuncRes:
     pass

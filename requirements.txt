@@ -4,7 +4,8 @@ flask
 numpy
 selenium
 requests
-psycopg2-binary
+psycopg
+psycopg_pool
 dotenv
 aiohttp
 selectolax

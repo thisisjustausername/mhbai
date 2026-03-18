@@ -79,16 +79,14 @@ def extract_modules_from_files(
         return modules_detailed_list
     return modules_list if not remove_duplicates else set(tuple(i.items()) for i in modules_list)
 
-def save_to_db(cursor, module: dict[str, Any]) -> bool:
+def save_to_db(module: dict[str, Any]) -> bool:
     """
     save extracted module data to database
 
     Args:
-        cursor: database cursor
         module (list[dict[str, Any]]): list of extracted module data
     """
     result = db.insert(
-        cursor=cursor,
         table="unia.modules_ai_extracted",
         values=module,
         returning_column="id",
@@ -99,9 +97,8 @@ def save_to_db(cursor, module: dict[str, Any]) -> bool:
 
 
 # TODO: load the mhbs from database instead of fixed path
-@db.cursor_handling(manually_supply_cursor=False)
 def load_pdf_modules(
-    pdf_folder: str, save_path: str | None = None, from_db: bool = True, cursor=None, remove_duplicates: bool = True
+    pdf_folder: str, save_path: str | None = None, from_db: bool = True, remove_duplicates: bool = True
 ) -> list[dict[str, Any]]:
     """
     load all raw modules from all pdfs in a folder
@@ -114,7 +111,6 @@ def load_pdf_modules(
                                 If save_path == "": then data will be saved to DATABASE
         from_db (bool): True when loading data from db, False when computing data freshly
         remove_duplicates (bool): whether to remove duplicate modules
-        cursor: specified by decorator
 
     Returns:
         list[dict[str, Any]]: list of dictionaries, each containing a module code and the matching
@@ -124,9 +120,8 @@ def load_pdf_modules(
 
     if from_db is True:
         result = db.select(
-            cursor=cursor,  # type: ignore
             table="unia.modules_raw",
-            keywords=["id", "module_code", "content"],
+            columns=["id", "module_code", "content"],
         )
         if result.is_error:
             raise Exception("Error occurred while reading data from the database")
@@ -197,7 +192,6 @@ def save_raw(raw_modules: list[dict[str, str]], cursor=None, bulk: bool = True) 
         variables = [tuple(i.values()) for i in raw_modules]
 
         result = db.custom_call(
-            cursor=cursor,  # type: ignore
             query=query,
             variables=variables,
             type_of_answer=db.ANSWER_TYPE.NO_ANSWER,
@@ -230,21 +224,16 @@ def save_raw(raw_modules: list[dict[str, str]], cursor=None, bulk: bool = True) 
 
 
 # TODO: Test this
-@db.cursor_handling(manually_supply_cursor=False)
-def fetch_uncomputed_raw_modules(cursor=None) -> Result:
+def fetch_uncomputed_raw_modules() -> Result:
     """
     fetches all raw modules from the database that have not been computed yet (i.e. do not have a matching entry in the modules_ai_extracted table)
-
-    Args:
-        cursor: specified by decorator
 
     Returns:
         Result: Result object containing either data or error information
     """
     result = db.select(
-        cursor=cursor,  # type: ignore
         table="unia.modules_raw",
-        keywords=["id", "module_code", "content"],
+        columns=["id", "module_code", "content"],
         specific_where="id NOT IN (SELECT raw_module_id FROM unia.modules_ai_extracted)"
     )
     return result
@@ -274,9 +263,8 @@ def handle_single_module(module: Any, module_text: str) -> Result:
     return Result(data=module)
 
 
-@db.cursor_handling(manually_supply_cursor=False)
 def extract_module_data(
-    modules: list[dict[str, Any]], save_path: str | None = None, cursor=None
+    modules: list[dict[str, Any]], save_path: str | None = None
 ) -> list[dict[str, Any]]:
     """
     extract structured json data from raw module texts using ai
@@ -285,7 +273,6 @@ def extract_module_data(
         modules (list[dict[str, Any]]): list of raw module texts
         save_path (str | None): optional path to save the extracted module data as json file
                                 if not specified, data won't be saved persistently
-        cursor: database cursor, supplied automatically by decorator
 
     Returns:
         list[dict[str, Any]]: list of extracted module data
@@ -329,7 +316,6 @@ def extract_module_data(
             db_module["raw_module_id"] = module["id"]
 
             db_res = db.insert(
-                cursor=cursor,  # type: ignore
                 table="unia.modules_ai_extracted",
                 values=db_module,
                 returning_column="id",

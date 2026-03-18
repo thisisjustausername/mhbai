@@ -24,8 +24,7 @@ import multiprocessing
 from database import database as db
 
 
-@db.cursor_handling(manually_supply_cursor=False)
-def process_urls(urls: list, offset: int=0, raspi=False, cursor: psycopg2.extensions.cursor | None = None) -> tuple[list, list]:
+def process_urls(urls: list, offset: int=0, raspi=False) -> tuple[list, list]:
     """
     Process a list of URLs to scrape course information.
     Each url is a page of studieren.de containing multiple courses of study.
@@ -34,7 +33,6 @@ def process_urls(urls: list, offset: int=0, raspi=False, cursor: psycopg2.extens
         urls (list): List of URLs to be processed.
         offset (int): Where to start counting in order to show a readable output to the user
         raspi (bool): Whether the program is running on a Raspberry Pi
-        cursor (psycopg2.extensions.cursor | None): SUPPLIED BY DECORATOR; Database cursor for storing data.
     Returns:
         tuple[list, list]: A tuple containing a list of scraped elements and a list of URLs that resulted in errors.
     """
@@ -98,7 +96,7 @@ def process_urls(urls: list, offset: int=0, raspi=False, cursor: psycopg2.extens
                 i["university"] = information[2].strip()
                 i["degree"] = information[3].strip()
                 try:
-                    db.insert(cursor=cursor, table="all_unis.prototyping_mhbs", values={ # type: ignore
+                    db.insert(table="all_unis.prototyping_mhbs", values={
                         "source_title": i["title"], 
                         "name": i["name"],
                         "city": i["city"],
@@ -108,7 +106,7 @@ def process_urls(urls: list, offset: int=0, raspi=False, cursor: psycopg2.extens
                         "source": "studieren.de"
                     })
                 except Exception as e:
-                    db.insert(cursor=cursor, table="all_unis.prototyping_mhbs", values={ # type: ignore
+                    db.insert(table="all_unis.prototyping_mhbs", values={
                         "source_title": i["title"],
                         "source_url": i["href"], 
                         "source": "studieren.de"})

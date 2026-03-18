@@ -16,14 +16,12 @@ import requests
 from bs4 import BeautifulSoup
 from database import database as db
 
-@db.cursor_handling(manually_supply_cursor=False)
-def fetch_search_strings(search_strings: list[dict[str, str]], cursor: psycopg2.extensions.cursor | None = None) -> None | Exception:
+def fetch_search_strings(search_strings: list[dict[str, str]]) -> None | Exception:
     """
     fetches mhb urls for given search strings and updates the database
     
     Args:
         search_strings (list[dict[str, str]]): list of search strings to fetch mh
-        cursor (psycopg2.extensions.cursor | None): SUPPLIED BY DECORATOR; Database cursor for storing data.
     Returns:
         None | Exception: None if successful, Exception if an error occurred
     """
@@ -52,7 +50,7 @@ def fetch_search_strings(search_strings: list[dict[str, str]], cursor: psycopg2.
         if mhb_url is None:
             print(f"Error for query {search_string}: No OfficialDomain found")
             continue
-        result = db.update(cursor=cursor, table="all_unis.prototyping_mhbs", arguments={"mhb_url": mhb_url}, conditions={"search_string": search_string}) # type: ignore
+        result = db.update(table="all_unis.prototyping_mhbs", columns={"mhb_url": mhb_url}, conditions={"search_string": search_string})
         if result.is_error:
             print(f"Error updating search_string {search_string}: {mhb_url}")
             continue
@@ -61,19 +59,16 @@ def fetch_search_strings(search_strings: list[dict[str, str]], cursor: psycopg2.
     return None
 
 
-@db.cursor_handling(manually_supply_cursor=False)
-def main(cursor: psycopg2.extensions.cursor | None = None) -> None:
+def main() -> None:
     """
     main function to fetch mhb urls for all universities without mhb url in the database
     
-    Args:
-        cursor (psycopg2.extensions.cursor | None): SUPPLIED BY DECORATOR; Database cursor for storing data.
     Returns:
         None
     """
 
     # fetch all universities
-    result = db.select(cursor=cursor, table="all_unis.prototyping_mhbs", keywords=["search_string"], specific_where="mhb_url IS NULL") # type: ignore
+    result = db.select(table="all_unis.prototyping_mhbs", columns=["search_string"], specific_where="mhb_url IS NULL")
     # handle possible error
     if result.is_error:
         raise result.error

@@ -22,7 +22,6 @@ import os
 import multiprocessing
 import math
 from psycopg2.extras import Json
-from psycopg2.extensions import cursor as Cursor
 
 from database import database as db
 from ai.overall_ai.data_extraction import extract_module_info as emi
@@ -30,13 +29,12 @@ from datatypes.response import Response as FuncRes, Message, Status
 from ai.overall_ai.full_extraction import extract_modules_from_files
 
 
-def save_raw(cursor: Cursor, modules):
+def save_raw(modules):
     query = f"""INSERT INTO unia.modules (title, module_code, content, goals, ects, pages, mhb_id)
                VALUES {", ".join(["%s" for _ in range(len(modules))])}
                 RETURNING id;"""
 
     result = db.custom_call(
-        cursor=cursor,  # type: ignore
         query=query,
         variables=modules,
         type_of_answer=db.ANSWER_TYPE.NO_ANSWER,
@@ -45,24 +43,19 @@ def save_raw(cursor: Cursor, modules):
     return result
 
 
-@db.cursor_handling(manually_supply_cursor=False)
-def load_pdf_modules(cursor: Cursor | None = None) -> FuncRes:
+def load_pdf_modules() -> FuncRes:
     """
     load all raw modules from all pdfs in a folder
     remove duplicates on the way in order to keep the ai data extraction time minimal
-
-    Args:
-        cursor: specified by decorator
 
     Returns:
         FuncRes: FuncRes object containing success or error
     """
 
     result = db.select(
-        cursor=cursor,  # type: ignore
         type_of_answer=db.ANSWER_TYPE.LIST_ANSWER,
         table="unia.mhbs",
-        keywords=["id", "folder", "pdf_name"],
+        columns=["id", "folder", "pdf_name"],
     )
 
     if result.is_error:
@@ -119,7 +112,7 @@ def load_pdf_modules(cursor: Cursor | None = None) -> FuncRes:
         for i in modules
     ]
 
-    result = save_raw(cursor=cursor, modules=modules)  # type: ignore
+    result = save_raw(modules=modules)  # type: ignore
     if result.is_error:
         return FuncRes(
             error_data=result.error,

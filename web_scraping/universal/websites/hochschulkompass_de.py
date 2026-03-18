@@ -39,14 +39,13 @@ class HochschulkompassDetailed(Scraper):
         return [f"https://www.hochschulkompass.de/studium/studiengangsuche/erweiterte-studiengangsuche/detail/all/search/{i}/studtyp/3/view/wide.html?tx_szhrksearch_pi1%5Babschluss%5D%5B0%5D=24&tx_szhrksearch_pi1%5Babschluss%5D%5B1%5D=37&tx_szhrksearch_pi1%5Babschluss%5D%5B2%5D=5&tx_szhrksearch_pi1%5Bresults_at_a_time%5D=100" for i in range(21941)]
     
 
-    def scrape_url(self, driver: webdriver.Chrome, wait: WebDriverWait, cursor: psycopg2.extensions.cursor, url: str):
+    def scrape_url(self, driver: webdriver.Chrome, wait: WebDriverWait, url: str):
         """
         extract information from detail-page
 
         Args:
             driver (webdriver.Chrome): Selenium WebDriver instance.
             wait (WebDriverWait): Selenium WebDriverWait instance.
-            cursor (psycopg2.extensions.cursor): Database cursor for storing data.
             url (str): URL of the list page to scrape.
         Returns:
             dict: course information found on the page
@@ -95,14 +94,13 @@ class HochschulkompassUndetailed(Scraper):
         return [f"https://www.hochschulkompass.de/studium/studiengangsuche/erweiterte-studiengangsuche/search/1/studtyp/3/pn/{i}/view/wide.html?tx_szhrksearch_pi1%5Babschluss%5D%5B0%5D=24&tx_szhrksearch_pi1%5Babschluss%5D%5B1%5D=37&tx_szhrksearch_pi1%5Babschluss%5D%5B2%5D=5&tx_szhrksearch_pi1%5Bresults_at_a_time%5D=100" for i in range(220)]
 
 
-    def scrape_url(self, driver: webdriver.Chrome, wait: WebDriverWait, cursor: psycopg2.extensions.cursor, url: str):
+    def scrape_url(self, driver: webdriver.Chrome, wait: WebDriverWait, url: str):
         """
         extract course link and information from list page
 
         Args:
             driver (webdriver.Chrome): Selenium WebDriver instance.
             wait (WebDriverWait): Selenium WebDriverWait instance.
-            cursor (psycopg2.extensions.cursor): Database cursor for storing data.
             url (str): URL of the list page to scrape.
         Returns:
             list[dict[str, Any]]: list of course information found on the page
@@ -117,6 +115,4 @@ if __name__ == "__main__":
     options.add_argument("--disable-dev-shm-usage")
     driver = webdriver.Chrome(options=options)
     wait = WebDriverWait(driver, 1)
-    cursor = db.connect()
-    hk_detailed.scrape_url(cursor=cursor, wait=wait, driver=driver, url=hk_detailed.list_urls[0])
-    db.close(cursor)
+    hk_detailed.scrape_url(wait=wait, driver=driver, url=hk_detailed.list_urls[0])

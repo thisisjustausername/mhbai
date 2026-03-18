@@ -69,7 +69,6 @@ class Daad(Scraper):
         return self.urls
 
     @override
-    @db.cursor_handling(manually_supply_cursor=False)
     @typechecked
     def process_urls(
         self,
@@ -77,7 +76,6 @@ class Daad(Scraper):
         offset: int = 0,
         delay: float = 0,
         printing: bool = True,
-        cursor: psycopg2.extensions.cursor | None = None,
     ) -> Response:
         """
         Overrides method process_urls from parent class Scraper since this version doesn't use selenium but requests.
@@ -90,7 +88,6 @@ class Daad(Scraper):
             offset (int): Where to start counting in order to show a readable output to the user
             delay (float): Delay in seconds between fetching URLs in order to avoid rate limits
             printing (bool): Whether to print progress information
-            cursor (psycopg2.extensions.cursor | None): SUPPLIED BY DECORATOR; Database cursor for storing data.
         Returns:
             Response: Response object containing scraped data and list of error URLs
         """
@@ -104,7 +101,7 @@ class Daad(Scraper):
         for index, element in enumerate(urls):
             try:
                 # scrape data for current url
-                result = self.scrape_url(cursor=cursor, url=element)  # type: ignore
+                result = self.scrape_url(url=element)
 
                 # test result for error
                 if result.is_error:
@@ -155,14 +152,13 @@ class Daad(Scraper):
         return Response(success_data=elements, error_data=error_list, message=message)
 
     @typechecked
-    def scrape_url(self, cursor: psycopg2.extensions.cursor, url: str) -> Result:
+    def scrape_url(self, url: str) -> Result:
         """
         Implements abstract method from parent class Scraper.
 
         extract information from api
 
         Args:
-            cursor (psycopg2.extensions.cursor): Database cursor for storing data.
             url (str): URL of the list page to scrape.
         Returns:
             Result: course information found on the page
@@ -242,7 +238,6 @@ class Daad(Scraper):
 
         # execute database insertion
         response = db.custom_call(
-            cursor=cursor,
             query=query,
             type_of_answer=db.ANSWER_TYPE.NO_ANSWER,
             variables=variables,
@@ -431,18 +426,14 @@ class Daad(Scraper):
 
         return Response(success_data=list(grouped_db_unis.keys()))
 
-    @db.cursor_handling(manually_supply_cursor=False)
     @typechecked
     def add_data_universities(
-        self, cursor: psycopg2.extensions.cursor | None = None
+        self
     ) -> Response:
         """
         Implements abstract method from parent class Scraper.
 
         Scrape information of universities and store them in the database.
-
-        Args:
-            cursor (psycopg2.extensions.cursor | None): SUPPLIED BY DECORATOR; Database cursor for storing data.
 
         Returns:
             Response: Response object indicating success or failure of the operation.
@@ -450,10 +441,9 @@ class Daad(Scraper):
 
         # get universities from db
         result = db.select(
-            cursor=cursor,  # type: ignore
             table="all_unis.universities",
             type_of_answer=db.ANSWER_TYPE.LIST_ANSWER,
-            keywords=["id", "name", "city"],
+            columns=["id", "name", "city"],
             specific_where="source = 'daad.de' AND website IS NULL",
         )
 
@@ -549,7 +539,6 @@ class Daad(Scraper):
         if len(variables) != 0:
             # execute update query
             result = db.custom_call(
-                cursor=cursor,  # type: ignore
                 query=query,
                 variables=variables,
                 type_of_answer=db.ANSWER_TYPE.NO_ANSWER,
@@ -558,7 +547,6 @@ class Daad(Scraper):
         if len(variables) != 0:
             # execute update query
             result = db.custom_call(
-                cursor=cursor,  # type: ignore
                 query=query,
                 variables=variables,
                 type_of_answer=db.ANSWER_TYPE.NO_ANSWER,
@@ -582,10 +570,9 @@ class Daad(Scraper):
 
         # get universities from db again, but with updated values
         result = db.select(
-            cursor=cursor,  # type: ignore
             table="all_unis.universities",
             type_of_answer=db.ANSWER_TYPE.LIST_ANSWER,
-            keywords=["id", "name", "city"],
+            columns=["id", "name", "city"],
             specific_where="source = 'daad.de' AND website IS NULL",
         )
 
@@ -609,10 +596,9 @@ class Daad(Scraper):
 
         # get universities from db again, but with updated values
         result = db.select(
-            cursor=cursor,  # type: ignore
             table="all_unis.universities",
             type_of_answer=db.ANSWER_TYPE.LIST_ANSWER,
-            keywords=["id", "name", "city"],
+            columns=["id", "name", "city"],
             specific_where="source = 'daad.de' AND website IS NULL",
         )
 

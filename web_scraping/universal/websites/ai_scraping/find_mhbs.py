@@ -21,11 +21,7 @@ def get_unis():
     Returns:
         list[dict[str, Any]]: List of universities with information
     """
-    
-    # connect to db
-    cursor = db.connect()
-
-    db.select(cursor=cursor, )
+    db.select()
 
 
 async def main():

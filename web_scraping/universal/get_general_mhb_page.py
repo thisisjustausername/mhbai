@@ -53,7 +53,6 @@ def get_general_mhb_page(university: str, city: str) -> str | None:
     return link
 
 
-@db.cursor_handling(manually_supply_cursor=False)
 def bundled_mhb_page(data: list[dict]):
     session = requests.Session()
 
@@ -80,9 +79,8 @@ def bundled_mhb_page(data: list[dict]):
         if link is None:
             continue
         result = db.update(
-            cursor=cursor,
             table="all_unis.universities",
-            arguments={"mhb_url": link},
+            columns={"mhb_url": link},
             conditions={"name": university, "city": city},
         )  # type: ignore
         if result.is_error:
@@ -90,31 +88,25 @@ def bundled_mhb_page(data: list[dict]):
     return None
 
 
-@db.cursor_handling(manually_supply_cursor=False)
 def get_uni_mhb_url(
-    abort: bool = False, cursor: psycopg2.extensions.cursor | None = None
+    abort: bool = False
 ) -> None:
     """
     get all universities from db
 
     Args:
         abort (bool): whether to abort on first failure
-        cursor (psycopg2.extensions.cursor | None): SUPPLIED BY DECORATOR; Database cursor for storing data.
     Returns:
         None
     """
 
-    # set cursor again in order to only set linter warning ignore setting once
-    cursor = cursor  # type: ignore
-
     # get data
     result = db.select(
-        cursor=cursor,
         table="all_unis.universities",
-        keywords=["name", "city"],
+        columns=["name", "city"],
         type_of_answer=db.ANSWER_TYPE.LIST_ANSWER,
         specific_where="mhb_url IS NULL",
-    )  # type: ignore
+    )
     if result.is_error:
         raise result.error
     data = result.data
@@ -132,9 +124,8 @@ def get_uni_mhb_url(
             print(f"No link found for {uni['university']}, {uni['city']}")
             continue
         result = db.update(
-            cursor=cursor,
             table="all_unis.universities",
-            arguments={"mhb_url": link},
+            columns={"mhb_url": link},
             conditions={"name": uni["university"], "city": uni["city"]},
         )  # type: ignore
         if result.is_error:
@@ -146,24 +137,16 @@ def get_uni_mhb_url(
             print(f"Updated university {uni['university']}, {uni['city']}: {link}")
 
 
-# NOTE: do not use cursor decorator, since this function closes the cursor very early while running for a long duration
 def get_data_asynchronous(urls_per_job: int = 2):
     # initialize multiprocessing
     multiprocessing.set_start_method("spawn")
 
-    # connect to db
-    cursor = db.connect()
-
     # get data
     result = db.select(
-        cursor=cursor,
         table="all_unis.universities",
-        keywords=["name", "city"],
+        columns=["name", "city"],
         type_of_answer=db.ANSWER_TYPE.LIST_ANSWER,
     )
-
-    # close cursor
-    db.close(cursor)
 
     # handle error
     if result.is_error:

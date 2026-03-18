@@ -24,8 +24,7 @@ from typing import Any
 
 from database import database as db
 
-@db.cursor_handling(manually_supply_cursor=False)
-def process_urls(urls: list, offset: int=0, raspi=False, cursor: psycopg2.extensions.cursor | None = None) -> tuple[list, list]:
+def process_urls(urls: list, offset: int=0, raspi=False) -> tuple[list, list]:
     """
     Process a list of URLs to scrape course information.
     Each url is a page of studiengaenge.zeit.de containing multiple courses of study.
@@ -34,7 +33,6 @@ def process_urls(urls: list, offset: int=0, raspi=False, cursor: psycopg2.extens
         urls (list): List of URLs to be processed.
         offset (int): Where to start counting in order to show a readable output to the user
         raspi (bool): Whether the program is running on a Raspberry Pi
-        cursor (psycopg2.extensions.cursor | None): SUPPLIED BY DECORATOR; Database cursor for storing data.
     Returns:
         tuple[list, list]: A tuple containing a list of scraped elements and a list of URLs that resulted in errors.
     """
@@ -74,14 +72,13 @@ def process_urls(urls: list, offset: int=0, raspi=False, cursor: psycopg2.extens
     return elements, error_list
 
 
-def find_courses_off_list_page(driver: webdriver.Chrome, wait: WebDriverWait, cursor: psycopg2.extensions.cursor, url: str) -> list[dict[str, Any]]:
+def find_courses_off_list_page(driver: webdriver.Chrome, wait: WebDriverWait, url: str) -> list[dict[str, Any]]:
     """
     extract course link and information from list page
 
     Args:
         driver (webdriver.Chrome): Selenium WebDriver instance.
         wait (WebDriverWait): Selenium WebDriverWait instance.
-        cursor (psycopg2.extensions.cursor): Database cursor for storing data.
         url (str): URL of the list page to scrape.
     Returns:
         list[dict[str, Any]]: list of course information found on the page
@@ -89,14 +86,13 @@ def find_courses_off_list_page(driver: webdriver.Chrome, wait: WebDriverWait, cu
     pass
 
 
-def find_courses_on_detail_page(driver: webdriver.Chrome, wait: WebDriverWait, cursor: psycopg2.extensions.cursor, url: str) -> dict[str, Any]:
+def find_courses_on_detail_page(driver: webdriver.Chrome, wait: WebDriverWait, url: str) -> dict[str, Any]:
     """
     extract information from detail-page
 
     Args:
         driver (webdriver.Chrome): Selenium WebDriver instance.
         wait (WebDriverWait): Selenium WebDriverWait instance.
-        cursor (psycopg2.extensions.cursor): Database cursor for storing data.
         url (str): URL of the list page to scrape.
     Returns:
         dict: course information found on the page

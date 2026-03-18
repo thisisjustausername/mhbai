@@ -46,20 +46,15 @@ def initialize_driver() -> webdriver.Chrome:
     driver = webdriver.Chrome(options=options)
     return driver
 
-@db.cursor_handling(manually_supply_cursor=False)
-def fetch_search_strings(search_strings: list[dict[str, str]], cursor: psycopg2.extensions.cursor | None = None) -> None | Exception:
+def fetch_search_strings(search_strings: list[dict[str, str]]) -> None | Exception:
     """
     fetches mhb urls for given search strings and updates the database
 
     Args:
         search_strings (list[dict[str, str]]): list of search strings to fetch mhb urls for
-        cursor (psycopg2.extensions.cursor | None): SUPPLIED BY DECORATOR; Database cursor for storing data.
     Returns:
         None | Exception: None if successful, Exception if an error occurred
     """
-
-    # set cursor again in order to only set linter warning ignore setting once
-    cursor = cursor # type: ignore
 
     driver = initialize_driver()
     
@@ -84,7 +79,7 @@ def fetch_search_strings(search_strings: list[dict[str, str]], cursor: psycopg2.
         if mhb_url is None:
             print(f"Error for query {search_string}: No OfficialDomain found")
             continue
-        result = db.update(cursor=cursor, table="all_unis.prototyping_mhbs", arguments={"mhb_url": mhb_url}, conditions={"search_string": search_string}) # type: ignore
+        result = db.update(table="all_unis.prototyping_mhbs", arguments={"mhb_url": mhb_url}, conditions={"search_string": search_string}) # type: ignore
         if result.is_error:
             print(f"Error updating search_string {search_string}: {mhb_url}")
             continue
@@ -93,7 +88,6 @@ def fetch_search_strings(search_strings: list[dict[str, str]], cursor: psycopg2.
     return None
 
 
-# NOTE: do not use cursor decorator, since this function closes the cursor very early while running for a long duration
 def main(use_multiprocessing: bool = True) -> None:
     """
     main function to fetch mhb urls for all universities without mhb url in the database
@@ -103,13 +97,8 @@ def main(use_multiprocessing: bool = True) -> None:
     Returns:
         None
     """
-
-    # connect to db
-    cursor = db.connect()
-
     # fetch all universities
-    result = db.select(cursor=cursor, table="all_unis.prototyping_mhbs", keywords=["search_string"], specific_where="mhb_url IS NULL")
-    db.close(cursor)
+    result = db.select(table="all_unis.prototyping_mhbs", columns=["search_string"], specific_where="mhb_url IS NULL")
     # handle possible error
     if result.is_error:
         raise result.error

@@ -59,7 +59,6 @@ class Scraper(ABC):
         """
         pass
 
-    @db.cursor_handling(manually_supply_cursor=False)
     def process_urls(
         self,
         urls: list,
@@ -67,7 +66,6 @@ class Scraper(ABC):
         delay: float = 0,
         printing: bool = True,
         raspi: bool = False,
-        cursor: psycopg2.extensions.cursor | None = None,
     ) -> Response:
         """
         Process a list of URLs to scrape course information.
@@ -79,7 +77,6 @@ class Scraper(ABC):
             delay (float): Delay in seconds between fetching URLs in order to avoid rate limits
             printing (bool): Whether to print progress information
             raspi (bool): Whether the program is running on a Raspberry Pi
-            cursor (psycopg2.extensions.cursor | None): SUPPLIED BY DECORATOR; Database cursor for storing data.
         Returns:
             Response: Response object containing scraped data and list of error URLs
         """
@@ -110,8 +107,8 @@ class Scraper(ABC):
             try:
                 # scrape data for current url
                 result = self.scrape_url(
-                    driver=driver, wait=wait, cursor=cursor, url=element
-                )  # type: ignore
+                    driver=driver, wait=wait, url=element
+                )
 
                 # if result data contains data from multiple courses, add list, if data only contains data of a single course, append data
                 if result.is_error is True:
@@ -154,7 +151,6 @@ class Scraper(ABC):
         self,
         driver: webdriver.Chrome,
         wait: WebDriverWait,
-        cursor: psycopg2.extensions.cursor,
         url: str,
     ) -> Result:
         """
@@ -163,7 +159,6 @@ class Scraper(ABC):
         Args:
             driver (webdriver.Chrome): Selenium WebDriver instance.
             wait (WebDriverWait): Selenium WebDriverWait instance.
-            cursor (psycopg2.extensions.cursor): Database cursor for storing data.
             url (str): URL of the list page to scrape.
         Returns:
             list[dict[str, Any]] | dict[str, Any]: list of course information found on the page or a single course information dictionary

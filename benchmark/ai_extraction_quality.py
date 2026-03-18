@@ -52,9 +52,7 @@ JOIN unia.modules AS modules ON raw.mhb_id = modules.mhb_id AND raw.module_code 
 ORDER BY raw.mhb_id;
 """
 
-cursor = db.connect()
 result = db.custom_call(
-    cursor=cursor,
     query=query,
     type_of_answer=db.ANSWER_TYPE.LIST_ANSWER,
     variables=None

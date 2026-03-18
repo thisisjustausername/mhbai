@@ -59,19 +59,17 @@ def get_unis() -> list[dict[str, str]]:
 
     return clean_data
 
-def save_info_to_db(cursor, uni_info: dict[str, str]) -> None:
+def save_info_to_db(uni_info: dict[str, str]) -> None:
     """
     Saves the university information to the database.
 
     Args:
-        cursor: Database cursor to execute the SQL commands.
         uni_info (dict[str, str]): A dictionary containing university information.
     """
     
     """result = db.select(
-        cursor=cursor,
         table="all_unis.universities",
-        keywords={"name", "city", "source"}, 
+        columns={"name", "city", "source"}, 
     )"""
     pass
 

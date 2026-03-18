@@ -10,7 +10,6 @@
 
 
 import time
-from psycopg2.extensions import cursor
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -39,7 +38,7 @@ class Zeit(Scraper):
         return [f"https://studiengaenge.zeit.de/studienangebote?abschluss%5B%5D=bachelor&abschluss%5B%5D=master&abschluss%5B%5D=staatsexamen&filterOrder=abschluss%5B%5D&page={i+1}" for i in range(100)]
 
 
-    def scrape_url(self, driver: webdriver.Chrome, wait: WebDriverWait, cursor: cursor, url: str):
+    def scrape_url(self, driver: webdriver.Chrome, wait: WebDriverWait, url: str):
      # call page
         driver.get(element)
         # wait for page to load
@@ -77,7 +76,7 @@ class Zeit(Scraper):
             i["university"] = information[2].strip()
             i["degree"] = information[3].strip()
             try:
-                db.insert(cursor=cursor, table="all_unis.prototyping_mhbs", values={
+                db.insert(table="all_unis.prototyping_mhbs", values={
                     "source_title": i["title"], 
                     "name": i["name"],
                     "city": i["city"],
@@ -87,7 +86,7 @@ class Zeit(Scraper):
                     "source": "studiengaenge.zeit.de"
                 })
             except Exception as e:
-                db.insert(cursor=cursor, table="all_unis.prototyping_mhbs", values={
+                db.insert(table="all_unis.prototyping_mhbs", values={
                     "source_title": i["title"],
                     "source_url": i["href"], 
                     "source": "studiengaenge.zeit.de"})

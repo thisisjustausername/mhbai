@@ -1,10 +1,7 @@
 import enum
 import json
 from enum import Enum
-from typing import Annotated, Any, Literal, TypedDict, cast, overload
-
-from psycopg2.extensions import cursor
-from typeguard import typechecked
+from typing import Annotated, Any, Literal
 
 from api.data_types import Email, UserRole
 from database import database as db
@@ -69,7 +66,6 @@ class UserIdentifier:
 
 
 def add_user(
-    cursor: cursor,
     user_role: UserRole,
     first_name: str,
     last_name: str,
@@ -83,7 +79,6 @@ def add_user(
     adds a user to the table users
 
     Args:
-        cursor: cursor for the connection
         user_role (UserRole): available roles for the user
         first_name (str): first name of the user
         last_name (str): last name of the user
@@ -136,7 +131,6 @@ def add_user(
     }
 
     result = db.insert(
-        cursor=cursor,
         table="users",
         values=values,
         returning_column=returning_column,
@@ -202,13 +196,12 @@ def add_user(
     )
 
 
-def remove_user(cursor: cursor, user_identifier: UserIdentifier) -> FuncRes:
+def remove_user(user_identifier: UserIdentifier) -> FuncRes:
     """
     removes a user from the table users \n
     actually not the whole user but just their password will be set to NULL
 
     Args:
-        cursor: cursor for the connection
         user_identifier (UserIdentifier): identifier with value for identification of user
     Returns:
         FuncRes: return FuncRes object
@@ -218,9 +211,8 @@ def remove_user(cursor: cursor, user_identifier: UserIdentifier) -> FuncRes:
     conditions: dict[str, str | int] = user_identifier.get_data()
     # delete password_hash from database
     result = db.update(
-        cursor=cursor,
         table="users",
-        arguments={"password_hash": None},
+        columns={"password_hash": None},
         conditions=conditions,
         returning_column="id, user_role",
     )
@@ -265,7 +257,6 @@ def remove_user(cursor: cursor, user_identifier: UserIdentifier) -> FuncRes:
 
 
 def update_user(
-    cursor: cursor,
     user_identifier: UserIdentifier,
     **kwargs,
 ) -> FuncRes:
@@ -273,7 +264,6 @@ def update_user(
     updates a user in the table users
 
     Args:
-        cursor: cursor for the connection
         user_identifier (UserIdentifier): identifier for user in database in table users
         **kwargs: fields to update
     Returns:
@@ -313,9 +303,8 @@ def update_user(
 
     # update user in db
     result = db.update(
-        cursor=cursor,
         table="users",
-        arguments=kwargs,
+        columns=kwargs,
         conditions=conditions,
         returning_column="id",
     )
@@ -367,7 +356,6 @@ def update_user(
 
 
 def get_user(
-    cursor: cursor,
     user_identifier: Annotated[
         UserIdentifier | None,
         "Explicit with select_max_of_key, conditions, specific_where",
@@ -393,7 +381,6 @@ def get_user(
     retrieves a user from the table users
 
     Args:
-        cursor: cursor for the connection
         user_identifier (UserIdentifier | None): used to identify user in table users
         keywords (tuple[str] | list[str]): list of fields to be retrieved, defaults to ["*"]
         conditions (dict | None): additional conditions for the query
@@ -467,9 +454,8 @@ def get_user(
         value["order_by"] = order_by
 
     result = db.select(
-        cursor=cursor,
         table="users",
-        keywords=keywords,
+        columns=keywords,
         type_of_answer=db.ANSWER_TYPE.SINGLE_ANSWER
         if expect_single_answer
         else db.ANSWER_TYPE.LIST_ANSWER,
@@ -523,14 +509,12 @@ def get_user(
     )
 
 
-def create_verification_code(
-    cursor: cursor, user_id: int | None, additional_data: dict[str, Any] | None = None
+def create_verification_code(user_id: int | None, additional_data: dict[str, Any] | None = None
 ) -> FuncRes:
     """
     creates a password reset code for a specific user
 
     Args:
-        cursor: cursor for the connection
         user_id (int | None): id of the user
         additional_data (dict | None): additional data to be stored in the table; can be None
     Returns:
@@ -551,7 +535,6 @@ def create_verification_code(
         values["additional_data"] = json.dumps(additional_data)
 
     result = db.insert(
-        cursor=cursor,
         table="verification_codes",
         values=values,
         returning_column="reset_code",
@@ -601,7 +584,6 @@ def create_verification_code(
 
 
 def confirm_verification_code(
-    cursor: cursor,
     reset_code: str,
     additional_data: bool = False,
     expiration_minutes: int | None = None,
@@ -610,7 +592,6 @@ def confirm_verification_code(
     confirms a password reset code for a specific user
 
     Args:
-        cursor: cursor for the connection
         reset_code (str): reset code of the user
         additional_data (bool): whether to return additional data
         expiration_minutes (int | None): if set, the code is only valid for this many minutes
@@ -637,9 +618,8 @@ def confirm_verification_code(
         )
         arguments["variables"] = (reset_code,)
     result = db.select(
-        cursor=cursor,
         table="verification_codes",
-        keywords=keywords,
+        columns=keywords,
         type_of_answer=db.ANSWER_TYPE.SINGLE_ANSWER,
         **arguments,
     )
@@ -673,9 +653,8 @@ def confirm_verification_code(
         )
 
     result_insert = db.update(
-        cursor=cursor,
         table="verification_codes",
-        arguments={"used": True},
+        columns={"used": True},
         conditions={"reset_code": reset_code},
     )
     if result_insert.is_error:
@@ -706,14 +685,12 @@ def confirm_verification_code(
     )
 
 
-def get_users(
-    cursor: cursor, user_uuids: list[str], keywords: list[str] | tuple[str] = ("id",)
+def get_users(user_uuids: list[str], keywords: list[str] | tuple[str] = ("id",)
 ) -> FuncRes:
     """
     retrieves users from the table api.users
 
     Args:
-        cursor: cursor for the connection
         user_uuids (list[str | int]): list of user uuids
         keywords (tuple[str] | list[str]): list of fields to be retrieved, defaults to ["*"]
     Returns:
@@ -724,7 +701,6 @@ def get_users(
 
     query = f"SELECT {', '.join(keywords)} FROM api.users WHERE user_uuid IN ({', '.join(['%s' for _ in range(len(user_uuids))])})"
     result = db.custom_call(
-        cursor=cursor,
         query=query,
         type_of_answer=db.ANSWER_TYPE.LIST_ANSWER,
         variables=tuple(user_uuids), # type: ignore

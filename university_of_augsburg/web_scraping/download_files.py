@@ -80,12 +80,11 @@ def fetch_valid_urls(url_list=["https://mhb.uni-augsburg.de/"], final_links=[]) 
     return fetch_valid_urls(new_urls, final_links)
 
 
-def fetch_pdf(cursor: db.cursor, web_url: str, adapt_file_names: bool = False) -> None:
+def fetch_pdf(web_url: str, adapt_file_names: bool = False) -> None:
     """
     fetches the pdf from the given web url
 
     Args:
-        cursor (db.cursor): database cursor
         web_url (str): url of the pdf to fetch
         adapt_file_names (bool): whether to adapt file names in order to reduce conflicts
     Returns:
@@ -114,7 +113,7 @@ def fetch_pdf(cursor: db.cursor, web_url: str, adapt_file_names: bool = False) -
         pass
 
     # insert data into database
-    result = db.insert(cursor=cursor, table="unia.mhbs", values={"web_url": web_url, "pdf_name": file_name, "folder": "~/mhbai/pdfs/", "version": time_code}, returning_column="id")
+    result = db.insert(table="unia.mhbs", values={"web_url": web_url, "pdf_name": file_name, "folder": "~/mhbai/pdfs/", "version": time_code}, returning_column="id")
     if result.is_error:
         raise Exception(f"Error inserting mhb {web_url} into database: {result.error}")
     if result.data is None:
@@ -127,8 +126,7 @@ def fetch_pdf(cursor: db.cursor, web_url: str, adapt_file_names: bool = False) -
     with open(pdf_path, "wb") as file:
         file.write(pdf.content)
 
-@db.cursor_handling(manually_supply_cursor=False)
-def download_pdfs(new_links: list, new_only: bool = False, adapt_file_names: bool = False, print: bool = True, cursor: psycopg2.extensions.cursor | None = None) -> None:
+def download_pdfs(new_links: list, new_only: bool = False, adapt_file_names: bool = False, print: bool = True) -> None:
     """
     downloads only new mhb pdfs
 
@@ -137,14 +135,13 @@ def download_pdfs(new_links: list, new_only: bool = False, adapt_file_names: boo
         new_only (bool): whether to only download new links
         adapt_file_names (bool): whether to adapt file names in order to reduce conflicts; filenames still aren't unique e.g. for instrument courses
         print (bool): whether to print progress information
-        cursor (psycopg2.extensions.cursor | None): SUPPLIED BY DECORATOR; Database cursor for storing data.
     Returns:
         None
     """
 
     # if only new links should be downloaded, filter the new_links list
     if new_only is True:
-        result = db.select(cursor=cursor, table="unia.mhbs", keywords=["web_url"], type_of_answer=db.ANSWER_TYPE.LIST_ANSWER)
+        result = db.select(table="unia.mhbs", columns=["web_url"], type_of_answer=db.ANSWER_TYPE.LIST_ANSWER)
         if result.is_error:
             raise Exception(f"Error fetching existing mhb links from database: {result.error}")
         existing_links = [i["web_url"] for i in result.data]
@@ -155,13 +152,12 @@ def download_pdfs(new_links: list, new_only: bool = False, adapt_file_names: boo
     
     if print is True:
         for web_url in tqdm(new_links):
-            fetch_pdf(cursor, web_url, adapt_file_names) # type: ignore
+            fetch_pdf(web_url, adapt_file_names)
     else:
         for web_url in new_links:
-            fetch_pdf(cursor, web_url, adapt_file_names) # type: ignore
+            fetch_pdf(web_url, adapt_file_names)
 
-@db.cursor_handling(manually_supply_cursor=False)
-def download_async(new_links: list[str], new_only: bool = False, adapt_file_names: bool = False, cursor: psycopg2.extensions.cursor | None = None) -> None:
+def download_async(new_links: list[str], new_only: bool = False, adapt_file_names: bool = False) -> None:
     """
     downloads mhb pdfs using multiprocessing
 
@@ -169,7 +165,6 @@ def download_async(new_links: list[str], new_only: bool = False, adapt_file_name
         new_links (list): list of new mhb links
         new_only (bool): whether to only download new links
         adapt_file_names (bool): whether to adapt file names in order to reduce conflicts
-        cursor (psycopg2.extensions.cursor | None): SUPPLIED BY DECORATOR; Database cursor for storing data.
     Returns:
         None
     """
@@ -177,7 +172,7 @@ def download_async(new_links: list[str], new_only: bool = False, adapt_file_name
     # if only new links should be downloaded, filter the new_links list
     if new_only is True:
         # fetch existing mhbs from database
-        result = db.select(cursor=cursor, table="unia.mhbs", keywords=["web_url"], type_of_answer=db.ANSWER_TYPE.LIST_ANSWER) # type: ignore
+        result = db.select(table="unia.mhbs", columns=["web_url"], type_of_answer=db.ANSWER_TYPE.LIST_ANSWER)
         if result.is_error:
             raise Exception(f"Error fetching existing mhb links from database: {result.error}")
         existing_links = [i["web_url"] for i in result.data]

@@ -9,20 +9,12 @@
 # FileID: Sc-ge-0011
 
 from database import database as db
-import requests
-
-# connect to db
-cursor = db.connect()
 
 # get all universities
 query = """SELECT DISTINCT(city, university) FROM all_unis.prototyping_mhbs"""
 result = db.custom_call(
-    cursor=cursor, 
     query=query,
     type_of_answer=db.ANSWER_TYPE.LIST_ANSWER)
-
-# close database connection
-db.close(cursor)
 
 # handle database error
 if result.is_error:

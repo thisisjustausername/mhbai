@@ -76,13 +76,11 @@ class SearchParams:
         return all(i in self.allowed_params for i in self.params)
 
 
-@db.cursor_handling(manually_supply_cursor=False)
-def load_data(mhb_url: str, uni_a: bool = True, cursor=None, **kwargs) -> dict:
+def load_data(mhb_url: str, uni_a: bool = True, **kwargs) -> dict:
     """
     Load data from SQL database and reconstruct it into a dictionary.
 
     Args:
-        cursor: Database cursor to execute SQL queries.
         uni_a (bool): Flag to determine the type of data to load.
         mhb_url (str): ulr of the mhb file
         **kwargs (Any): values to search for in the database
@@ -92,17 +90,15 @@ def load_data(mhb_url: str, uni_a: bool = True, cursor=None, **kwargs) -> dict:
 
     if not uni_a:
         raise NotImplementedError("Only uni_a=True is implemented.")
-    result = load_unia_modules(cursor=cursor, search_params=search_params, **kwargs)
+    result = load_unia_modules(search_params=search_params, **kwargs)
     return result
 
 
-@db.cursor_handling(manually_supply_cursor=True)
-def load_unia_modules(cursor, search_params: SearchParams, **kwargs) -> Result:
+def load_unia_modules(search_params: SearchParams, **kwargs) -> Result:
     """
     Load uni_a modules from the database and reconstruct them into a dictionary.
 
     Args:
-        cursor: Database cursor to execute SQL queries.
         search_params (SearchParams): SearchParams object containing search parameters.
         module_code (str): module code to search
 
@@ -140,10 +136,9 @@ def load_unia_modules(cursor, search_params: SearchParams, **kwargs) -> Result:
         )
 
     result = db.select(
-        cursor=cursor,
         table="unia.modules_ai_extracted",
         type_of_answer=db.ANSWER_TYPE.LIST_ANSWER,
-        keywords=search_params.params,
+        columns=search_params.params,
         conditions=kwargs,
     )
 

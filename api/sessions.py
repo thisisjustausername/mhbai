@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 
-from psycopg2.extensions import cursor
 import pytz
 
 from database import database as db
@@ -9,12 +8,11 @@ from datatypes.response import Response as FuncRes, Message, Status
 from api.data_types import UserRole
 
 
-def create_session(cursor: cursor, user_id: int) -> FuncRes:
+def create_session(user_id: int) -> FuncRes:
     """
     creates a session for a user in the table sessions
 
     Args:
-        cursor: cursor for the connection
         user_id (int): id of the user
     Returns:
         FuncRes: FuncRes object containing the expiration time of the session
@@ -22,8 +20,7 @@ def create_session(cursor: cursor, user_id: int) -> FuncRes:
 
     # load the configuration variable for session expiration time in days from table configurations
     expiration_time = db.select(
-        cursor=cursor,
-        keywords=["value"],
+        columns=["value"],
         table="api.configurations",
         conditions={"key": "session_expiration_days"},
         type_of_answer=db.ANSWER_TYPE.SINGLE_ANSWER,
@@ -67,7 +64,6 @@ def create_session(cursor: cursor, user_id: int) -> FuncRes:
 
     # set the expiration_date
     result = db.insert(
-        cursor=cursor,
         table="api.sessions",
         values={"user_id": user_id, "expiration_date": expiration_date},
         returning_column="session_id",
@@ -113,19 +109,17 @@ def create_session(cursor: cursor, user_id: int) -> FuncRes:
         )
 
 
-def get_session(cursor: cursor, session_id: str) -> FuncRes:
+def get_session(session_id: str) -> FuncRes:
     """
     gets the session of a user from the table sessions
     Args:
-        cursor: cursor for the connection
         session_id (str): id of the session
     Returns:
         FuncRes: FuncRes object containing the session_id and expiration_date
     """
 
     result = db.select(
-        cursor=cursor,
-        keywords=["session_id", "expiration_date"],
+        columns=["session_id", "expiration_date"],
         table="api.sessions",
         type_of_answer=db.ANSWER_TYPE.SINGLE_ANSWER,
         specific_where="session_id = %s AND expiration_date > NOW()",
@@ -170,18 +164,16 @@ def get_session(cursor: cursor, session_id: str) -> FuncRes:
     )
 
 
-def remove_session(cursor: cursor, session_id: str) -> FuncRes:
+def remove_session(session_id: str) -> FuncRes:
     """
     removes a session from the table sessions
     Args:
-        cursor: cursor for the connection
         session_id (str): id of the user
     Returns:
         FuncRes: FuncRes object containing the session_id
     """
 
     result = db.delete(
-        cursor=cursor,
         table="api.sessions",
         conditions={"session_id": session_id},
         returning_column="session_id",
@@ -225,13 +217,11 @@ def remove_session(cursor: cursor, session_id: str) -> FuncRes:
     )
 
 
-def get_user(
-    cursor: cursor, session_id: str, keywords: tuple[str] | list[str] | None = None
+def get_user(session_id: str, keywords: tuple[str] | list[str] | None = None
 ) -> FuncRes:
     """
     gets the user role of a user from the table users via the sessions table
     Args:
-        cursor: cursor for the connection
         session_id (str): id of the user
         keywords (tuple[str] | list[str]): list of keywords to be returned
     Returns:
@@ -269,8 +259,7 @@ def get_user(
             )
 
     result = db.select(
-        cursor=cursor,
-        keywords=["u." + i for i in keywords],
+        columns=["u." + i for i in keywords],
         table="api.sessions s JOIN users u ON s.user_id = u.id",
         type_of_answer=db.ANSWER_TYPE.SINGLE_ANSWER,
         conditions={"s.session_id": session_id},
@@ -328,18 +317,16 @@ def get_user(
     )
 
 
-def remove_user_sessions(cursor: cursor, user_id: int) -> FuncRes:
+def remove_user_sessions(user_id: int) -> FuncRes:
     """
     removes all sessions of a user from the table sessions
     Args:
-        cursor: cursor for the connection
         user_id (int): id of the user
     Returns:
         FuncRes: FuncRes object containing removed session ids
     """
 
     result = db.delete(
-        cursor=cursor,
         table="api.sessions",
         conditions={"user_id": user_id},
         returning_column="session_id",
@@ -386,17 +373,15 @@ def remove_user_sessions(cursor: cursor, user_id: int) -> FuncRes:
     )
 
 
-def check_session_id(cursor: cursor, session_id: int) -> FuncRes:
+def check_session_id(session_id: int) -> FuncRes:
     """
     checks, whether a session_id is valid
 
     Args:
-        cursor: cursor for the db connection
         session_id: id of the session
     """
 
     result = db.select(
-        cursor=cursor,
         table="api.sessions",
         conditions={"id": session_id},
         type_of_answer=db.ANSWER_TYPE.SINGLE_ANSWER,
@@ -441,11 +426,10 @@ def check_session_id(cursor: cursor, session_id: int) -> FuncRes:
     )
 
 
-def get_session_ids(cursor: cursor, user_id: int, uuid: bool = False) -> FuncRes:
+def get_session_ids(user_id: int, uuid: bool = False) -> FuncRes:
     """
     gets all session ids of a user from the table sessions
     Args:
-        cursor: cursor for the connection
         user_id (int): id of the user
         uuid (bool): whether to return the session_id (uuid) or the internal id
     Returns:
@@ -453,8 +437,7 @@ def get_session_ids(cursor: cursor, user_id: int, uuid: bool = False) -> FuncRes
     """
 
     result = db.select(
-        cursor=cursor,
-        keywords=["id"] if uuid is False else ["session_id"],
+        columns=["id"] if uuid is False else ["session_id"],
         table="api.sessions",
         conditions={"user_id": user_id},
         type_of_answer=db.ANSWER_TYPE.LIST_ANSWER,
@@ -501,13 +484,11 @@ def get_session_ids(cursor: cursor, user_id: int, uuid: bool = False) -> FuncRes
     )
 
 
-def check_permissions(
-    cursor, session_id: str | None, required_role: UserRole
+def check_permissions(session_id: str | None, required_role: UserRole
 ) -> FuncRes:
     """
     checks whether the user with the given session_id has the required role
     Args:
-        cursor: cursor for the connection
         session_id (str): session id of the user
         required_role (UserRole): required role of the user
     Returns:
@@ -528,7 +509,7 @@ def check_permissions(
         )
 
     # get the user_id, user_role by session_id
-    result = get_user(cursor=cursor, session_id=session_id)
+    result = get_user(session_id=session_id)
 
     # if error occurred, return error
     if result.is_error:
