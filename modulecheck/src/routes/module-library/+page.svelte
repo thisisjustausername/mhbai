@@ -4,10 +4,9 @@
 	import { onMount } from 'svelte';
 
 	let modules = $state(null);
-
 	let filters = $state(null);
 
-	let mods: string = $state('');
+	let search = $state();
 
 	onMount(() => {
 		loadFilters();
@@ -21,20 +20,29 @@
 		filters = await response.json();
 	}
 
-	async function searchModule() {
+	async function search_modules() {
+		if (!search) return;
+		search.requestSubmit();
+	}
+
+	async function handle_submit(event) {
+		event.preventDefault();
+		const formData = new FormData(search);
+		const values = Object.fromEntries(formData.entries());
 		const response = await fetch('/api/get-modules', {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'text/plain'
+				'Content-Type': 'application/json'
 			},
-			body: mods
+			body: JSON.stringify(values)
 		});
 		if (!response.ok) {
-			module = null;
+			modules = null;
 			return;
 		}
 		const data = await response.json();
 		modules = data;
+		console.log(modules);
 	}
 
 </script>
@@ -42,18 +50,19 @@
 <Header link="/module-library" />
 
 <main class="px-9">
-	<div class="mx-auto max-w-8xl bg-gradient-to-br from-fuchsia-700 to-cyan-400 p-[3px] dark:p-[0px] shadow-[_10px_20px_40px_rgba(50,0,50,0.3)] dark:from-black dark:to-black dark:shadow-none rounded-2xl">
+	<div class="mx-auto max-w-8xl mb-30 bg-gradient-to-br from-fuchsia-700 to-cyan-400 p-[3px] dark:p-[0px] shadow-[_10px_20px_40px_rgba(50,0,50,0.3)] dark:from-black dark:to-black dark:shadow-none rounded-2xl">
 			<div
-			class="rounded-2xl dark:border-3 p-6 grid justify-items-center bg-white/70
+			class="rounded-2xl dark:border-3 p-6 grid justify-items-center bg-white/80
 			dark:border-cyan-400 dark:shadow-[inset_0_0_40px_#1e40af] dark:bg-blue-800/10"
 		>
 			<h1 class="text-2xl font-medium mb-5 text-center mt-3">Suche</h1>
-			<form class="grid grid-cols-3 gap-x-15">
+			<form class="grid grid-cols-3 gap-x-15" bind:this={search} onsubmit={handle_submit}>
 
 			<!-- Modulcode -->
 			<div class="flex gap-x-2 items-center mb-5">
 			<span class="text-center">Modulcode:</span>
 				<input
+					name="module_code"
 					type="text"
 					placeholder="Modulcode"
 					class="w-28 rounded-xl 
@@ -65,13 +74,15 @@
 			<!-- ECTS -->
 			<div class="flex gap-x-2 items-center mb-5">
 			<span class="text-center">ECTS:</span>
-				<select class="dark:text-white rounded-xl dark:bg-blue-800/30 dark:border-cyan-400 dark:shadow-[inset_0_0_20px_#1e40af] w-35">
-					<option value="equ" selected class="dark:bg-blue-900">exakt</option>
-					<option value="min" class="dark:bg-blue-900">mindestens</option>
-					<option value="max" class="dark:bg-blue-900">höchstens</option>
+				<select name="ects_type" class="dark:text-white rounded-xl dark:bg-blue-800/30 dark:border-cyan-400 dark:shadow-[inset_0_0_20px_#1e40af] w-35">
+					<option value="=" selected class="dark:bg-blue-900">exakt</option>
+					<option value=">=" class="dark:bg-blue-900">mindestens</option>
+					<option value="<=" class="dark:bg-blue-900">höchstens</option>
 				</select>
 				<input
+					name="ects"
 					type="number"
+					min="0"
 					placeholder="ECTS"
 					class="w-22 rounded-xl 
 					dark:bg-blue-800/30 dark:border-cyan-400 dark:shadow-[inset_0_0_20px_#1e40af] 
@@ -84,6 +95,7 @@
 			<div class="flex gap-x-2 items-center mb-5">
 			<span class="text-center">Titel:</span>
 				<input
+					name="title"
 					type="text"
 					placeholder="Titel"
 					class="w-90 rounded-xl 
@@ -96,6 +108,7 @@
 			<div class="flex gap-x-2 items-center mb-5">
 			<span class="text-center">Dozent*in:</span>
 				<input
+					name="lecturer"
 					type="text"
 					placeholder="Dozent*in"
 					class="w-65 rounded-xl 
@@ -107,13 +120,15 @@
 			<!-- weekly_hours -->
 			<div class="flex gap-x-2 items-center mb-5">
 			<span class="text-center">SWS:</span>
-				<select class="dark:text-white rounded-xl dark:bg-blue-800/30 dark:border-cyan-400 dark:shadow-[inset_0_0_20px_#1e40af] w-35">
-					<option value="equ" selected class="dark:bg-blue-900">exakt</option>
-					<option value="min" class="dark:bg-blue-900">mindestens</option>
-					<option value="max" class="dark:bg-blue-900">höchstens</option>
+				<select name="weekly_hours_type" class="dark:text-white rounded-xl dark:bg-blue-800/30 dark:border-cyan-400 dark:shadow-[inset_0_0_20px_#1e40af] w-35">
+					<option value="=" selected class="dark:bg-blue-900">exakt</option>
+					<option value=">=" class="dark:bg-blue-900">mindestens</option>
+					<option value="<=" class="dark:bg-blue-900">höchstens</option>
 				</select>
 				<input
+					name="weekly_hours"
 					type="number"
+					min="0"
 					placeholder="SWS"
 					class="w-22 rounded-xl 
 					dark:bg-blue-800/30 dark:border-cyan-400 dark:shadow-[inset_0_0_20px_#1e40af] 
@@ -124,13 +139,15 @@
 			<!-- recommended_semester -->
 			<div class="flex gap-x-2 items-center mb-5">
 			<span class="text-center">Empfohlenes Semester:</span>
-				<select class="dark:text-white rounded-xl dark:bg-blue-800/30 dark:border-cyan-400 dark:shadow-[inset_0_0_20px_#1e40af] w-35">
-					<option value="equ" selected class="dark:bg-blue-900">exakt</option>
-					<option value="min" class="dark:bg-blue-900">mindestens</option>
-					<option value="max" class="dark:bg-blue-900">höchstens</option>
+				<select name="recommended_semester_type" class="dark:text-white rounded-xl dark:bg-blue-800/30 dark:border-cyan-400 dark:shadow-[inset_0_0_20px_#1e40af] w-35">
+					<option value="=" selected class="dark:bg-blue-900">exakt</option>
+					<option value=">=" class="dark:bg-blue-900">mindestens</option>
+					<option value="<=" class="dark:bg-blue-900">höchstens</option>
 				</select>
 				<input
+					name="recommended_semester"
 					type="number"
+					min="1"
 					placeholder="Sem."
 					class="w-22 rounded-xl 
 					dark:bg-blue-800/30 dark:border-cyan-400 dark:shadow-[inset_0_0_20px_#1e40af] 
@@ -141,7 +158,7 @@
 			<!-- version -->
 			<div class="flex gap-x-2 items-center mb-5">
 			<span class="text-center">MHB-Version:</span>
-				<select class="dark:text-white rounded-xl dark:bg-blue-800/30 dark:border-cyan-400 dark:shadow-[inset_0_0_20px_#1e40af] w-40">
+				<select name="version" class="dark:text-white rounded-xl dark:bg-blue-800/30 dark:border-cyan-400 dark:shadow-[inset_0_0_20px_#1e40af] w-40">
 					<option value="" selected class="dark:bg-blue-900">Alle</option>
 					{#each filters?.version as version}
 						<option value={version} class="dark:bg-blue-900">{version}</option>
@@ -152,7 +169,7 @@
 			<!-- Subject -->
 			<div class="flex gap-x-2 items-center mb-5">
 			<span class="text-center">Fach:</span>
-				<select class="dark:text-white rounded-xl dark:bg-blue-800/30 dark:border-cyan-400 dark:shadow-[inset_0_0_20px_#1e40af] w-25">
+				<select name="subject" class="dark:text-white rounded-xl dark:bg-blue-800/30 dark:border-cyan-400 dark:shadow-[inset_0_0_20px_#1e40af] w-25">
 					<option value="" selected class="dark:bg-blue-900">Alle</option>
 					{#each filters?.subject as subject}
 						<option value={subject} class="dark:bg-blue-900">{subject}</option>
@@ -164,9 +181,10 @@
 			<div class="p-[2px] rounded-full w-128 mt-7
 				bg-gradient-to-br from-cyan-400 to-fuchsia-500">
 					<button
-						class="block rounded-full bg-white/50 py-2 w-127 dark:text-gray-100 
-						shadow-[inset_0_2px_10px_#4a044e] hover:shadow-[inset_0_2px_10px_#6b21a8]
-						hover:bg-fuchsia-400/20
+						onclick={search_modules}
+						class="block rounded-full bg-gray-100 py-2 w-127 dark:text-gray-100 
+						shadow-[inset_0_2px_7px_#4a044e] hover:shadow-[inset_0_2px_10px_#6b21a8]
+						hover:bg-gray-100/60
 						transition duration-200 backdrop-blur-md
 						dark:bg-black/50 hover:cursor-pointer dark:text-gray-200 dark:hover:text-black"
 						
@@ -180,7 +198,7 @@
 
 
 {#if modules === null}
-	<div class="mx-auto mt-30 max-w-3xl rounded-2xl dark:bg-gradient-tobr dark:from-black dark:to-black bg-gradient-to-br from-fuchsia-700 to-cyan-400 p-[2px] dark:p-[0px] shadow-[_10px_20px_40px_rgba(50,0,50,0.3)]
+	<div class="mx-auto max-w-3xl rounded-2xl dark:bg-gradient-tobr dark:from-black dark:to-black bg-gradient-to-br from-fuchsia-700 to-cyan-400 p-[2px] dark:p-[0px] shadow-[_10px_20px_40px_rgba(50,0,50,0.3)]
 	  dark:border-purple-400 dark:bg-purple-600/30 dark:shadow-[inset_0_0_20px_#9333ea]">
 		<div
 			class="rounded-2xl dark:border-3 dark:border-fuchsia-800 

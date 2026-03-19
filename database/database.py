@@ -520,7 +520,7 @@ def delete(
 
 
 def custom_call(
-    query: str,
+    query: sql.Composed | str,
     type_of_answer: ANSWER_TYPE,
     variables: list[Any] | tuple[Any,...] | None = None,
 ) -> Result[Any, Exception]:
@@ -528,13 +528,13 @@ def custom_call(
     send a custom query to the database
 
     Args:
-        query (str):
+        query (sql.Composed | str): the SQL query to execute
         type_of_answer (ANSWER_TYPE): what answer to expect
         variables (list | tuple | None): list of variables that should be passed into the query
     Returns:
         Result: result object with data or error
     """
-    commit = query.startswith("SELECT") is False
+    commit = (query if isinstance(query, str) else query.as_string()).startswith("SELECT") is False
     data = fetch(query=query, type_of_answer=type_of_answer, variables=variables, commit=commit) # type: ignore
 
     if isinstance(data, Exception):
