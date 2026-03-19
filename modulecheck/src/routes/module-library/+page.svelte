@@ -177,6 +177,16 @@
 				</select>
 			</div>
 
+
+			<div class="flex justify-center">
+			<button 
+				onclick={() => search.reset()}
+				class="bg-red-500/30 border-2 border-red-500 rounded-full w-32 h-12 hover:cursor-pointer hover:bg-red-500/60 transition duration-200 
+				dark:bg-red-900/30 dark:border-red-400 dark:hover:bg-red-900/50 dark:hover:border-red-500">
+				<span>Filter löschen</span>
+			</button>
+			</div>
+
 			</form>
 			<div class="p-[2px] rounded-full w-128 mt-7
 				bg-gradient-to-br from-cyan-400 to-fuchsia-500">
@@ -185,7 +195,7 @@
 						class="block rounded-full bg-gray-100 py-2 w-127 dark:text-gray-100 
 						shadow-[inset_0_2px_7px_#4a044e] hover:shadow-[inset_0_2px_10px_#6b21a8]
 						hover:bg-gray-100/60
-						transition duration-200 backdrop-blur-md
+						transition duration-200
 						dark:bg-black/50 hover:cursor-pointer dark:text-gray-200 dark:hover:text-black"
 						
 					>
@@ -199,7 +209,7 @@
 
 {#if modules === null}
 	<div class="mx-auto max-w-3xl rounded-2xl dark:bg-gradient-tobr dark:from-black dark:to-black bg-gradient-to-br from-fuchsia-700 to-cyan-400 p-[2px] dark:p-[0px] shadow-[_10px_20px_40px_rgba(50,0,50,0.3)]
-	  dark:border-purple-400 dark:bg-purple-600/30 dark:shadow-[inset_0_0_20px_#9333ea]">
+	  dark:border-purple-400 dark:bg-purple-600/30 dark:shadow-[inset_0_0_20px_#9333ea] mb-20">
 		<div
 			class="rounded-2xl dark:border-3 dark:border-fuchsia-800 
 			bg-white/70 p-6 dark:shadow-inset[_0_0_40px_rgba(250,100,250,0.7)]

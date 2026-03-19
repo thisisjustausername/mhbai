@@ -103,10 +103,9 @@
 			<h2 class="mb-8 text-2xl font-bold dark:text-gray-200">Try it yourself</h2>
 			<p class="dark:text-gray-200">
 				Sie wollen sich selbst überzeugen 🤔?<br />
-				Dann klicken Sie einfach auf
-				<a href="/try" class="font-bold text-fuchsia-700 underline dark:text-fuchsia-400"
-					>AUSPROBIEREN</a
-				>.
+				 Durchsuchen Sie die <a href="/module-library" class="font-bold text-fuchsia-700 underline dark:text-fuchsia-400">Modulbibliothek</a> oder 
+				 <a href="/try" class="font-bold text-fuchsia-700 underline dark:text-fuchsia-400"
+					>analysieren Sie Modulhandbücher</a>.
 			</p>
 		</div>
 		</div>
