@@ -20,3 +20,12 @@ pdfs_2
 test*
 *.json
 *.pyc
+*.pdf
+*.index
+*.pkl
+*.log
+*.xml
+*.txt
+*.html
+*.csv
+mount/
