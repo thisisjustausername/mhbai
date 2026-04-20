@@ -11,7 +11,6 @@
 import time
 
 from bs4 import BeautifulSoup
-import psycopg2
 import requests
 from database import database as db
 

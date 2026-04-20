@@ -13,7 +13,6 @@ import math
 import multiprocessing
 import sys
 import time
-import psycopg2
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait

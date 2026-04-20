@@ -13,7 +13,6 @@ import json
 import math
 import multiprocessing
 from typing import Annotated, Literal, overload
-import psycopg2
 import time
 
 from selenium import webdriver

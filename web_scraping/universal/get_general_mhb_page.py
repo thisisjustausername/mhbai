@@ -12,7 +12,6 @@ import math
 import multiprocessing
 from multiprocessing import pool
 import time
-import psycopg2
 import requests
 from bs4 import BeautifulSoup
 from database import database as db

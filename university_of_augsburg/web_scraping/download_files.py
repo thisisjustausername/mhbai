@@ -11,7 +11,6 @@
 
 import math
 import sys
-import psycopg2
 import requests
 import json
 from bs4 import BeautifulSoup

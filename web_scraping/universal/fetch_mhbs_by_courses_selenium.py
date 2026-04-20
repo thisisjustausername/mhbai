@@ -11,7 +11,6 @@
 from datetime import datetime, timedelta
 import math
 import time
-import psycopg2
 import selenium.webdriver as webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
