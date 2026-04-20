@@ -13,7 +13,7 @@ export const POST: RequestHandler = async ({ request }) => {
     const formData = new FormData();
     formData.append("file", file, file.name)
 
-    const response = await fetch('http://127.0.0.1:5000/api/get_mhb_info', {
+    const response = await fetch('http://127.0.0.1:5000/modules/get_mhb_info', {
       method: 'POST',
       body: formData
     });

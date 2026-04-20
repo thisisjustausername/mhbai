@@ -4,7 +4,7 @@ import { json } from "@sveltejs/kit";
 export const GET: RequestHandler = async () => {
   try {
     
-    const response = await fetch('http://127.0.0.1:5000/get-module/filters', {
+    const response = await fetch('http://127.0.0.1:5000/modules/get-module/filters', {
       method: 'GET',
     });
     if (!response.ok) {

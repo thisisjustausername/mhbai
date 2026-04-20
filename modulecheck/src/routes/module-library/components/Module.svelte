@@ -54,8 +54,8 @@ shadow-[_0_0_20px_rgba(0,0,0,0.5)] dark:border-cyan-400 dark:shadow-[inset_0_0_4
 		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Version</p>
 		<p class="col-start-3">{module.version}</p>
 
-		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Validität</p>
-		<p class="col-start-3">{Number(module.correctness_score*100).toFixed(0) + ' %'}</p>
+		<p class="col-start-1 border-transparent whitespace-nowrap dark:text-white">Confidence Score</p>
+		<p class="col-start-3">{Number(module.confidence_score*100).toFixed(0) + ' %'}</p>
 
 
 		<div class="col-start-2 row-start-1 row-end-[16] w-[2px] bg-fuchsia-900/80 dark:bg-cyan-800/70"></div>
