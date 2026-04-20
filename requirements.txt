@@ -23,3 +23,6 @@ bcrypt
 pytz
 tabulate
 bidict
+smolagents[toolkit]
+docling
+tokenizers
