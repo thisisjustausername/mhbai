@@ -79,6 +79,8 @@ def extract_modules_from_files(
         return modules_detailed_list
     return modules_list if not remove_duplicates else set(tuple(i.items()) for i in modules_list)
 
+
+@DeprecationWarning
 def save_to_db(module: dict[str, Any]) -> bool:
     """
     save extracted module data to database
@@ -314,6 +316,9 @@ def extract_module_data(
                 for key, value in module["extracted_data"].items()
             }
             db_module["raw_module_id"] = module["id"]
+
+            # TODO: set that as variable
+            db_module["technique"] = "llm-llama3:3b"
 
             db_res = db.insert(
                 table="unia.modules_ai_extracted",

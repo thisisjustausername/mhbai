@@ -16,9 +16,10 @@ This module provides functionality to extract structured module information from
 
 from pydantic import BaseModel, Field
 from typing import Any
-from ollama import Client, chat
+from ollama import Client
+from dataclasses import dataclass
 
-
+@dataclass
 class exam_info(BaseModel):
     """
     exam info class for setting strict type requirements for ai model when extracting information
@@ -42,7 +43,7 @@ class exam_info(BaseModel):
         default=None, description="""Die Dauer der Prüfung in Minuten."""
     )
 
-
+@dataclass
 class time_info(BaseModel):
     """
     time info class for setting strict type requirements for ai model when extracting information
@@ -62,7 +63,7 @@ class time_info(BaseModel):
         description="""Der Arbeitsaufwand beschreibt, wie viele Stunden die Studierenden für das Modul aufwenden müssen.""",
     )
 
-
+@dataclass
 class ModuleInfo(BaseModel):
     """
     module info class for setting strict type requirements for ai model when extracting information
@@ -218,6 +219,7 @@ def extract_module_info(
     module_text: str,
     local: bool = True,
     model: str = "llama3.2:3b",  # "llama3.3:70b"
+    example: bool = False,
 ) -> ModuleInfo:
     """
     Extract structured module information from raw module text using an AI model.
@@ -225,6 +227,7 @@ def extract_module_info(
         module_text (str): The raw text of the module from which to extract information.
         local (bool): Whether to use a local model or a remote one. Defaults to True.
         model (str): Specify the AI model to use.
+        example (bool): Whether to include an example in the system prompt. Defaults to False to avoid halluzination
 
     Returns:
         ModuleInfo: A Pydantic model containing the extracted module information.
@@ -234,6 +237,79 @@ def extract_module_info(
         if not local
         else {}
     )
+
+    valid_full_info = {
+    "title": "Gesundheits-/ Hebammenwissenschaftliches Denken und Methodenkompetenz III",
+    "module_code": "MED-0113",
+    "ects": 5,
+    "lecturer": " Univ.-Prof. Dr.oec.troph.habil. Thorsten Terlecki",
+    "contents": [
+        "Deutsches Gesundheitssystem Ordnung: politische und rechtliche Struktur der Bundesrepublik, politische Meinungsbildung im hebammenwissenschaftlichen Kontext, politisches System und Wirtschaftsordnungsmodelle, soziale Sicherung, internationaler Vergleich",
+        "Entwicklung, Struktur und Prinzipen des deutschen Gesundheits- und Pflegesystems",
+        "Bedeutung und Leistungen der Gesetzlichen Krankenversicherung nach SGB V",
+        "Krankenhäuser als wesentliche Leistungserbringer: Organisation, Leistung und Finanzierung;",
+        "Leistungsdaten, Ausstattung und wirtschaftliche Betriebsführung im Krankenhaus",
+        "Rehabilitationssystem mit Bezug zur Hebammentätigkeit",
+        "Die Hebamme im sektoralen Gesundheitssystem und als Akteurin im Gesundheitswesen",
+    ],
+    "goals": [
+        "die Grundstrukturen des deutschen Gesundheitssystems darstellen",
+        "die Normengeber des Gesundheitssystems mit Fokus Hebammentätigkeit und Geburtshilfe benennen",
+        "Rollen und Funktionen der Hebamme im deutschen Gesundheitswesen darstellen",
+        "den Rehabilitationsgedanken reflektieren und in der Hebammentätigkeit umsetzen",
+    ],
+    "requirements": ["Zulassung zum Studium der Hebammenwissenschaft"],
+    "expense": [
+        {"activity": "Teilnahme an Lehrveranstaltungen (Präsenzstudium)", "hours": 42},
+        {
+            "activity": "Vor- und Nachbereitung des Stoffes inkl. Prüfungsvorbereitung (Selbststudium)",
+            "hours": 108,
+        },
+    ],
+    "success_requirements": ["Bestehen der Modulprüfung"],
+    "weekly_hours": 3,
+    "recommended_semester": 2,
+    "exams": [
+        {
+            "exam_type": "Klausur",
+            "exam_info": [
+                "Antwortformat: Antwort-Wahl-Verfahren, benotet",
+                "Die Anmeldung zu jeder einzelnen Prüfung und zum Wiederholungsversuch erfolgt nicht automatisch und muss selbstständig von Ihnen durchgeführt werden. Die Termine der Prüfungen und Wiederholungsprüfung sowie die Frist zur Anmeldung werden Ihnen rechtzeitig mitgeteilt.",
+            ],
+            "duration": 32,
+        }
+    ],
+    "module_parts": [
+        {
+            "title": "Gesundheits- und Versorgungssystem im Kontext von Hebammenwesen und -wissenschaft",
+            "language": "deutsch",
+            "teaching_methods": [
+                "Vorlesung",
+                "Gruppenarbeit",
+                "Diskussion",
+                "Präsentation",
+            ],
+        }
+    ],
+}
+    prompt = f"""
+Sie sind ein Extraktionsmodell, das Informationen aus Modulhandbüchern extrahiert und in einem strukturierten JSON-Format zurückgibt. Deine Hauptsprache ist Deutsch, aber du beherrscht auch Englisch. Es gibt keine Toleranz für Halluzination oder dem Erfinden zusätzlicher Informationen. Sie verwenden ausschließlich Daten aus den mitgelieferten Daten.
+Wiederholungen sind erlaubt, insofern sie sinnvoll sind. Beispielsweise unterscheiden sich die SWS-Angaben für das Modul und die Modulteile, weswegen die Gesamtanzahl unter weekly_hours und die Aufteilung in den Modulen angegeben werden soll.
+Falls Informationen in anderen Bereichen teilweise sinnvoll sind, soll der dort vorkommende Teil ebenfalls angegeben werden. Ein Beispiel ist das Feld Inhalt.
+
+Absolute Regeln:
+1. Antworte nur mit dem JSON-Objekt, das die extrahierten Informationen enthält. Keine zusätzlichen Erklärungen oder Kommentare.
+2. Wenn Informationen für ein bestimmtes Feld nicht verfügbar sind, lasse das Feld leer oder setze es auf null.
+3. Vermute niemals Informationen und generiere niemals Informationen.
+4. Verwende die bereitgestellten Daten ausschließlich zur Extraktion der Informationen. Erfinde keine zusätzlichen Details oder Informationen.
+5. Es ist besser, immer null zurückzugeben, als ein einziges Mal zu raten.
+
+{"\nErlaubt:\n\t" if example else ""}
+{valid_full_info if example else ""}
+
+Wichtig: Gebe nur Informationen wieder. Falls Informationen fehlen, lasse das entsprechende Feld leer.
+"""
+
     try:
         client = Client(**additional_params)
         response = client.chat(
