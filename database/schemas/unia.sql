@@ -60,7 +60,8 @@ CREATE TABLE IF NOT EXISTS unia.modules_ai_extracted (
     exams JSONB, -- exams related to the module
     module_parts JSONB, -- parts of the module
     raw_module_id INTEGER NOT NULL REFERENCES unia.modules_raw(id), -- reference to the raw module text from which this ai extracted module was created
-    created_at TIMESTAMPTZ DEFAULT NOW()
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    technique TEXT NOT NULL
 );
 
 
