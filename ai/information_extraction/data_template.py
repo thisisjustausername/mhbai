@@ -10,7 +10,7 @@ class exam_info(BaseModel):
 
     Attributes:
         exam_type (str | None): type of the exam
-        exam_info (list[str] | None): additional information about the exam
+        info (str | None): additional information about the exam
         duration (int | None): duration of the exam in minutes
     """
 
@@ -18,7 +18,7 @@ class exam_info(BaseModel):
         default=None,
         description="Die Art der Prüfung, z.B. Klausur, mündliche Prüfung, Hausarbeit, etc.",
     )
-    exam_info: list[str] | None = Field(
+    info: str | None = Field(
         default=None,
         description="Zusätzliche Informationen zur Prüfung, falls vorhanden. Falls nicht vorhanden, lasse das Feld leer.",
     )
@@ -115,7 +115,7 @@ class ModuleInfo(BaseModel):
         default=None,
         description="Eine Liste von Prüfungen, die im Modul stattfinden. Jede Prüfung enthält Informationen über die Art der Prüfung, die Dauer und den Anteil an der Gesamtnote.",
     )
-    module_parts: None | list[dict[Any, Any]] = Field(
+    module_parts: None | list[dict[Any, Any] | str] = Field(
         default=None,
         description="Eine Liste von Modulteilen, falls das Modul aus mehreren Teilen besteht. Diese befinden sich meist in der Kategorie Modulteile, Modulbestandteile, Prüfungen, Prüfungsleistungen oder Prüfungsformen. Diese Angabe ist nur selten vorhanden. Jeder Modulteil besteht aus einem Dictionary mit values aus den Informationen zu dem Modul und den keys, die daraus hervorgehen. Falls sie nicht vorhanden ist, lasse das Feld leer.",
     )
