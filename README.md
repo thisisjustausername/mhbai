@@ -285,13 +285,18 @@ E.g. for data fetching: Execute file x (FileID) after file y (FileID)
 - bug-fixes in pdf_reader_toc.py making reading mhbs more resilient to "irregular" pdfs
 
 ### TODOs
-- adding options for saving data in csv/xlsx/json etc.
-- finish commenting pdf_reader_toc.py
-- important bug-fix. For pages always the pages of the shortest module are used. For the website and export, show the pages for all mhbs and specify which page list correlates to which mhb
-- restructure file structure to make it more intuitiv
-- in MHB_Overlaps instead of choosing name, choose title and mention date of MHB
-- In the future, the file structure will be radically restructured. This is due to the split between software taylored for the University of Augsburg and software made for all universities.
-- run screen python3 -m web_scraping.universal.get_unis_fhs_courses_of_study at night for faster internet connection
-- add Solr for efficient Data Management
-- add Tabulate or another appropriate tool
-- implement Docker
+1. Update file structure in README.md
+2. adding options for saving data in csv/xlsx/json etc.
+3. finish commenting pdf_reader_toc.py
+4. important bug-fix. For pages always the pages of the shortest module are used. For the website and export, show the pages for all mhbs and specify which page list correlates to which mhb
+5. restructure file structure to make it more intuitiv
+6. in MHB_Overlaps instead of choosing name, choose title and mention date of MHB
+7. In the future, the file structure will be radically restructured. This is due to the split between software taylored for the University of Augsburg and software made for all universities.
+8. run screen python3 -m web_scraping.universal.get_unis_fhs_courses_of_study at night for faster internet connection
+9. add Solr for efficient Data Management
+10. add Tabulate or another appropriate tool
+11. implement Docker
+12. work on agent-efficiency (tool-design, step-design, free space as memory for not to do again errors)
+13. Add NER-computed confidence score for LLM -> Agent workflow extraction
+14. Train or finetune embedding for faiss-db for search
+15. Create 2D-map of modules and MHBs using Tucker etc.
