@@ -17,4 +17,4 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip3 install mypy
-      - run: mypy .
+      - run: mypy --install-types .
