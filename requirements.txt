@@ -23,6 +23,9 @@ bcrypt
 pytz
 tabulate
 bidict
-smolagents[toolkit]
+smolagents[toolkit,vllm]
 docling
 tokenizers
+vllm
+openai
+IPython
