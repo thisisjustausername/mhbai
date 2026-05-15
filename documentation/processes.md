@@ -4,10 +4,22 @@ This documentation lists all processes that run regularly.
 
 ## Specific for University of Augsburg
 
+0. [Extracting information from XML-MHBs](#xml-extraction)
 1. [Downloading mhbs](#fetch-mhbs)
 2. [Extracting raw module pages from mhbs and saving them to the db](#raw-pages)
 3. [Extracting module information from mhbs using regex and saving data to db](#regex-extraction)
 4. [Extracting module information using ai and saving data to db](#ai-extraction)
+
+
+### XML Extraction
+
+In order to extract the data from all module handbooks in XMl format of the University of Augsburg, use this way of computation.<br/>
+It is cheap, fast and deterministic with very high accuracy and the option to add optional ML computing.
+```bash
+source venv/bin/activate
+python3 -m 
+```
+
 
 ### Fetch MHBs
 
