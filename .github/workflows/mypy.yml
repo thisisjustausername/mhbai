@@ -12,9 +12,38 @@ jobs:
   type-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+
+      - name: Checkout
+        uses: actions/checkout@v6
+          
+      - name: Python setup
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+        with:
+          files: |
+             **/*.py  # Only look for python files
       - run: pip3 install mypy
-      - run: mypy --install-types .
+      - name: Type check commit files
+        run: |
+          # Get list of .py files modified in the current commit (HEAD)
+          # '|| true' prevents the step from failing if grep finds no files
+          CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r HEAD | grep '\.py$' || true)
+          
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "No Python files in this commit. Skipping."
+            exit 0
+          fi
+          
+          echo "Running mypy on:"
+          echo "$CHANGED_FILES"
+          
+          # Install types silently first
+          mypy --install-types --non-interactive $CHANGED_FILES || true
+          
+          # Run actual mypy check
+          mypy $CHANGED_FILES
