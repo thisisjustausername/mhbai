@@ -339,6 +339,8 @@ def select(  # pylint: disable=too-many-branches, too-many-positional-arguments,
                 if type_of_answer == ANSWER_TYPE.SINGLE_ANSWER
                 else [dict(zip(columns, vals)) for vals in data]  # type: ignore
             )
+        else:
+            result = data
         if isinstance(data, Exception):
             return Result(error=data, stack_trace=traceback.format_exc())
         return Result(data=result)
@@ -370,7 +372,9 @@ def select(  # pylint: disable=too-many-branches, too-many-positional-arguments,
             if type_of_answer == ANSWER_TYPE.SINGLE_ANSWER
             else [dict(zip(columns, vals)) for vals in data]  # type: ignore
         )
-    elif "*" in columns:
+        if not isinstance(data, Exception):
+            return Result(data=result)
+    else:
         result = data
     if isinstance(data, Exception):
         return Result(error=data, stack_trace=traceback.format_exc())
