@@ -5,7 +5,8 @@ convert xml to json and clean the html tags in the process
 from pathlib import Path
 from typing import Any
 import re
-import xmltodict, json
+import xmltodict
+import json
 
 
 def clean_dict(diction: dict[str, Any]) -> dict[str, Any]:
