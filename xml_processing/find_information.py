@@ -192,12 +192,12 @@ def clean_mhb(data: dict) -> dict | None:
             module["module_code"] = mod.get("kurz_bez", None)
             module["ects"] = mod.get("ects_punkte", None)
             module["duration_in_semesters"] = mod.get("dauer", None)
-            module["weekly_hours"] = mod.get("sws", None)
+            module["weekly_hours"] = a if (a := mod.get("sws", None)) is None or isinstance(a, int) else int(float(a.replace(",", ".")))
             module["min_semester"] = mod.get("minfachsem", None)
             module["max_semester"] = mod.get("maxfachsem", None)
             module["title"] = mod.get("sprache_bez", None)
-            module["content"] = mod.get("inhalte", None)
-            module["workload"] = mod.get("arbeitsaufwand", None)
+            module["content"] = a if (a := mod.get("inhalte", None)) is None or not isinstance(a, str) else a.strip()
+            module["workload_hours"] = a if (a := mod.get("arbeitsaufwand", None)) is None or isinstance(a, int) else int(float(a.replace(",", ".")))
             module["prerequisites"] = mod.get("voraussetzungen", None) # usually requirements
             module["success_requirements"] = mod.get("ects_bedingungen", None)
             module["frequency"] = [{"frequency_id": c.get("haeufigkeit", None), "frequency_name": c.get("name", None)} for c in mod.get("haeufigkeit", []) if isinstance(c, dict)]
@@ -224,10 +224,12 @@ def clean_mhb(data: dict) -> dict | None:
             module["maintainers"] = [{"person_id": c.get("personid", None), "role": c.get("role", None), "email": c.get("email", None), "first_name": c.get("vorname", None), "last_name": c.get("nachname", None), "degree": c.get("akadgrad", None)} for c in persons if c.get("personid", None) is not None and c.get("personid", 0) > 0]
 
             sem = mod.get("semester", [])
-            start_semester = next((c for c in sem if c.get("role", "").lower() == "semesterbybis"), None)
+            start_semester = next((c for c in sem if c.get("role", "").lower() == "semesterbyvon"), None)
             start_semester = {"id": start_semester.get("semesternr", None), "name": start_semester.get("zeugnisbez", None), "short_name": start_semester.get("semester", None)} if start_semester else None
-            end_semester = next((c for c in sem if c.get("role", "").lower() == "semesterbyvon"), None)
+            end_semester = next((c for c in sem if c.get("role", "").lower() == "semesterbybis"), None)
             end_semester = {"id": end_semester.get("semesternr", None), "name": end_semester.get("zeugnisbez", None), "short_name": end_semester.get("semester", None)} if end_semester else None
+            if end_semester and end_semester["id"] == -1 and end_semester["name"] is None and end_semester["short_name"] == "(leer)":
+                end_semester["short_name"] = "unbegrenzt"
             sem_ids = [c.get("id", None) for c in [start_semester, end_semester] if c is not None]
             module["available_semesters"] = {"start_semester": start_semester,
                                             "end_semester": end_semester,
@@ -289,7 +291,7 @@ def clean_mhb(data: dict) -> dict | None:
                     workload = dict()
                     workload["in_presence"] = c.get("praesenz", None)
                     workload["type"] = {"type_id": c.get("aufwand_art", {}).get("aufwand_art", None), "name": c.get("aufwand_art", {}).get("name", None)}
-                    workload["workload_hours"] = c.get("arbeitsaufwand", None)
+                    workload["workload_hours"] = a if (a := c.get("arbeitsaufwand", None)) is None or isinstance(a, int) else int(float(a.replace(",", ".")))
 
                     workloads.append(workload)
 
@@ -303,14 +305,14 @@ def clean_mhb(data: dict) -> dict | None:
                 crs = dict()
                 crs["id"] = c.get("modul_lv", None)
                 crs["created_at"] = c.get("zeitstempel", None)
-                crs["weekly_hours"] = c.get("sws", None)
+                crs["weekly_hours"] = a if (a := c.get("sws", None)) is None or isinstance(a, int) else int(float(a.replace(",", ".")))
                 crs["order"] = c.get("reihenfolge", None)
                 crs["mandatory"] = True if c.get("pflicht", None) == 1 else False if c.get("pflicht", None) == 0 else None
                 crs["ects"] = c.get("ects", None)
-                crs["content"] = c.get("inhalte", None)
-                crs["literature"] = c.get("literatur", None)
+                crs["content"] = a if (a := c.get("inhalte", None)) is None or not isinstance(a, str) else a.strip()
+                crs["literature"] = a if (a := c.get("literatur", None)) is None or not isinstance(a, str) else a.strip()
                 crs["frequencies"] = [{"frequency_id": d.get("haeufigkeit", None), "frequency_name": d.get("name", None)} for d in mod.get("haeufigkeit", []) if isinstance(d, dict)]
-                crs["workload"] = c.get("arbeitsaufwand", None)
+                crs["workload_hours"] = a if (a := c.get("arbeitsaufwand", None)) is None or isinstance(a, int) else int(float(a.replace(",", ".")))
                 crs["success_requirements"] = c.get("ects_bedingungen", None)
                 crs["learning_methods"] = c.get("lernmethoden", None)
                 crs["goals"] = c.get("lernziele", None)
@@ -372,7 +374,7 @@ def clean_mhb(data: dict) -> dict | None:
                     subcourse["id"] = d.get("modullv_lv", None)
                     subcourse["semester_id"] = d.get("lv", {}).get("semesternr", None)
                     subcourse["id"] = d.get("lv", {}).get("lv", None)
-                    subcourse["content"] = d.get("lv", {}).get("inhalte", None)
+                    subcourse["content"] = a if (a := d.get("inhalte", None)) is None or not isinstance(a, str) else a.strip()
                     subcourse["ects"] = d.get("lv", {}).get("ects", None)
                     subcourse["delivery_form"] = d.get("lv", {}).get("lehrangebot_art", None)
                     subcourse["semester_name"] = d.get("lv", {}).get("semester", {}).get("zeugnisbez", None)
