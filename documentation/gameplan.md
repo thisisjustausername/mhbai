@@ -15,3 +15,5 @@ To achieve this goal following "game-plan" was developed:
     * Detects headers
 * Zero-Shot classification / QA
     * The text between two headers will be split into the first relevant part and the second part, that doesn't fit the semantic meaning of the header and might resemble another block, that wasn't extracted (since it contains irrelevant information or header detection failed; therefore trying to reclassify this block / these blocks might be appropiate)
+
+* For mapping courses of study take all their modules and comapre whether there is an overlap and in which module groups the overlapping module is part of for each course of study
