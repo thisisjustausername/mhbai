@@ -30,3 +30,6 @@ test*
 *.csv
 mount/
 .venv
+**/chroma_db/
+transformers/
+ai/information_extraction/mrc_test/
