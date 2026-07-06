@@ -14,6 +14,18 @@ It is used to compare the courses of two courses of study to evaluate how many E
 Therefore it can be used to see whether changing courses of study or university or starting studying two courses of study makes sense. 
 Also it can be useful in the creation of new courses of study or seeing which courses can be added to an existing course of study.
 
+## Setup
+Until a docker setup will be available, this is the way to set up the project.
+
+1. Create venv using uv
+```bash
+sudo apt install uv
+
+uv venv uv_venv --python 3.13 --seed --managed-python
+source uv_venv/bin/activate
+uv pip install -r requirements.txt
+```
+
 ## Additional informations
 This project is still in devolepment.
 
@@ -300,3 +312,4 @@ E.g. for data fetching: Execute file x (FileID) after file y (FileID)
 13. Add NER-computed confidence score for LLM -> Agent workflow extraction
 14. Train or finetune embedding for faiss-db for search
 15. Create 2D-map of modules and MHBs using Tucker etc.
+16. Not only validate ects, etc. but also contents by using BERT etc. to find a similar text in the module text and rate based on content difference, certainty of a correct match and content, whether it matches
