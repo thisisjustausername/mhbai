@@ -29,3 +29,4 @@ tokenizers
 vllm
 openai
 IPython
+transformers[onnx]
