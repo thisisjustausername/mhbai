@@ -15,16 +15,17 @@ from database import database as db
 from .xml_to_json import xml_to_json as xtj
 
 
-def get_xml_files(path_to_xml: Path) -> list[Path]:
+def get_files(path_to_file: Path, file_type: str = "xml") -> list[Path]:
     """
     Retrieves all XML files from the specified directory and its subdirectories.
     
     Args:
-        path_to_xml (Path): The path to the directory containing XML files.
+        path_to_file (Path): The path to the directory containing files.
+        file_type (str): The type of files to retrieve (default is "xml").
     Returns:
-        list[Path]: A list of paths to the XML files found in the directory.
+        list[Path]: A list of paths to the files found in the directory.
     """
-    return list(list(path_to_xml.rglob('*.xml')))
+    return list(list(path_to_file.rglob(f'*.{file_type}')))
 
 
 def conversion_xml_to_json(files: list[Path]) -> list[tuple[dict[str, Any], Path]]:
@@ -50,7 +51,7 @@ if __name__ == "__main__":
     path_to_xml = Path(os.path.expanduser("~/mhbai/mount/StudisDaten/Modulhandbuecher/"))
 
     print("Collecting all XML files...")
-    res = get_xml_files(path_to_xml)
+    res = get_files(path_to_xml)
     print(f"Found {len(res)} XML files.")
     print()
 
