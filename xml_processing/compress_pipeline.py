@@ -36,7 +36,7 @@ def save(res) -> None:
         data (dict[str, Any]): The data to save.
         file_path (Path): The path where the JSON file will be saved.
     """
-    with open(Path(os.path.expanduser(f"~/mhbai/ai/compressed_mhbs/{str(res[1]).split('/')[-1][:-5]}.json")), "w") as f:
+    with open(Path(os.path.expanduser(f"~/mhbai/ai/compressed_mhbs/{str(res[1]).split('/')[-1][:-5]}_index_{res[2]}.json")), "w") as f:
         json.dump(res[0], f, indent=4)
 
 
@@ -63,6 +63,7 @@ if __name__ == "__main__":
 
     print("Converting JSON files...")
     result = conversion_json_to_json(res)
+    result = [[*r, index] for index, r in enumerate(result) if r is not None]
     print()
     print("Saving converted JSON files...")
     save_concurrently(result)
