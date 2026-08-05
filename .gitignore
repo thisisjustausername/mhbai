@@ -33,3 +33,6 @@ mount/
 **/chroma_db/
 transformers/
 ai/information_extraction/mrc_test/
+**/markdown/
+*.bz2
+*.bin
