@@ -40,7 +40,7 @@ def recursive_walk(
                     recursive_walk(i, remove_keys, rename_keys, retype_values, replace_values)
                     new_list.append(i)
                 elif isinstance(i, list):
-                    i = recursive_walk(i, remove_keys, rename_keys, retype_values, replace_values, list_key=None)
+                    i = recursive_walk(i, remove_keys, rename_keys, retype_values, replace_values)
                     new_list.append(i)
                 else:
                     new_list.append(i)
@@ -52,7 +52,7 @@ def recursive_walk(
             if key in remove_keys:
                 d.pop(key)
                 continue
-            
+
             # recursively walk through the dictionary if the value is a dictionary or a list
             if isinstance(d[key], dict):
                 recursive_walk(d[key], remove_keys, rename_keys, retype_values, replace_values)
@@ -70,7 +70,7 @@ def recursive_walk(
                     recursive_walk(d[key], remove_keys, rename_keys, retype_values, replace_values)
                 elif isinstance(d[key], list):
                     d[key] = recursive_walk(d[key], remove_keys, rename_keys, retype_values, replace_values)
-            
+
             # rename key if it is in the rename_keys dictionary
             if key in rename_keys:
                 d[rename_keys[key]] = d.pop(key)
@@ -234,11 +234,11 @@ def clean_mhb(data: dict) -> dict | None:
             module["available_semesters"] = {"start_semester": start_semester,
                                             "end_semester": end_semester,
                                             "other_semesters": [{ "id": c.get("semesternr", None), "name": c.get("zeugnisbez", None), "short_name": c.get("semester", None)} for c in sem if c.get("semesternr", None) not in sem_ids]}
-            
+
             module["keywords"] = mod.get("sorted_modul_stichworte", [])
             module["usability"] = {k: v for k, v in mod.get("verwendbarkeit", {}).items() if k != "sprache_bez"}
             module["organization_owner"] = [ {"organization_id": c.get("orgeinheit", None), "role": c.get("role", None), "name": c.get("name", None)} for c in mod.get("orgeinheit", [])]
-            
+
             # print(list(mod.keys()))
             mod_parts = (mod.get("modul_lvs", {}) or {}).get("modul_lv", [])
             # print(json.dumps(mod_parts, indent=4))
@@ -404,5 +404,5 @@ def clean_mhb(data: dict) -> dict | None:
 if __name__ == "__main__":
     with open("xml_processing/test_cleaned.json", "r") as f:
         data = json.load(f)
-    
+
     result = clean_mhb(data)

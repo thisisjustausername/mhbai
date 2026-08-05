@@ -10,6 +10,8 @@ from pathlib import Path
 from typing import Any
 import re
 
+from xml_processing.find_information import recursive_walk
+
 
 def compress_json(local_path: Path):
     path = "uni-a_mhbs_json/"
@@ -86,7 +88,7 @@ def compress_json(local_path: Path):
             for e in j.get("exams", []):
                 exam = dict()
                 exam["name"] = e.get("name", None)
-                exam["duration"] = str(e.get("duration", None)) + ((" " + e.get("time_unit", None)) if e.get("time_unit", None) is not None else "")
+                exam["duration"] = (str(e.get("duration", None)) + ((" " + e.get("time_unit", None)) if e.get("time_unit", None) is not None else "")) if e.get("duration", None) is not None else None
                 exam["graded"] = e.get("graded", None)
                 exam["portion_of_grade"] = e.get("portion_of_grade", None) if e.get("portion_of_grade", None) is not None else "NA"
                 exam["preparation"] = e.get("preparation", None)
@@ -178,7 +180,9 @@ def compress_json(local_path: Path):
 
             module_group["modules"].append(module)
         mhb["module_groups"].append(module_group)
-    return mhb
+
+        recursive_walk(mhb, remove_keys = [], rename_keys = dict(), retype_values=dict(), replace_values = {"keine Angabe": None, 'NA': None})
+        return mhb
 
 
 def json_to_compressed_json(json_path: Path) -> tuple[dict[str, Any], Path]:
