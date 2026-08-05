@@ -30,3 +30,7 @@ vllm
 openai
 IPython
 transformers[onnx]
+langchain
+langchain_chroma
+IPython
+ipykernel
