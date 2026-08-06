@@ -13,14 +13,22 @@ import re
 from xml_processing.find_information import recursive_walk
 
 
-def compress_json(local_path: Path):
+def compress_json(local_path: Path) -> dict[str, Any] | None:
+    '''
+    Compress the json schema and change it for RAG for AI
+
+    Args:
+        local_path (Path): The path to the JSON file to compress
+    Returns:
+        dict[str, Any] | None: the compressed and cleaned json or None when the file is malformed
+    '''
     path = "uni-a_mhbs_json/"
     file_path = os.path.join(path, local_path)
 
     with open(file_path, "r", encoding="utf-8") as f:
         data = json.load(f)
+
     if data is None:
-        print(f"Error: No data found in {file_path}")
         return None
 
     mhb = dict()
@@ -181,23 +189,26 @@ def compress_json(local_path: Path):
             module_group["modules"].append(module)
         mhb["module_groups"].append(module_group)
 
-        recursive_walk(mhb, remove_keys = [], rename_keys = dict(), retype_values=dict(), replace_values = {"keine Angabe": None, 'NA': None})
-        return mhb
+    recursive_walk(mhb, remove_keys = [], rename_keys = dict(), retype_values=dict(), replace_values = {"keine Angabe": None, 'NA': None})
+    return mhb
 
 
-def json_to_compressed_json(json_path: Path) -> tuple[dict[str, Any], Path]:
+def json_to_compressed_json(json_path: Path | tuple[Path, int]) -> tuple[dict[str, Any] | None, Path | tuple[Path, int]]:
     """
     Finished pipeline step, that combines all of the steps above.
     Convert json to a compressed format
 
     Args:
-        xml_path (Path): The path to the XML file to convert
+        xml_path (Path | tuple[Path, int]): The path to the XML file to convert
     Returns:
-        tuple(dict[str, Any], Path): the converted and cleaned json and the path to the XML file
+        tuple(dict[str, Any] | None, Path | tuple[Path, int]): the converted and cleaned json and the path to the XML file
     """
+    if isinstance(json_path, tuple):
+        json_path, index = json_path
     data = compress_json(json_path)
-
-    return data, json_path
+    if data is None:
+        print(f"Malformed JSON file: {json_path}")
+    return data, (json_path, index)
 
 if __name__ == "__main__":
     local_path = "BachelorStudiengaenge/Bachelor of Arts (Haupt und Nebenfach)/Anglistik  Amerikanistik (Hauptfach)/POVersion 2023/Sommersemester 2024/Bachelor_of_Arts_Anglistik_Amerikanistik_Hauptfach_BaPO_2023_ID44938_1_de_20240304_0739.json"
