@@ -1,3 +1,9 @@
+"""
+Interactive console agent ("Hera") that queries the Chroma vector store
+built from info-cards and responds in German. Demonstrates streaming output
+and a simple tool wrapper for similarity search.
+"""
+
 import time
 
 from langchain_core.tools import tool
@@ -31,7 +37,7 @@ def query_academic_knowledgebase(query: str, k: int = 5) -> str:
     Args:
         query (str): Die Suchanfrage, die Informationen zu einem Studiengang oder studiengangsbezogenen Fragen enthält.
         k (int): Die Anzahl der zurückzugebenden relevanten Ergebnisse.
-    
+
     Returns:
         str: Die relevantesten Informationen aus den Informationskarten, die der Anfrage entsprechen. Wenn keine relevanten Informationen gefunden werden, wird eine entsprechende Nachricht zurückgegeben.
     """
@@ -52,7 +58,7 @@ def query_academic_knowledgebase(query: str, k: int = 5) -> str:
 
 
 llm = ChatOllama(
-    model="qwen3.6:35b", 
+    model="qwen3.6:35b",
     temperature=0.5,
     num_predict=2048,  # Entspricht max_tokens in Ollama
 )

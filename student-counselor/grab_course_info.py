@@ -1,3 +1,12 @@
+"""
+Scrapes the Augsburg university study program overview and extracts per-
+program metadata, descriptive text and helpful links. Results are written to
+student-counselor/course_data.json when executed as a script.
+
+This module uses requests + BeautifulSoup and supports threaded retrieval via
+ThreadPoolExecutor (TaskTracker skeleton included).
+"""
+
 import threading
 from concurrent.futures import ThreadPoolExecutor
 import json
@@ -49,7 +58,7 @@ class TaskTracker:
         self.active = 0
         self.lock = threading.Lock()
         self.futures = []
-    
+
 
     def start_func(self, future) -> int:
         """
@@ -65,7 +74,7 @@ class TaskTracker:
             self.active += 1
         self.futures.append(future)
         return self.active
-    
+
 
     def finish_work(self) -> None:
         """
@@ -88,7 +97,7 @@ def search_courses(executor, courses: list[dict[str, str]]) -> None | Exception:
     Args:
         executor: ThreadPoolExecutor to handle the threads created by search_courses
         courses: List of course URLs to search
-    
+
     Raises:
         requests.exceptions.HTTPError: when status code is not 200
         IndexOutOfBoundsError: when file has no file ending (might be fixed)
@@ -104,7 +113,7 @@ def search_courses(executor, courses: list[dict[str, str]]) -> None | Exception:
 
         facts_urls = facts_box.find_all("a", class_="linkColumns-columnLink")
         facts_urls = dict((i.text.strip(), i["href"]) for i in facts_urls)
-        
+
 
         contents = soup.find_all("div", class_="textEditorContent")
         content = "\n".join([t for p in contents[0].find_all("p") if ( t := p.text.strip()) != "&nbsp;"])
@@ -118,8 +127,8 @@ def search_courses(executor, courses: list[dict[str, str]]) -> None | Exception:
         i["base"] = course_data.text
 
 
-        # urls = 
-        # contacts = 
+        # urls =
+        # contacts =
 
 
 def search_threaded(courses: list[dict[str, str]]) -> None: # list[dict[str, str | list[str] | list[dict[str, str]]]]:
@@ -133,7 +142,7 @@ def search_threaded(courses: list[dict[str, str]]) -> None: # list[dict[str, str
     Returns:
         list[dict[str, str | list[str] | list[dict[str, str]]]]: List of course data with facts, urls, content and perspectives
     """
- 
+
     num_workers = 10
 
     with ThreadPoolExecutor(max_workers=num_workers) as executor:
@@ -142,7 +151,7 @@ def search_threaded(courses: list[dict[str, str]]) -> None: # list[dict[str, str
         for i in tracker.futures:
             # results.extend(i.result())
             pass
-        
+
     # return results
 
 
@@ -167,7 +176,7 @@ if __name__ == "__main__":
     courses = clean_spaces(courses)
 
     courses = [{k: v for k, v in i.items() if not isinstance(v, dict) and k not in ["base"]} | i["facts_items"] | i["facts_urls"] for i in courses]
-    
+
     with open("student-counselor/course_data.json", "w", encoding="utf-8") as f:
         json.dump(courses, f, indent=4, ensure_ascii=False)
 

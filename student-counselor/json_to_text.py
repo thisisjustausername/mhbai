@@ -1,3 +1,9 @@
+"""
+Converts the raw course JSON (course_data.json) into human-readable text
+cards and writes the results to student-counselor/info-cards.json. Each
+entry is rendered as a short German summary with standardized fields.
+"""
+
 import os
 import json
 

@@ -1,25 +1,27 @@
 """
+Demonstrates a StateGraph workflow that augments a ChatOllama model with a
+search tool backed by a Chroma vector store. This example is async and uses
+streaming to print incremental model output.
 """
 
 
+import asyncio
+import operator
+import warnings
 from typing import Literal
+
+from IPython.display import Image, display
+from langchain.messages import AnyMessage, HumanMessage, SystemMessage, ToolMessage
 from langchain.tools import tool
 from langchain_chroma import Chroma
-from langchain_ollama import ChatOllama, OllamaEmbeddings
-from typing_extensions import TypedDict, Annotated
-from langchain.messages import SystemMessage, ToolMessage, AnyMessage, HumanMessage
-from langgraph.graph import StateGraph, START, END
 from langchain_core._api.beta_decorator import LangChainBetaWarning
-import operator
-from IPython.display import Image, display
-import warnings
-import asyncio
-
-from rich.markdown import Markdown
-from rich.live import Live
-from rich.console import Console
+from langchain_ollama import ChatOllama, OllamaEmbeddings
+from langgraph.graph import END, START, StateGraph
 from rich import print as p
-
+from rich.console import Console
+from rich.live import Live
+from rich.markdown import Markdown
+from typing_extensions import Annotated, TypedDict
 
 warnings.filterwarnings("ignore", category=LangChainBetaWarning)
 
@@ -37,7 +39,7 @@ db = Chroma(
         )
 
 model = ChatOllama(
-    model="qwen3.6:35b", 
+    model="qwen3.6:35b",
     temperature=0.5,
     num_predict=4096,
     streaming=True
@@ -59,7 +61,7 @@ async def search_studiengang(query: str, k: int = 5) -> str:
     Args:
         query (str): Die Suchanfrage, die Informationen zu einem Studiengang oder studiengangsbezogenen Fragen enthält.
         k (int): Die Anzahl der zurückzugebenden relevanten Ergebnisse.
-    
+
     Returns:
         str: Die relevantesten Informationen aus den Informationskarten, die der Anfrage entsprechen. Wenn keine relevanten Informationen gefunden werden, wird eine entsprechende Nachricht zurückgegeben.
     """
@@ -150,7 +152,7 @@ async def should_continue(state: MessagesState) -> Literal["tool_node", END]:
     last_message = messages[-1]
 
     # If the LLM makes a tool call, then perform an action
-    if last_message.tool_calls: # type: ignore
+    if last_message.tool_calls:
         return "tool_node"
 
     # Otherwise, we stop (reply to the user)
@@ -167,8 +169,8 @@ Build agent
 agent_builder = StateGraph(MessagesState)
 
 # Add nodes
-agent_builder.add_node("llm_call", llm_call) # type: ignore
-agent_builder.add_node("tool_node", tool_node) # type: ignore
+agent_builder.add_node("llm_call", llm_call)
+agent_builder.add_node("tool_node", tool_node)
 
 # Add edges to connect nodes
 agent_builder.add_edge(START, "llm_call")
@@ -195,10 +197,10 @@ query = "Wie unterscheiden sich die Studiengänge Data Science und Informatik"
 # for m in messages["messages"]:
 #     print(m)
 
-# stream = 
+# stream =
 async def main():
     async for event in agent.stream_events(
-            {"messages": [HumanMessage(content=query)]}, 
+            {"messages": [HumanMessage(content=query)]},
             version="v3"
         ):
             # Filter for the actual chat model streaming event

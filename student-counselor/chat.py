@@ -1,3 +1,13 @@
+"""
+StateGraph-based agent that routes queries to a local Qwen LLM and a hybrid
+retriever (FAISS dense + BM25 sparse). Provides a tool to query the local
+academic knowledgebase (produced from scraped university course pages).
+
+Notes:
+- Expects local embedding and LLM services (see comments below).
+- Answers are produced in German and should rely only on retrieved facts.
+"""
+
 import os
 from typing import Annotated, Sequence
 
@@ -21,7 +31,7 @@ from langchain_core.tools import tool
 # Interface connecting to the Rust TEI container handling the 8B vector space
 print("Establishing connection to local gte-Qwen3-8B-embedding engine...")
 qwen3_embeddings = HuggingFaceHubEmbeddings(
-    model="http://localhost:8080", 
+    model="http://localhost:8080",
 )
 
 # GTE-Qwen models require an explicit instruction prefix to optimize asymmetric RAG
@@ -49,7 +59,7 @@ sparse_retriever.k = 1
 
 # Fusing semantic alignment with strict literal token interception
 hybrid_retriever = EnsembleRetriever(
-    retrievers=[dense_retriever, sparse_retriever], 
+    retrievers=[dense_retriever, sparse_retriever],
     weights=[0.5, 0.5]
 )
 
@@ -62,14 +72,14 @@ hybrid_retriever = EnsembleRetriever(
 def query_academic_knowledgebase(query: str) -> str:
     """Durchsucht die internen Informationskarten für Studiengängen nach Studiengangsinformationen, Inhalten, Zulassungsvoraussetzungen (NC) und weiteren studiengangsspezifischen Fragen"""
     retrieved_documents = hybrid_retriever.invoke(query)
-    
+
     # Accelerated linear deduplication preserving contextual proximity
     discovered = set()
     cleaned_context = [
-        doc.page_content for doc in retrieved_documents 
+        doc.page_content for doc in retrieved_documents
         if not (doc.page_content in discovered or discovered.add(doc.page_content))
     ]
-    
+
     if cleaned_context:
         return "\n---\n".join(cleaned_context)
     return "Keine übereinstimmenden Datenkarten im lokalen Verzeichnis gefunden."
@@ -119,7 +129,7 @@ app = workflow.compile()
 if __name__ == "__main__":
     test_query = "Benötige ich für das VWL Studium einen NC?"
     print(f"[Anfrage]: {test_query}\n")
-    
+
     execution_state = {"messages": [HumanMessage(content=test_query)]}
     for cycle_update in app.stream(execution_state, stream_mode="updates"):
         for current_node, contents in cycle_update.items():

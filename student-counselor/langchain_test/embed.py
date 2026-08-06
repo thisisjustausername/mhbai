@@ -1,3 +1,9 @@
+"""
+Builds a Chroma vector store from the generated info-cards using Ollama
+embeddings (qwen3 embedding model). Each document includes metadata useful
+for retrieval (Studiengang, Abschluss, Zulassungsmodus, ...).
+"""
+
 import json
 from langchain_core.documents import Document
 from langchain_chroma import Chroma
@@ -13,8 +19,8 @@ docs = []
 
 for entry in info_cards:
     name = entry[0]["Name"]
-    
-    metadata ={"Studiengang": entry[0]['Name'], 
+
+    metadata ={"Studiengang": entry[0]['Name'],
                 "Abschluss": entry[0]['Studienabschluss'],
                 "Zulassungsmodus": entry[0]['Zulassungsmodus'],
                 "Unterrichtssprache": entry[0]['Unterrichtssprache'],
