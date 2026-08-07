@@ -1,11 +1,11 @@
 """
-This module defines the pipeline for processing XML files and storing the extracted data in a database.
+This module defines the pipeline for processing XML files and storing the extracted data in JSON files.
 """
 
+# TODO: evaluate the exact cause why concurrent saving droppend around 3000 / 26000 files here
 
 import json
 import os
-from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import Pool
 from pathlib import Path
 from typing import Any
@@ -58,18 +58,6 @@ def save(res: tuple[dict, Path]) -> None:
         json.dump(res[0], f, indent=4)
 
 
-def save_concurrently(results):
-    """
-    Saves the converted JSON data to files concurrently using a thread pool.
-
-    Args:
-        results (list[tuple[dict[str, Any], Path]]): A list of tuples containing the converted JSON data and the corresponding file paths.
-    """
-    processes = os.cpu_count()
-    with ThreadPoolExecutor(max_workers=processes) as executor:
-        executor.map(save, results)
-
-
 if __name__ == "__main__":
     # Initialize base data
     path_to_xml = Path(os.path.expanduser("~/mhbai/mount/StudisDaten/Modulhandbuecher/"))
@@ -84,4 +72,6 @@ if __name__ == "__main__":
 
     print()
     print("Saving converted JSON files...")
-    save_concurrently(result)
+    # save_concurrently(result)
+    for res in tqdm(result):
+        save(res)
