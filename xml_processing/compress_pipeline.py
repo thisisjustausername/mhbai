@@ -4,7 +4,6 @@ from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import Pool
 from pathlib import Path
 from typing import Any
-import base64
 
 from tqdm import tqdm
 
@@ -62,7 +61,7 @@ if __name__ == "__main__":
     print("Collecting all JSON files...")
     res = get_files(path_to_json, file_type="json")
     res: list[tuple[Path, int]] = [(r, index) for index, r in enumerate(res)]
-    with open(Path(os.path.expanduser(f"~/mhbai/ai/compressed_mhbs/metadata.json")), "w") as f:
+    with open(Path(os.path.expanduser("~/mhbai/ai/compressed_mhbs/metadata.json")), "w") as f:
         json.dump([(str(r[0]), r[1]) for r in res], f, indent=4)
     print(f"Found {len(res)} JSON files.")
     print()

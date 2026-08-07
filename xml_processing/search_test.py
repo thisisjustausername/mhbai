@@ -1,13 +1,6 @@
 import json
 import os
 from pathlib import Path
-from typing import Any
-from multiprocessing import Pool
-
-from tqdm import tqdm
-
-from database import database as db
-from .xml_to_json import xml_to_json as xtj
 
 
 def get_json_files(path_to_json: Path) -> list[Path]:
@@ -19,7 +12,7 @@ def get_json_files(path_to_json: Path) -> list[Path]:
     Returns:
         list[Path]: A list of paths to the JSON files found in the directory.
     """
-    return list(list(path_to_json.rglob('*.json')))
+    return list(path_to_json.rglob('*.json'))
 
 if __name__ == "__main__":
     # Initialize base data

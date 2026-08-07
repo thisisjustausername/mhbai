@@ -5,33 +5,32 @@ This module defines the pipeline for processing XML files and storing the extrac
 
 import json
 import os
+from multiprocessing import Pool
 from pathlib import Path
 from typing import Any
-from multiprocessing import Pool
 
 from tqdm import tqdm
 
-from database import database as db
 from .xml_to_json import xml_to_json as xtj
 
 
 def get_files(path_to_file: Path, file_type: str = "xml") -> list[Path]:
     """
     Retrieves all XML files from the specified directory and its subdirectories.
-    
+
     Args:
         path_to_file (Path): The path to the directory containing files.
         file_type (str): The type of files to retrieve (default is "xml").
     Returns:
         list[Path]: A list of paths to the files found in the directory.
     """
-    return list(list(path_to_file.rglob(f'*.{file_type}')))
+    return list(path_to_file.rglob(f'*.{file_type}'))
 
 
 def conversion_xml_to_json(files: list[Path]) -> list[tuple[dict[str, Any], Path]]:
     """
     Converts XML files to JSON format using multiprocessing for efficiency.
-    
+
     Args:
         files (list[Path]): A list of paths to the XML files to convert.
     Returns:
