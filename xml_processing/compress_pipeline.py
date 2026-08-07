@@ -36,7 +36,7 @@ def save(res) -> None:
         data (dict[str, Any]): The data to save.
         file_path (Path): The path where the JSON file will be saved.
     """
-    name = str(res[1][0]).split('/')[-1][:-5] + '__' + str(res[1][1]) + '.json'
+    name = res[1][0].stem + '__' + str(res[1][1]) + '.json'
     with open(Path(os.path.expanduser(f"~/mhbai/ai/compressed_mhbs/{name}")), "w") as f:
         json.dump(res[0], f, indent=4)
 

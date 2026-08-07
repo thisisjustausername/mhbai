@@ -57,6 +57,6 @@ if __name__ == "__main__":
     print("Converting XML files to JSON...")
     result = conversion_xml_to_json(res)
     for i in result:
-        with open(os.path.expanduser(f"~/mhbai/xml_processing/_temp/{str(i[1]).split('/')[-1][:-3]}.json"), "w") as f:
+        with open(os.path.expanduser(f"~/mhbai/xml_processing/_temp/{i[1].stem}.json"), "w") as f:
             json.dump(i[0], f, indent=4)
     print(result)
