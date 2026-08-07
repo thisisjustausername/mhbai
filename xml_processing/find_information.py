@@ -1,4 +1,5 @@
 """
+Convert raw Studis XML-files for study programs (courses) to a new JSON schema
 """
 
 import json
@@ -27,7 +28,7 @@ def recursive_walk(
         if isinstance(d, list):
             new_list = []
             for i in d:
-                if str(type(i)) in retype_values.keys():
+                if str(type(i)) in retype_values:
                     try:
                         i = retype_values[str(type(i))](i)
                     except ValueError:
@@ -59,7 +60,7 @@ def recursive_walk(
             elif isinstance(d[key], list):
                 d[key] = recursive_walk(d[key], remove_keys, rename_keys, retype_values, replace_values)
             else:
-                if str(type(d[key])) in retype_values.keys():
+                if str(type(d[key])) in retype_values:
                     try:
                         d[key] = retype_values[str(type(d[key]))](d[key])
                     except ValueError:
@@ -144,7 +145,7 @@ def clean_mhb(data: dict) -> dict | None:
     # print(json.dumps(mhb, indent=4)[:10000])
     # print(mhb["handbuch_gruppen"]["handbuch_gruppe"][0]["modulgruppe"]["gruppe_module"]["gruppe_modul"][0]["studien_modul"].keys())
 
-    new_mhb = dict()
+    new_mhb = {}
     new_mhb["id"] = mhb.get("modulhandbuch", None)
     new_mhb["name"] = mhb.get("bez", None)
     new_mhb["description"] = m.split(" (")[0] if (m := mhb.get("beschreibung", None)) else None
@@ -162,7 +163,7 @@ def clean_mhb(data: dict) -> dict | None:
     for i in mhb.get("handbuch_gruppen", {}).get("handbuch_gruppe", []):
         if isinstance(i, str):
             continue
-        new_module_group = dict()
+        new_module_group = {}
         new_module_group["order"] = i.get("reihenfolge", None)
         new_module_group["id"] = i.get("modulgruppe", {}).get("modulgruppe", None)
         new_module_group["min_ects"] = i.get("modulgruppe", {}).get("ectsmin", None)
@@ -177,7 +178,7 @@ def clean_mhb(data: dict) -> dict | None:
 
         modules = []
         for e in (i.get("modulgruppe", {}).get("gruppe_module", {}) or {}).get("gruppe_modul", []):
-            module = dict()
+            module = {}
             # important: studien_modul, ordnummer, pflicht, fachsem, gruppe_modul_art
             module["order"] = e.get("ordnummer", None)
             module["is_mandatory"] = a if (a := e.get("pflicht", None)) is not None and a != -1 else None if (b := e.get("gruppe_modul_art", {}).get("gruppe_modul_art", -1)) == -1 else b == 1
@@ -208,7 +209,7 @@ def clean_mhb(data: dict) -> dict | None:
             module["lecturer"] = mod.get("nochzustaendig", None)
             module["mandatory_proof"] = mod.get("pflichtnachweis", None)
             module["creator"] = mod.get("nutzer", None)
-            module["module_course_combination"] = mod.get("modullv_kombi", None)
+            module["module_part_combination"] = mod.get("modullv_kombi", None)
             module["exam"] = mod.get("modulprf_kombi", None)
             module["goals"] = mod.get("lernziele", None)
             # module["graded"] = mod["unbenoted"] is False if mod["unbenoted"] is not None else # TODO: finish this with module_lvs
@@ -240,18 +241,19 @@ def clean_mhb(data: dict) -> dict | None:
             module["organization_owner"] = [ {"organization_id": c.get("orgeinheit", None), "role": c.get("role", None), "name": c.get("name", None)} for c in mod.get("orgeinheit", [])]
 
             # print(list(mod.keys()))
+            # TODO: check, whether it contains useful information
             mod_parts = (mod.get("modul_lvs", {}) or {}).get("modul_lv", [])
             # print(json.dumps(mod_parts, indent=4))
 
             # TODO: maybe add to lv if more exist, but probably not
             # TODO: look at modul_lv_prfs key
-            # NOTE: ignore as that is a less precisely played duplicate of exam in courses (lv)
+            # NOTE: ignore as that is a less precisely played duplicate of exam in parts (lv)
             exams = []
             ex = (mod.get("modul_prfs", {}) or {}).get("modul_prf", [])
             if not isinstance(ex, list):
                 ex = [ex]
             for exa in ex:
-                exam = dict()
+                exam = {}
                 exam["id"] = exa.get("modul_prf", None)
                 exam["created_at"] = exa.get("zeitstempel", None)
                 exam["duration"] = exa.get("pruefdauer", None)
@@ -268,7 +270,7 @@ def clean_mhb(data: dict) -> dict | None:
                 exam["duration_type"] = exa.get("typ", None) # e.g. Vorbereituungszeit, ...
                 exam["exam_organization"] = {"organization_id": exa.get("orgeinheit", {}).get("orgeinheit", None), "role": exa.get("orgeinheit", {}).get("role", None), "name": exa.get("orgeinheit", {}).get("name", None)}
 
-                exam_langs = dict()
+                exam_langs = {}
                 for c in exa.get("sprache", []):
                     if isinstance(c, str):
                         continue
@@ -277,7 +279,7 @@ def clean_mhb(data: dict) -> dict | None:
                 exam["languages"] = [c for c in exam_langs.values()]
 
                 exam["exam_frequency"] = {"frequency_id": exa.get("prfhaeufigkeit", {}).get("prfhaeufigkeit", None), "name": exa.get("prfhaeufigkeit", {}).get("name", None)}
-                exam["module_course_exams"] = exa.get("modul_lv_prfs", [])
+                exam["module_part_exams"] = exa.get("modul_lv_prfs", [])
                 exams.append(exam)
             module["exams"] = exams
 
@@ -288,7 +290,7 @@ def clean_mhb(data: dict) -> dict | None:
                 for c in mod.get("workloads", {}).get("arbeitsaufwand", []):
                     if isinstance(c, str):
                         continue
-                    workload = dict()
+                    workload = {}
                     workload["in_presence"] = c.get("praesenz", None)
                     workload["type"] = {"type_id": c.get("aufwand_art", {}).get("aufwand_art", None), "name": c.get("aufwand_art", {}).get("name", None)}
                     workload["workload_hours"] = a if (a := c.get("arbeitsaufwand", None)) is None or isinstance(a, int) else int(float(a.replace(",", ".")))
@@ -297,12 +299,12 @@ def clean_mhb(data: dict) -> dict | None:
 
             module["workloads"] = workloads
 
-            courses = []
+            parts = []
             crss = (mod.get("modul_lvs", {}) or {}).get("modul_lv", [])
             if isinstance(crss, dict):
                 crss = [crss]
             for c in crss:
-                crs = dict()
+                crs = {}
                 crs["id"] = c.get("modul_lv", None)
                 crs["created_at"] = c.get("zeitstempel", None)
                 crs["weekly_hours"] = a if (a := c.get("sws", None)) is None or isinstance(a, int) else int(float(a.replace(",", ".")))
@@ -317,14 +319,14 @@ def clean_mhb(data: dict) -> dict | None:
                 crs["learning_methods"] = c.get("lernmethoden", None)
                 crs["goals"] = c.get("lernziele", None)
                 crs["name"] = c.get("name", None)
-                crs_langs = dict()
+                crs_langs = {}
                 for d in c.get("sprache", []):
                     if d.get("sprache", None) not in crs_langs:
                         crs_langs[d.get("sprache", None)] = {"language_id": d.get("sprache", None), "name": d.get("name", None)}
                 crs["languages"] = list(crs_langs.values())
                 crs["teaching_methods"] = None if c.get("lehrformen", None) is None else [{"id": d.get("modul_lv_form", None), "name": d.get("lehrformen", {}).get("modul_lv_form", {}).get("name", None)} for d in (c.get("lehrformen", {}).get("modul_lv_form", []) if isinstance(c.get("lehrformen", {}).get("modul_lv_form", []), list) else [c.get("lehrformen", {}).get("modul_lv_form", [])])]
 
-                exam = dict()
+                exam = {}
                 if c.get("modul_prfs", None) is not None:
                     exams = []
                     ex = c.get("modul_prfs", {}).get("modul_prf", {})
@@ -347,7 +349,7 @@ def clean_mhb(data: dict) -> dict | None:
                         exam["duration_type"] = exa.get("typ", None) # e.g. Vorbereituungszeit, ...
                         exam["exam_organization"] = {"organization_id": exa.get("orgeinheit", {}).get("orgeinheit", None), "role": exa.get("orgeinheit", {}).get("role", None), "name": exa.get("orgeinheit", {}).get("name", None)}
 
-                        exam_langs = dict()
+                        exam_langs = {}
                         for d in exa.get("sprache", []):
                             if isinstance(d, str):
                                 continue
@@ -356,7 +358,7 @@ def clean_mhb(data: dict) -> dict | None:
                         exam["languages"] = [d for d in exam_langs.values()]
 
                         exam["exam_frequency"] = {"frequency_id": exa.get("prfhaeufigkeit", {}).get("prfhaeufigkeit", None), "name": exa.get("prfhaeufigkeit", {}).get("name", None)}
-                        exam["module_course_exams"] = exa.get("modul_lv_prfs", None)
+                        exam["module_part_exams"] = exa.get("modul_lv_prfs", None)
                         exams.append(exam)
 
                     crs["exams"] = exams
@@ -365,32 +367,32 @@ def clean_mhb(data: dict) -> dict | None:
                 crs["lecturer"] = c.get("dozenten", None)
                 crs["workloads"] = c.get("workloads", None)
 
-                subcourses = []
+                subparts = []
                 subcrss = ({} if (a := c.get("modullv_lvs", {})) is None else a).get("modullv_lv", [])
                 if isinstance(subcrss, dict):
                     subcrss = [subcrss]
                 for d in subcrss:
-                    subcourse = dict()
-                    subcourse["id"] = d.get("modullv_lv", None)
-                    subcourse["semester_id"] = d.get("lv", {}).get("semesternr", None)
-                    subcourse["id"] = d.get("lv", {}).get("lv", None)
-                    subcourse["content"] = a if (a := d.get("inhalte", None)) is None or not isinstance(a, str) else a.strip()
-                    subcourse["ects"] = d.get("lv", {}).get("ects", None)
-                    subcourse["delivery_form"] = d.get("lv", {}).get("lehrangebot_art", None)
-                    subcourse["semester_name"] = d.get("lv", {}).get("semester", {}).get("zeugnisbez", None)
-                    subcourse["type"] = d.get("lv", {}).get("lvtyp", {}).get("name", None)
-                    subcourse["type_id"] = d.get("lv", {}).get("lvtyp", {}).get("lvtyp", None)
-                    subcourse["name"] = d.get("lv", {}).get("name", None)
-                    subcourses.append(subcourse)
-                crs["subcourses"] = subcourses
+                    subpart = {}
+                    subpart["id"] = d.get("modullv_lv", None)
+                    subpart["semester_id"] = d.get("lv", {}).get("semesternr", None)
+                    subpart["id"] = d.get("lv", {}).get("lv", None)
+                    subpart["content"] = a if (a := d.get("inhalte", None)) is None or not isinstance(a, str) else a.strip()
+                    subpart["ects"] = d.get("lv", {}).get("ects", None)
+                    subpart["delivery_form"] = d.get("lv", {}).get("lehrangebot_art", None)
+                    subpart["semester_name"] = d.get("lv", {}).get("semester", {}).get("zeugnisbez", None)
+                    subpart["type"] = d.get("lv", {}).get("lvtyp", {}).get("name", None)
+                    subpart["type_id"] = d.get("lv", {}).get("lvtyp", {}).get("lvtyp", None)
+                    subpart["name"] = d.get("lv", {}).get("name", None)
+                    subparts.append(subpart)
+                crs["subparts"] = subparts
 
                 crs["skills"] = [{"id": d.get("typid", None), "name": d.get("name", None), "knowledge": d.get("kenntnis", None), "skills": d.get("fertigkeiten", None), "competency": d.get("kompetenzen", None)} for d in ((c or {}).get("modullv_matrixs", {}) or {}).get("modullv_matrix", [])]
 
                 # TODO: check sorted_modul_lv_prfs, modul_lv_prfs
 
-                courses.append(crs)
+                parts.append(crs)
 
-            module["courses"] = courses
+            module["parts"] = parts
             mod["graded"] = True if mod.get("unbenotet", None) == 0 else False if mod.get("unbenotet", None) == 1 else None
             modules.append(module)
 
