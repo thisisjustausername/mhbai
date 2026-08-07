@@ -5,6 +5,7 @@ This module defines the pipeline for processing XML files and storing the extrac
 
 import json
 import os
+from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import Pool
 from pathlib import Path
 from typing import Any
@@ -45,6 +46,30 @@ def conversion_xml_to_json(files: list[Path]) -> list[tuple[dict[str, Any], Path
         )
 
 
+def save(res: tuple[dict, Path]) -> None:
+    """
+    Saves the given data to a JSON file at the specified path.
+
+    Args:
+        res (tuple[dict, Path]): The data to save.
+        file_path (Path): The path where the JSON file will be saved.
+    """
+    with open(Path(os.path.expanduser(f"~/mhbai/xml_processing/_temp/{res[1].stem}.json")), "w") as f:
+        json.dump(res[0], f, indent=4)
+
+
+def save_concurrently(results):
+    """
+    Saves the converted JSON data to files concurrently using a thread pool.
+
+    Args:
+        results (list[tuple[dict[str, Any], Path]]): A list of tuples containing the converted JSON data and the corresponding file paths.
+    """
+    processes = os.cpu_count()
+    with ThreadPoolExecutor(max_workers=processes) as executor:
+        executor.map(save, results)
+
+
 if __name__ == "__main__":
     # Initialize base data
     path_to_xml = Path(os.path.expanduser("~/mhbai/mount/StudisDaten/Modulhandbuecher/"))
@@ -56,7 +81,7 @@ if __name__ == "__main__":
 
     print("Converting XML files to JSON...")
     result = conversion_xml_to_json(res)
-    for i in result:
-        with open(os.path.expanduser(f"~/mhbai/xml_processing/_temp/{i[1].stem}.json"), "w") as f:
-            json.dump(i[0], f, indent=4)
-    print(result)
+
+    print()
+    print("Saving converted JSON files...")
+    save_concurrently(result)
