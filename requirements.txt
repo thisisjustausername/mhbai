@@ -32,5 +32,7 @@ IPython
 transformers[onnx]
 langchain
 langchain_chroma
+langchain_ollama
 IPython
 ipykernel
+pymongo
