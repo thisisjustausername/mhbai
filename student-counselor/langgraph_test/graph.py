@@ -8,7 +8,7 @@ streaming to print incremental model output.
 import asyncio
 import operator
 import warnings
-from typing import Literal
+from typing import Annotated, Literal
 
 from IPython.display import Image, display
 from langchain.messages import AnyMessage, HumanMessage, SystemMessage, ToolMessage
@@ -21,7 +21,7 @@ from rich import print as p
 from rich.console import Console
 from rich.live import Live
 from rich.markdown import Markdown
-from typing_extensions import Annotated, TypedDict
+from typing_extensions import TypedDict
 
 warnings.filterwarnings("ignore", category=LangChainBetaWarning)
 

@@ -4,7 +4,6 @@ cards and writes the results to student-counselor/info-cards.json. Each
 entry is rendered as a short German summary with standardized fields.
 """
 
-import os
 import json
 
 

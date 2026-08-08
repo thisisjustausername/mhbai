@@ -7,9 +7,10 @@ This module uses requests + BeautifulSoup and supports threaded retrieval via
 ThreadPoolExecutor (TaskTracker skeleton included).
 """
 
+import json
+import re
 import threading
 from concurrent.futures import ThreadPoolExecutor
-import json
 
 import requests
 from bs4 import BeautifulSoup
@@ -26,10 +27,10 @@ soup = BeautifulSoup(result.text, 'lxml')
 
 # find table over all study programs
 link_container = soup.find("table")
-th = link_container.find("thead")
-tb = link_container.find("tbody")
-columns = [i.text.strip() for i in th.find_all("th")]
-rows = tb.find_all("tr")
+th = link_container.find("thead") # type: ignore
+tb = link_container.find("tbody") # type: ignore
+columns = [i.text.strip() for i in th.find_all("th")] # type: ignore
+rows = tb.find_all("tr") # type: ignore
 courses = []
 for row in rows:
     cells = row.find_all("td")
@@ -38,9 +39,9 @@ for row in rows:
             {
                 columns[i]: cells[i].text.strip() for i in range(len(columns))
             } | {
-                     "language": (href if (href := cells[-1].find("a")) is not None else dict()).get("href", None)
+                     "language": (href if (href := cells[-1].find("a")) is not None else {}).get("href", None)
             } | {
-                "course_url": cells[0].find("a")["href"]
+                "course_url": cells[0].find("a")["href"] # type: ignore
             })
 
 
@@ -76,7 +77,7 @@ class TaskTracker:
         return self.active
 
 
-    def finish_work(self) -> None:
+    def finish_work(self) -> int | None:
         """
         stop tasks after everything finishes
         """
@@ -108,11 +109,11 @@ def search_courses(executor, courses: list[dict[str, str]]) -> None | Exception:
 
         # find facts-box
         facts_box = soup.find("div", class_="factsBox-body")
-        facts_items = facts_box.find_all("div", class_="factsBox-item")
-        facts_items = {name[:-1] if (name:= i.find("span", class_="factsBox-itemLabel").text.strip()).endswith(":") else name: i.find("span", class_="factsBox-itemValue").text.strip() for i in facts_items}
+        facts_items = facts_box.find_all("div", class_="factsBox-item") # type: ignore
+        facts_items = {name[:-1] if (name:= i.find("span", class_="factsBox-itemLabel").text.strip()).endswith(":") else name: i.find("span", class_="factsBox-itemValue").text.strip() for i in facts_items} # type: ignore
 
-        facts_urls = facts_box.find_all("a", class_="linkColumns-columnLink")
-        facts_urls = dict((i.text.strip(), i["href"]) for i in facts_urls)
+        facts_urls = facts_box.find_all("a", class_="linkColumns-columnLink") # type: ignore
+        facts_urls = {i.text.strip(): i["href"] for i in facts_urls}
 
 
         contents = soup.find_all("div", class_="textEditorContent")
@@ -120,10 +121,10 @@ def search_courses(executor, courses: list[dict[str, str]]) -> None | Exception:
 
         perspectives = [i.text.strip() for i in contents[1].find_all("li", class_="bulletList-item--small-margin")]
 
-        i["facts_items"] = facts_items
-        i["facts_urls"] = facts_urls
+        i["facts_items"] = facts_items # type: ignore
+        i["facts_urls"] = facts_urls # type: ignore
         i["content"] = content
-        i["perspectives"] = perspectives
+        i["perspectives"] = perspectives # type: ignore
         i["base"] = course_data.text
 
 
@@ -140,22 +141,20 @@ def search_threaded(courses: list[dict[str, str]]) -> None: # list[dict[str, str
         courses (list[dict[str, str]]): List of course URLs to search
 
     Returns:
-        list[dict[str, str | list[str] | list[dict[str, str]]]]: List of course data with facts, urls, content and perspectives
+        None: Data is changed in place
     """
 
     num_workers = 10
 
     with ThreadPoolExecutor(max_workers=num_workers) as executor:
         executor.submit(search_courses, executor, courses).result()
-        results = []
+        # results = []
         for i in tracker.futures:
             # results.extend(i.result())
             pass
 
     # return results
 
-
-import re
 
 def clean_spaces(obj):
     if isinstance(obj, dict):
@@ -172,7 +171,7 @@ def clean_spaces(obj):
 
 
 if __name__ == "__main__":
-    search_threaded(courses)
+    search_threaded(courses) # type: ignore
     courses = clean_spaces(courses)
 
     courses = [{k: v for k, v in i.items() if not isinstance(v, dict) and k not in ["base"]} | i["facts_items"] | i["facts_urls"] for i in courses]
