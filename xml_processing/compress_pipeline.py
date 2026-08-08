@@ -1,3 +1,9 @@
+"""
+Pipeline for compressing the extended JSON study program schemas into smaller schemas more suitable for RAG.
+"""
+
+# TODO: check parts for errors, as it is always empty and doesn't seem to exist in the uni-a_mhbs_json folder files
+
 import json
 import os
 from concurrent.futures import ThreadPoolExecutor
