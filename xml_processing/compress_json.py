@@ -62,9 +62,8 @@ def compress_json(local_path: Path) -> dict[str, Any] | None:
             module["workload_hours"] = j.get("workload_hours", None)
             module["prerequisites"] = j.get("prerequisites", None)
             module["success_requirements"] = j.get("success_requirements", None)
-            module["frequency"] = j.get("frequency", [{}])[0].get("frequency_name", None)
             semesters = [j.get("min_semester", None), j.get("max_semester", None)]
-            module["recommended_semester"] = None if all(s is None for s in semesters) else f"{semesters[0] if semesters[0] is not None else 'NA'} - {semesters[1] if semesters[1] is not None else 'NA'}"
+            module["recommended_semester_span"] = None if all(s is None for s in semesters) else {"start_semester": semesters[0], "end_semester": semesters[1]}
             module["description"] = j.get("description", None)
             module["duration_in_semesters"] = j.get("duration_in_semesters", None)
             module["content"] = None if (a := re.sub(r'\s+', ' ', (j.get("content", "") or "")).strip()) == "" else a
@@ -78,7 +77,7 @@ def compress_json(local_path: Path) -> dict[str, Any] | None:
             module["languages"] = ", ".join(langs) if len(langs) > 0 else None
             start_sem = j.get("available_semesters", {}).get("start_semester", {}).get("name", "NA")
             end_sem = j.get("available_semesters", {}).get("end_semester", {}).get("name", "NA")
-            module["available_semesters"] = f"{start_sem} - {end_sem}"
+            module["available_semesters"] = {"start_semester": start_sem, "end_semester": end_sem, "frequency": j.get("frequency", [{}])[0].get("frequency_name", None)}
             module["keywords"] = j.get("keywords", None)
             usability = j.get("usability", [])
             if isinstance(usability, dict):
@@ -133,7 +132,8 @@ def compress_json(local_path: Path) -> dict[str, Any] | None:
                     exam["portion_of_grade"] = l.get("portion_of_grade", None) if l.get("portion_of_grade", None) is not None else "NA"
                     exam["preparation"] = l.get("preparation", None)
                     exam["deadline"] = l.get("deadline", None)
-                    exam["description"] = l.get("description", None)
+                    description = l.get("description", None)
+                    exam["description"] = description if not isinstance(description, dict) else description.get('html', {}).get('body', None)
                     exam["type"] = l.get("type", None)
                     langs = {a for a in [a.get("language", None) for a in l.get("languages", [])] if a is not None}
                     exam["languages"] = ", ".join(langs) if len(langs) > 0 else None
