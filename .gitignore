@@ -36,3 +36,4 @@ ai/information_extraction/mrc_test/
 **/markdown/
 *.bz2
 *.bin
+mongot-community
