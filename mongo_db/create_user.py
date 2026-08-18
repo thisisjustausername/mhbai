@@ -58,5 +58,5 @@ db.command(
 )
 
 print("User created successfully.")
-set_key(env_path, 'MONGO_DB_unia-search-ai_PASSWORD', password)
+set_key(env_path, 'MONGO_DB_UNIA_SEARCH_AI_PASSWORD', password)
 client.close()
