@@ -14,6 +14,7 @@ from pymongo import MongoClient, ReturnDocument
 from pymongo.collection import Collection
 from tqdm import tqdm
 
+from mongo_db.init_vector_search import embedded_keys
 from xml_processing.pipeline import get_files
 
 
@@ -29,6 +30,7 @@ def retype_objectid_to_str(data: dict | list):
     return data
 
 
+# NOTE: DO NOT HASH THE EMBEDDING VECTOR FIELDS!!!
 def create_unique_hash(doc: dict) -> str:
     '''
     Create an almost unique hash for a document based on its content. This is used to identify duplicates.
@@ -41,6 +43,62 @@ def create_unique_hash(doc: dict) -> str:
     '''
     string = json.dumps(retype_objectid_to_str(deepcopy(doc)), sort_keys=True, ensure_ascii=False)
     return hashlib.sha256(string.encode('utf-8')).hexdigest()
+
+
+def infocard(data: dict, collection: Literal['mhbs', 'modules', 'exams'] | None) -> str:
+    '''
+    Create an infocard from a dictionary of key-value pairs to embed infocard and perform vector search on it.
+
+    Args:
+        data (dict): A dictionary containing key-value pairs.
+        collection (Literal['mhbs', 'modules', 'exams'] | None): The collection name to which the infocard belongs, if None no keys will be sorted out by collection.
+    Returns:
+        str: A formatted string representing the infocard.
+    '''
+    # order for the keys in the infocard (combines mhbs, modules and exams but the keys are almost distinct or the position matches)
+    order = ['name', 'description', 'path', 'faculties', 'faculty_chair', 'prerequisites', 'lecturer', 'type', 'frequency', 'preparation', 'duration', 'success_requirements', 'workloads', 'goals', 'content']
+
+    # replace shallow (only!) None values with Unknown
+    data = {k: (v if v is not None else 'Unknown') for k, v in data.items()}
+
+    # unnest nested values for mhbs collection
+    if 'faculties' in data:
+        data['faculties'] = ', '.join(data['faculties'])
+    if 'module_groups' in data and data['module_groups'] != 'Unknown':
+        data['module_groups'] = [f'    name: {mg["name"]}\n    needed / allowed ects: {mg["min_ects"]} - {mg["max_ects"]}\n    modules: {", ".join(mg["modules"])}' for mg in data['module_groups']]
+    # clean path
+    if 'path' in data:
+        data['path'] = data['path'].split('uni-a_mhbs_json/', 1)[1]
+
+    # unnest nested values for modules collection
+    if 'languages' in data and data['languages'] != 'Unknown':
+        data['languages'] = ', '.join(data['languages'])
+    if 'workloads' in data and data['workloads'] != 'Unknown':
+        data['workloads'] = ';\n'.join([f'    name: {wl["name"]}\n    in presence: {wl["in_presence"]}\n    time expenditure in hours: {wl["time_expenditure"]}' for wl in data['workloads']])
+    if 'recommended_semester_span' in data and data['recommended_semester_span'] != 'Unknown':
+        data['recommended_semester_span'] = 'start: ' + (data['recommended_semester_span']['start_semester'] or 'Unknown') + ', end: ' + (data['recommended_semester_span']['end_semester'] or 'Unlimited')
+    if 'available_semesters' in data:
+        data['available_semesters'] = 'start: ' + (data['available_semesters']['start_semester'] or 'Unknown') + ', end: ' + (data['available_semesters']['end_semester'] or 'Unlimited') + ', frequency: ' + (data['available_semesters']['frequency'] or 'Unknown')
+
+    infocard = ';\n'.join(f"{k}: {data[k]}" for k in order if k in data and (collection is None or k in embedded_keys[collection]))  # order the keys according to the order list and filter out any other keys
+    return infocard.strip()
+
+
+# NOTE: DO NOT HASH THE EMBEDDING VECTOR FIELDS!!!
+def create_embedding_vector(data: str | list | dict):
+    '''
+    Create an embedding vector for data.
+
+    Args:
+        data (str): The data to create an embedding vector for.
+    Returns:
+    '''
+    if isinstance(data, list):
+        data = ' '.join(data)
+    if isinstance(data, dict):
+        data = infocard(data, collection=None)
+
+
 
 
 def insert_non_dupl(collection: Collection, doc: dict, check_attr: str = '_hash') -> ObjectId:
@@ -74,6 +132,7 @@ base_path = Path(os.path.expanduser('~/mhbai/ai/compressed_mhbs'))
 files = get_files(path_to_file=base_path, file_type='json')
 files = [i for i in files if i.stem != 'metadata']
 
+# NOTE: DO NOT HASH THE EMBEDDING VECTOR FIELDS!!!
 for file in tqdm(files):
     with open(file, 'r') as f:
         data = json.load(f)
@@ -123,14 +182,21 @@ for file in tqdm(files):
                 if isinstance(exam['description'], dict):
                     exam['description'] = exam['description'].get('html', {}).get('body', None)
 
-                # NOTE: do not change anything in exam after creating '_hash'-key
+                # NOTE: do not change anything in exam after creating '_hash'-key except for adding embedding vectors
                 exam['_hash'] = create_unique_hash(exam)
+
+                # NOTE: DO NOT HASH THE EMBEDDING VECTOR FIELDS!!!
+
+
                 exam_doc_id = insert_non_dupl(exams, exam)
                 new_exams.append(exam_doc_id)
             mod['exams'] = new_exams if len(new_exams) > 0 else None
 
-            # NOTE: do not change anything in mod after creating '_hash'-key
+            # NOTE: do not change anything in mod after creating '_hash'-key except for adding embedding vectors
             mod['_hash'] = create_unique_hash(mod)
+
+            # NOTE: DO NOT HASH THE EMBEDDING VECTOR FIELDS!!!
+
             mod_doc_id = insert_non_dupl(modules, mod)
             new_modules.append(mod_doc_id)
         group['modules'] = new_modules if len(new_modules) > 0 else None
