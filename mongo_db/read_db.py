@@ -12,13 +12,49 @@ exams = db['exams']
 # %% Query the database
 res = mhbs.count_documents({})
 print(res)
-# %% Look at documents
+# %% Inspect mhb documents
 docs = list(mhbs.find())
-df = pd.DataFrame(docs)
-print(df.head(3))
+df = pd.DataFrame(docs).keys()
+print(df)
+print(mhbs.find_one().get('path')) # type: ignore
+'''
+description
+faculties
+mhb_group
+module_groups
+name
+'''
 
+# %% Inspect module documents
+docs = list(modules.find())
+df = pd.DataFrame(docs).keys()
+print(df)
+'''
+content
+goals
+exam_outline
+faculty_chair
+lecturer
+name
+prerequisites
+success_requirements
+workloads
+'''
 
-# %% Clear the database and verify
+# %% Inspect exam documents
+docs = list(exams.find())
+df = pd.DataFrame(docs).keys()
+print(df)
+'''
+description
+duration
+frequency
+name
+preparation
+type
+'''
+
+ # %% Clear the database and verify
 # mhbs.delete_many({})
 # modules.delete_many({})
 # exams.delete_many({})
