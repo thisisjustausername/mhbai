@@ -16,7 +16,7 @@ db.create_collection(
     validator={
         '$jsonSchema': {
             'bsonType': 'object',
-            'required': ['compressed_path', 'path', 'name', 'start_semester', 'faculties', 'mhb_group', 'module_groups'],
+            'required': ['compressed_path', 'path', 'name', 'start_semester', 'embedding_start_semester', 'faculties', 'mhb_group', 'module_groups'],
             'properties': {
                 'compressed_path': {
                     'bsonType': 'string',
@@ -43,6 +43,10 @@ db.create_collection(
                         'bsonType': 'string'
                     }
                 },
+                'embedding_faculties': {
+                                'bsonType': ['string', 'null'],
+                                'description': 'faculties as vector embedding'
+                },
                 'mhb_group': {
                     'bsonType': ['string', 'null'],
                     'description': 'the mhb group the mhb belongs to'
@@ -50,6 +54,10 @@ db.create_collection(
                 'description': {
                     'bsonType': ['string', 'null'],
                     'description': 'the description of the mhb'
+                },
+                'embedding_description': {
+                                'bsonType': ['string', 'null'],
+                                'description': 'description as vector embedding'
                 },
                 'module_groups': {
                     'bsonType': ['array', 'null'],
@@ -107,6 +115,10 @@ db.create_collection(
                     'bsonType': 'string',
                     'description': 'name of the module'
                 },
+                'embedding_name': {
+                    'bsonType': 'string',
+                    'description': 'name as vector embedding'
+                },
                 'module_code': {
                     'bsonType': 'string',
                     'description': 'module code of the module',
@@ -135,9 +147,17 @@ db.create_collection(
                     'bsonType': ['string', 'null'],
                     'description': 'prerequisites for the module'
                 },
+                'embedding_prerequisites': {
+                    'bsonType': ['string', 'null'],
+                    'description': 'prerequisites as vector embedding'
+                },
                 'success_requirements': {
                     'bsonType': ['string', 'null'],
                     'description': 'requirements for successfully completing the module'
+                },
+                'embedding_success_requirements': {
+                    'bsonType': ['string', 'null'],
+                    'description': 'success_requirements as vector embedding'
                 },
                 'recommended_semester_span': {
                     'bsonType': ['object', 'null'],
@@ -164,17 +184,33 @@ db.create_collection(
                     'bsonType': ['string', 'null'],
                     'description': 'content of the module'
                 },
+                'embedding_content': {
+                    'bsonType': ['string', 'null'],
+                    'description': 'content as vector embedding'
+                },
                 'lecturer': {
                     'bsonType': ['string', 'null'],
                     'description': 'lecturer of the module'
+                },
+                'embedding_lecturer': {
+                    'bsonType': ['string', 'null'],
+                    'description': 'lecturer as vector embedding'
                 },
                 'exam_outline': {
                     'bsonType': ['string', 'null'],
                     'description': 'what the exam will look like (e.g. Klausur, mündlich, Hausarbeit, etc.)'
                 },
+                'embedding_exam_outline': {
+                    'bsonType': ['string', 'null'],
+                    'description': 'exam_outline as vector embedding'
+                },
                 'goals': {
                     'bsonType': ['string', 'null'],
                     'description': 'goals the module aims to teach'
+                },
+                'embedding_goals': {
+                    'bsonType': ['string', 'null'],
+                    'description': 'goals as vector embedding'
                 },
                 'international': {
                     'bsonType': 'bool',
@@ -213,6 +249,10 @@ db.create_collection(
                     'bsonType': 'string',
                     'description': 'the faculty chair responsible for the module'
                 },
+                'embedding_faculty_chair': {
+                    'bsonType': 'string',
+                    'description': 'faculty_chair as vector embedding'
+                },
                 'workloads': {
                     'bsonType': ['array', 'null'],
                     'description': 'the workloads the module contains',
@@ -237,6 +277,10 @@ db.create_collection(
                         }
                     }
                 },
+                'embedding_workloads': {
+                    'bsonType': ['string', 'null'],
+                    'description': 'workloads as vector embedding'
+                },
                 'exams': {
                     'bsonType': ['array', 'null'],
                     'description': 'the exams the module contains',
@@ -248,7 +292,7 @@ db.create_collection(
                 },
                 '_hash': {
                     'bsonType': 'string',
-                    'description': 'hash of the module, used for uniqueness checks'
+                    'description': 'hash of the module, used for uniqueness checks, without embedding vectors'
                 }
             }
         }
@@ -271,6 +315,10 @@ db.create_collection(
                     'bsonType': 'string',
                     'description': 'name of the exam'
                 },
+                'embedding_name': {
+                                'bsonType': 'string',
+                                'description': 'name as vector embedding'
+                },
                 'id': {
                     'bsonType': 'int',
                     'description': 'exam id from STUDIS',
@@ -285,9 +333,17 @@ db.create_collection(
                     'bsonType': 'string',
                     'description': 'type of the exam (e.g. Klausur, mündlich, Hausarbeit, etc.)'
                 },
+                'embedding_type': {
+                                'bsonType': 'string',
+                                'description': 'type as vector embedding'
+                },
                 'duration': {
                     'bsonType': ['string', 'null'],
                     'description': 'duration of the exam, time unit is being specified in the string (e.g. 90 Minuten, 2 Stunden, etc.)',
+                },
+                'embedding_duration': {
+                                'bsonType': ['string', 'null'],
+                                'description': 'duration as vector embedding'
                 },
                 'portion_of_grade': {
                     'bsonType': ['int', 'null'],
@@ -299,22 +355,33 @@ db.create_collection(
                     'bsonType': ['string', 'null'],
                     'description': 'preparation for the exam'
                 },
+                'embedding_preparation': {
+                                'bsonType': ['string', 'null'],
+                                'description': 'preparation as vector embedding'
+                },
                 'deadline': {
                     'bsonType': ['int', 'null'],
                     'description': 'deadline for the exam',
-                    'minimum': 0
                 },
                 'description': {
                     'bsonType': ['string', 'null'],
                     'description': 'description of the exam'
                 },
+                'embedding_description': {
+                                'bsonType': ['string', 'null'],
+                                'description': 'description as vector embedding'
+                },
                 'frequency': {
                     'bsonType': ['string', 'null'],
                     'description': 'how often the exam is offered (e.g. every semester, every year, etc.); LV: Lehrveranstaltung, SoSe: Sommersemester, WiSe: Wintersemester'
                 },
+                'embedding_frequency': {
+                                'bsonType': ['string', 'null'],
+                                'description': 'frequency as vector embedding'
+                },
                 '_hash': {
                     'bsonType': 'string',
-                    'description': 'hash of the exam, used for uniqueness checks'
+                    'description': 'hash of the exam, used for uniqueness checks, without embedding vectors'
                 }
             }
         }
