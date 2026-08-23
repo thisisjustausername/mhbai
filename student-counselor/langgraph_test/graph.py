@@ -10,13 +10,14 @@ import operator
 import warnings
 from typing import Annotated, Literal
 
-from IPython.display import Image, display
+from dotenv import load_dotenv
 from langchain.messages import AnyMessage, HumanMessage, SystemMessage, ToolMessage
 from langchain.tools import tool
 from langchain_chroma import Chroma
 from langchain_core._api.beta_decorator import LangChainBetaWarning
 from langchain_ollama import ChatOllama, OllamaEmbeddings
 from langgraph.graph import END, START, StateGraph
+from pymongo import MongoClient
 from rich import print as p
 from rich.console import Console
 from rich.live import Live
@@ -44,6 +45,15 @@ model = ChatOllama(
     num_predict=4096,
     streaming=True
 )
+
+load_dotenv()  # Load environment variables from .env file
+
+# %% Connect to MongoDB
+client = MongoClient('mongodb://localhost:27017/', authSource='unia', username='unia-search-ai', password=os.getenv('MONGO_DB_UNIA_SEARCH_AI_PASSWORD'))
+db = client['unia']
+mhbs = db['mhbs']
+modules = db['modules']
+exams = db['exams']
 
 
 ################################################################
@@ -149,7 +159,7 @@ Tools:
             * Studienbeginn
             * Unterrichtssprache
             * gefordertes Deutschniveau
-        Es wird empfohlen, den Studiengangsnamen zu suchen, je nach Anfrage können auch die anderen Bereiche abgefragt werden.
+        Es wird empfohlen, NUR DEN STUDIENGANGSNAMEN im Query zu suchen, je nach Anfrage können auch die anderen Bereiche abgefragt werden.
     - get_studiengang_modulhandbuch: Gibt das Modulhandbuch für einen bestimmten Studiengang zurück.
 '''
 
@@ -224,8 +234,8 @@ agent_builder.add_edge('tool_node', 'llm_call')
 agent = agent_builder.compile()
 
 # Show the agent
-# display(Image(agent.get_graph(xray=True).draw_mermaid_png()))
-
+# with open('agent.png', 'wb') as f:
+#     f.write(agent.get_graph(xray=True).draw_mermaid_png())
 
 query = 'Wie unterscheiden sich die Studiengänge Data Science und Informatik'
 
