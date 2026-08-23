@@ -8,14 +8,18 @@ import os
 import re
 from copy import deepcopy
 from pathlib import Path
+from typing import Literal, overload
 
 from bson import ObjectId
-from pymongo import MongoClient, ReturnDocument
+from langchain_ollama import OllamaEmbeddings
+from pymongo import MongoClient, ReturnDocument, UpdateOne
 from pymongo.collection import Collection
 from tqdm import tqdm
 
-from mongo_db.init_vector_search import embedded_keys
+from mongo_db.init_vector_search import collections, embedded_keys
 from xml_processing.pipeline import get_files
+
+embeddings = OllamaEmbeddings(model="qwen3-embedding")
 
 
 def retype_objectid_to_str(data: dict | list):
@@ -66,7 +70,7 @@ def infocard(data: dict, collection: Literal['mhbs', 'modules', 'exams'] | None)
         data['faculties'] = ', '.join(data['faculties'])
     if 'module_groups' in data and data['module_groups'] != 'Unknown':
         data['module_groups'] = [f'    name: {mg["name"]}\n    needed / allowed ects: {mg["min_ects"]} - {mg["max_ects"]}\n    modules: {", ".join(mg["modules"])}' for mg in data['module_groups']]
-    # clean path
+    # clean path (for security reasons too)
     if 'path' in data:
         data['path'] = data['path'].split('uni-a_mhbs_json/', 1)[1]
 
@@ -85,20 +89,32 @@ def infocard(data: dict, collection: Literal['mhbs', 'modules', 'exams'] | None)
 
 
 # NOTE: DO NOT HASH THE EMBEDDING VECTOR FIELDS!!!
-def create_embedding_vector(data: str | list | dict):
+@overload
+def create_embedding_vector(data: str | list | dict, return_embeddings: Literal[True] = True) -> list[float]: ...
+
+@overload
+def create_embedding_vector(data: str | list | dict, return_embeddings: Literal[False]) -> str: ...
+
+def create_embedding_vector(data: str | list | dict | None, return_embeddings: bool = True) -> list[float] | str | None:
     '''
-    Create an embedding vector for data.
+    Create an embedding vector for data or simply an infocard for the data.
 
     Args:
-        data (str): The data to create an embedding vector for.
+        data (str | list | dict | None): The data to create an embedding vector for.
     Returns:
+        list[float] | None: The embedding vector for the data.
     '''
-    if isinstance(data, list):
-        data = ' '.join(data)
-    if isinstance(data, dict):
+    if data is None:
+        return None
+    if isinstance(data, list): # e.g. for faculties
+        if len(data) > 0 and isinstance(data[0], dict):
+            data = [infocard(d, collection=None) for d in data]
+        data = ', '.join(data)
+    elif isinstance(data, dict):
         data = infocard(data, collection=None)
-
-
+    if return_embeddings is False:
+        return data
+    return embeddings.embed_query(data)
 
 
 def insert_non_dupl(collection: Collection, doc: dict, check_attr: str = '_hash') -> ObjectId:
@@ -126,6 +142,33 @@ db = client['unia']
 mhbs = db['mhbs']
 modules = db['modules']
 exams = db['exams']
+
+
+def batch_embedding_to_mongo(collection: Literal['mhbs', 'modules', 'exams'], batch_size: int = 64):
+    '''
+    Batch embedding of documents in a collection and storing the embeddings in the same collection.
+
+    Args:
+        collection (Literal['mhbs', 'modules', 'exams']): The collection to embed documents from.
+        batch_size (int): The number of documents to process in each batch.
+    '''
+    keys = embedded_keys[collection]
+    docs = db[collection].find({key: {'$ne': None} for key in keys}, projection={key: 1 for key in keys})
+
+    pending = [
+        (doc['_id'], key, val) for doc in docs for key, val in doc.items() if key != '_id'
+    ]
+
+    for i in tqdm(range(0, len(pending), batch_size)):
+        batch = pending[i:i + batch_size]
+        texts = [create_embedding_vector(val, return_embeddings=False) for _, _, val in batch]
+
+        vecs = embeddings.embed_documents(texts)
+
+        ops = [
+            UpdateOne({'_id': doc_id}, {'$set': {f'embedding_{key}': vec}}) for (doc_id, key, _), vec in zip(batch, vecs)
+        ]
+        db[collection].bulk_write(ops)
 
 
 base_path = Path(os.path.expanduser('~/mhbai/ai/compressed_mhbs'))
@@ -186,7 +229,8 @@ for file in tqdm(files):
                 exam['_hash'] = create_unique_hash(exam)
 
                 # NOTE: DO NOT HASH THE EMBEDDING VECTOR FIELDS!!!
-
+                # for key in embedded_keys['exams']:
+                #     exam[f'embedding_{key}'] = create_embedding_vector(exam[key])
 
                 exam_doc_id = insert_non_dupl(exams, exam)
                 new_exams.append(exam_doc_id)
@@ -196,6 +240,8 @@ for file in tqdm(files):
             mod['_hash'] = create_unique_hash(mod)
 
             # NOTE: DO NOT HASH THE EMBEDDING VECTOR FIELDS!!!
+            # for key in embedded_keys['modules']:
+            #     mod[f'embedding_{key}'] = create_embedding_vector(mod[key])
 
             mod_doc_id = insert_non_dupl(modules, mod)
             new_modules.append(mod_doc_id)
@@ -203,4 +249,11 @@ for file in tqdm(files):
     data['compressed_path'] = str(file)
     if len(data['module_groups']) == 0:
         data['module_groups'] = None
+
+    # NOTE: DO NOT HASH THE EMBEDDING VECTOR FIELDS!!!
+    # for key in embedded_keys['mhbs']:
+    #     data[f'embedding_{key}'] = create_embedding_vector(data[key])
     insert_non_dupl(mhbs, data, 'path')
+
+for collection in collections:
+    batch_embedding_to_mongo(collection, batch_size=64)
