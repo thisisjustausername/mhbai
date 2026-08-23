@@ -5,10 +5,10 @@ for retrieval (Studiengang, Abschluss, Zulassungsmodus, ...).
 """
 
 import json
-from langchain_core.documents import Document
-from langchain_chroma import Chroma
-from langchain_ollama import OllamaEmbeddings
 
+from langchain_chroma import Chroma
+from langchain_core.documents import Document
+from langchain_ollama import OllamaEmbeddings
 
 embeddings = OllamaEmbeddings(model="qwen3-embedding")
 
@@ -33,9 +33,8 @@ for entry in info_cards:
         metadata["Regelstudienzeit"] = d
     if (d := entry[0].get('Studienform', None)) is not None:
         metadata["Studienform"] = d
-    if entry[0]['Zulassungsmodus'].strip().lower() != 'zulassungsfrei':
-        if (d := ' / '.join([e for e in ['Wintersemester: ' + entry[0].get('Bewerbungsschluss Wintersemester', ''), 'Sommersemester: ' + entry[0].get('Bewerbungsschluss Sommersemester', '')] if e not in ["Wintersemester: ", "Sommersemester: "]])) != '':
-            metadata["Bewerbungsfrist"] = d
+    if entry[0]['Zulassungsmodus'].strip().lower() != 'zulassungsfrei' and (d := ' / '.join([e for e in ['Wintersemester: ' + entry[0].get('Bewerbungsschluss Wintersemester', ''), 'Sommersemester: ' + entry[0].get('Bewerbungsschluss Sommersemester', '')] if e not in ["Wintersemester: ", "Sommersemester: "]])) != '':
+        metadata["Bewerbungsfrist"] = d
 
     doc = Document(
         page_content=entry[1],
