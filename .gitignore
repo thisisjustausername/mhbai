@@ -37,4 +37,5 @@ ai/information_extraction/mrc_test/
 *.bz2
 *.bin
 mongot-community
-student-counselor/chroma_db/
+student_counselor/chroma_db/
+.chainlit/
