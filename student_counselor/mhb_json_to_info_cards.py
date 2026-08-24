@@ -71,7 +71,7 @@ Module:
 
     study_programs.append((str(file), output))
 
-with open("student-counselor/info-cards-mhbs.json", "w") as f:
+with open("student_counselor/info-cards-mhbs.json", "w") as f:
     json.dump(study_programs, f, indent=4, ensure_ascii=True)
 
 print(study_programs[0])

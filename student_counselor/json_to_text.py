@@ -1,13 +1,13 @@
 """
 Converts the raw course JSON (course_data.json) into human-readable text
-cards and writes the results to student-counselor/info-cards.json. Each
+cards and writes the results to student_counselor/info-cards.json. Each
 entry is rendered as a short German summary with standardized fields.
 """
 
 import json
 
 
-with open("student-counselor/course_data.json", "r", encoding="utf-8") as f:
+with open("student_counselor/course_data.json", "r", encoding="utf-8") as f:
     data = json.load(f)
 
 
@@ -24,7 +24,7 @@ Inhalt: {i['content']}
 Perspektiven: {', '.join(i['perspectives'])}"""
     study_programs.append((i, output))
 
-with open("student-counselor/info-cards.json", "w") as f:
+with open("student_counselor/info-cards.json", "w") as f:
     json.dump(study_programs, f, indent=4, ensure_ascii=True)
 
 print(study_programs[0])

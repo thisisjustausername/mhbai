@@ -1,7 +1,7 @@
 """
 Scrapes the Augsburg university study program overview and extracts per-
 program metadata, descriptive text and helpful links. Results are written to
-student-counselor/course_data.json when executed as a script.
+student_counselor/course_data.json when executed as a script.
 
 This module uses requests + BeautifulSoup and supports threaded retrieval via
 ThreadPoolExecutor (TaskTracker skeleton included).
@@ -176,7 +176,7 @@ if __name__ == "__main__":
 
     courses = [{k: v for k, v in i.items() if not isinstance(v, dict) and k not in ["base"]} | i["facts_items"] | i["facts_urls"] for i in courses]
 
-    with open("student-counselor/course_data.json", "w", encoding="utf-8") as f:
+    with open("student_counselor/course_data.json", "w", encoding="utf-8") as f:
         json.dump(courses, f, indent=4, ensure_ascii=False)
 
     print(json.dumps([dict((k, v) for k, v in i.items() if k not in ["base"]) for i in courses], indent=4, ensure_ascii=False))

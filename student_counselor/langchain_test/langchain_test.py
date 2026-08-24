@@ -5,26 +5,24 @@ and a simple tool wrapper for similarity search.
 """
 
 import time
-
-from langchain_core.tools import tool
-from langchain_ollama import ChatOllama
-from langchain.agents import create_agent
-from langchain_ollama import OllamaEmbeddings
-from langchain_chroma import Chroma
-from langchain_core._api.beta_decorator import LangChainBetaWarning
 import warnings
 
-from rich.markdown import Markdown
-from rich.live import Live
-from rich.console import Console
+from langchain.agents import create_agent
+from langchain_chroma import Chroma
+from langchain_core._api.beta_decorator import LangChainBetaWarning
+from langchain_core.tools import tool
+from langchain_ollama import ChatOllama, OllamaEmbeddings
 from rich import print as p
+from rich.console import Console
+from rich.live import Live
+from rich.markdown import Markdown
 
 warnings.filterwarnings("ignore", category=LangChainBetaWarning)
 
 embeddings = OllamaEmbeddings(model="qwen3-embedding")
 
 db = Chroma(
-            persist_directory=str("student-counselor/chroma_db"),
+            persist_directory=str("student_counselor/chroma_db"),
             embedding_function=embeddings,
         )
 

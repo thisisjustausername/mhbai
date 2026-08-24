@@ -12,7 +12,7 @@ from langchain_ollama import OllamaEmbeddings
 
 embeddings = OllamaEmbeddings(model="qwen3-embedding")
 
-with open("student-counselor/info-cards.json", "r") as f:
+with open("student_counselor/info-cards.json", "r") as f:
     info_cards = json.load(f)
 
 docs = []
@@ -45,5 +45,5 @@ for entry in info_cards:
 vector_store = Chroma.from_documents(
     documents=docs,
     embedding=embeddings,
-    persist_directory="student-counselor/chroma_db"
+    persist_directory="student_counselor/chroma_db"
 )
