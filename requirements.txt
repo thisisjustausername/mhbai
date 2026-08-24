@@ -36,3 +36,6 @@ langchain_ollama
 IPython
 ipykernel
 pymongo
+chainlit
+trafilatura
+langchain_community
