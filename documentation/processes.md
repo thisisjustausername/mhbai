@@ -9,7 +9,8 @@ This documentation lists all processes that run regularly.
 2. [Extracting raw module pages from mhbs and saving them to the db](#raw-pages)
 3. [Extracting module information from mhbs using regex and saving data to db](#regex-extraction)
 4. [Extracting module information using ai and saving data to db](#ai-extraction)
-5. [Extract MHB and module information from studis and save it to mongodb](#mhb-and-module-extraction-from-studis)
+5. [Extracting course of study information from unia website](#uni-a-website-extraction)
+6. [Extract MHB and module information from studis and save it to mongodb](#mhb-and-module-extraction-from-studis)
 
 
 ### XML Extraction
@@ -60,6 +61,18 @@ Only run this program after downloading all needed MHB-PDFs using [Fetch MHBs](#
 ```bash
 source venv/bin/activate
 python3 -m ai.overall_ai.full_extraction
+```
+
+### Uni-A Website Extraction
+
+Extract information about courses of study from the University of Augsburg website (NOT FINISHED YET).</br>
+This information is embedded and stored in a chromadb database.</br>
+
+```bash
+source venv/bin/activate
+python3 -m student_counselor.grab_course_info
+python3 -m student_counselor.json_to_text
+python3 -m student_counselor.embed
 ```
 
 ### MHB and Module Extraction from Studis
