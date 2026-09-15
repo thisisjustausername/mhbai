@@ -94,6 +94,7 @@ When first using mongoDB, initialize it first as follows:
 source venv/bin/activate
 python3 -m mongo_db.create_user
 python3 -m mongo_db.create_collection
+python3 -m mongo_db.init_vector_search
 ```
 
 ## Website and API
