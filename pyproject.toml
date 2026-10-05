@@ -1,0 +1,11 @@
+[project]
+name = "mhbai"
+version = "0.1.0"
+
+[tool.ty.environment]
+root = ["./src"]
+python = "./venv"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
