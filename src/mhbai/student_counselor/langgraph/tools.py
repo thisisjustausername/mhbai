@@ -16,6 +16,8 @@ from langchain.tools import tool
 from langchain_chroma import Chroma
 from langchain_ollama import OllamaEmbeddings
 from pymongo import MongoClient
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from mhbai.mongo_db.init_vector_search import (
     bm25_keys,
@@ -51,6 +53,53 @@ modules_db = mongo_db['modules']
 exams_db = mongo_db['exams']
 
 options = htm.ConversionOptions(exclude_selectors=['script', 'style', 'noscript', 'footer', 'nav'])
+
+mhb_lookup_modules = [ '_id', 'module_code', 'name']
+mhb_lookup_pipeline = [
+    {'$lookup': {
+            'from': 'modules',
+            'localField': 'module_groups.modules',
+            'foreignField': '_id',
+            'as': '_modules',
+            'pipeline': [
+                {'$project': {k: 1 for k in mhb_lookup_modules}}
+            ]
+        }
+    },
+    {'$set': {
+        'module_groups': {
+            '$map': {
+                'input': '$module_groups',
+                'as': 'mg',
+                'in': {'$mergeObjects': [
+                    '$$mg', {
+                        'modules': {
+                            '$map': {
+                                'input': '$$mg.modules',
+                                'as': 'm',
+                                'in': {
+                                    '$first': {'$filter': {
+                                        'input': '$_modules',
+                                        'as': 'mods',
+                                        'cond': {'$eq': ['$$mods._id', '$$m']}
+                                    }}
+                                }
+                            }
+                        }
+                    }
+                ]}
+            }
+        }}
+    },
+    {'$unset': '_modules'}
+]
+
+module_lookup =  {'$lookup': {
+    'from': 'exams',
+    'foreignField': '_id',
+    'localField': 'exams',
+    'as': 'exams'
+}}
 
 ################################################################
 '''
@@ -165,14 +214,25 @@ def _create_vector_search(attribs: dict, rename_keys: dict, bm25_keys: list[str]
     pipelines = {}
     flat_weights = {}
 
+    ''''should': [
+        {'text': {'query': [val], 'path': key}},
+
+    ],'''
+
     for key, val in bm25_attribs.items():
         if filters:
             search_stage = {
                 'index': 'bm25_index',
                 'compound': {
-                    'should': [
-                        {'text': {'query': [val], 'path': key}},
-
+                    'must': [
+                        {
+                            'text': {
+                                'query': val,
+                                'path': key,
+                                'matchCriteria': 'all',
+                                'fuzzy': {'maxEdits': 2, 'prefixLength': 1}
+                            }
+                        }
                     ],
                 **({'filter': lexico_filters} if lexico_filters else {})
                 }
@@ -306,13 +366,13 @@ class ModuleHandbook:
             Returns:
                 str: A string representation of the infocard for the module handbook.
             '''
-            return f'''Name: {self.data.get('name')};
-            MongoDB-ID: {self.data.get('_id')};
-            Beginn: {start_semester};
-            Fakultäten: {', '.join(self.data.get('faculties'))};
-            Modulhandbuchgruppe: {self.data.get('module_handbook_group', default)};
-            Dateipfad: {self.data.get('path').split('uni-a_mhbs_json', 1)[1][1:]}; # NOTE: replace hardcoded path
-            Gründung des Studiengangs: {self.data.get('description', default)};
+            return f'''Name: {self.data.get('name')}
+            MongoDB-ID: {self.data.get('_id')}
+            Beginn: {start_semester}
+            Fakultäten: {', '.join(self.data.get('faculties'))}
+            Modulhandbuchgruppe: {self.data.get('module_handbook_group', default)}
+            Dateipfad: {self.data.get('path').split('uni-a_mhbs_json', 1)[1][1:]}
+            Gründung des Studiengangs: {self.data.get('description', default)}
             Modulgruppen: {mdl_grp}''' # type: ignore
 
         def _create_module_group(module_group: dict, information: Literal['all', 'compressed', 'ids']) -> str:
@@ -330,9 +390,9 @@ class ModuleHandbook:
                 modules = default
             if not isinstance(modules, str):
                 if information == 'ids':
-                    modules = ', '.join([str(i.get('_id', default)) for i in modules])
+                    modules = ', '.join([str(i.get('_id', default) if isinstance(i, dict) else i) for i in modules]) # TODO: test isinstance
                 elif information == 'compressed':
-                    modules = ', '.join([f'<{i.get("name")}, {i.get("module_code")}, {i.get("_id")}>' for i in modules])
+                    modules = ', '.join([f'<{i.get("name")}, {i.get("module_code")}, {i.get("_id")}>' if isinstance(i, dict) else f'<{default}, {default}, {i}' for i in modules])
                 else:
                     modules = '\n'.join(['        --- Modul ---\n' + '\n        '.join(Module(i).infocard.split(';\n')) for i in modules])
             return f'''\tName: {module_group.get('name_letter')},
@@ -367,8 +427,8 @@ async def get_studiengang_modulhandbuch(
     description: str | None = None,
     faculties: str | None = None,
     path: str | None = None,
-    start_semester: int | tuple[int | None, int | None] | None = None,
-    k: int = 5) -> str | ValueError:
+    start_semester: int | tuple[int | None, int | None] | None = None, # (datetime.now(ZoneInfo('Europe/Berlin')).year - (1 if (curr_time := datetime.now(ZoneInfo('Europe/Berlin')).month) < 3 else 0)) * 10 + (0 if curr_time < 7 else 1),
+    k: int = 3) -> str | ValueError:
     '''
     Gibt passende Modulhandbücher von Studiengängen zurück.
     Verwende mindestens einen semantischen Parameter (module_handbook, name, description, faculties, path).
@@ -384,6 +444,7 @@ async def get_studiengang_modulhandbuch(
     Returns:
         str | ValueError: Eine Liste von Modulhandbüchern (Studiengängen). ValueError, wenn keine semantischen Parameter angegeben wurden.
     '''
+
     # module_handbook (str | None): Suche mit einem gesamten Modulhandbuchobjekt, das durch infocard() umgewandelt wurde und bei dem alle Unbekannt-Werte danach entfernt wurden (SEMANTISCHE SUCHE).
     attribs = locals()
     attribs.pop('k')
@@ -401,47 +462,8 @@ async def get_studiengang_modulhandbuch(
     # NOTE: check manual implementation: each embedding field must have a weight
     if set(rename_keys.keys()).union(set(bm25)) != set(weights.keys()): # use sets for avoiding order
         raise ValueError(f'Weights must be specified for all embedding fields. Missing weights for: {set(rename_keys.keys()) - set(weights.keys())}')
-    lookup_modules = [ '_id', 'module_code', 'name']
-    lookup_pipeline = [
-        {'$lookup': {
-                'from': 'modules',
-                'localField': 'module_groups.modules',
-                'foreignField': '_id',
-                'as': '_modules',
-                'pipeline': [
-                    {'$project': {k: 1 for k in lookup_modules}}
-                ]
-            }
-        },
-        {'$set': {
-            'module_groups': {
-                '$map': {
-                    'input': '$module_groups',
-                    'as': 'mg',
-                    'in': {'$mergeObjects': [
-                        '$$mg', {
-                            'modules': {
-                                '$map': {
-                                    'input': '$$mg.modules',
-                                    'as': 'm',
-                                    'in': {
-                                        '$first': {'$filter': {
-                                            'input': '$_modules',
-                                            'as': 'mods',
-                                            'cond': {'$eq': ['$$mods._id', '$$m']}
-                                        }}
-                                    }
-                                }
-                            }
-                        }
-                    ]}
-                }
-            }}
-        },
-        {'$unset': '_modules'}
-    ]
     agg_pipeline = _create_vector_search(attribs=attribs, rename_keys=rename_keys, bm25_keys=bm25, weights=weights, k=k)
-    agg_pipeline.extend(lookup_pipeline)
+    agg_pipeline.extend(mhb_lookup_pipeline)
     cursor = mhbs_db.aggregate(agg_pipeline)
     results = cursor.to_list(length=k)
     outputs = [ModuleHandbook(i, granularities=['compressed']).infocard_compressed_modules for i in results]
@@ -519,12 +541,7 @@ exam, name, description, preparation, type, duration, or frequency
         raise ValueError(f'Weights must be specified for all embedding fields. Missing weights for: {set(rename_keys.keys()) - set(weights.keys())}')
     agg_pipeline = _create_vector_search(attribs=attribs, rename_keys=rename_keys, bm25_keys=bm25, weights=weights, k=k)
     agg_pipeline.append(
-        {'$lookup': {
-            'from': 'exams',
-            'foreignField': '_id',
-            'localField': 'exams',
-            'as': 'exams'
-        }}
+       module_lookup
     )
     cursor = modules_db.aggregate(agg_pipeline)
     results = cursor.to_list(length=k)
@@ -617,7 +634,11 @@ def get_modul_by_mongodb_id(mongo_id: str) -> str | None:
     Returns:
         str | None: Informationen zu dem Modul. None, wenn kein Modul mit der angegebenen MongoDB-ID gefunden wurde.
     '''
-    result = modules_db.find_one({'_id': ObjectId(mongo_id)})
+    aggregation_pipeline = [
+        {'$match': {'_id': ObjectId(mongo_id)}},
+        module_lookup
+    ]
+    result = modules_db.aggregate(aggregation_pipeline).to_list(length=1)[0]
     if result:
         return Module(result).infocard
     return None
@@ -632,7 +653,11 @@ def get_modulhandbuch_by_mongodb_id(mongo_id: str) -> str | None:
     Returns:
         str | None: Ausführliche Informationen zu dem Modulhandbuch. None, wenn kein Modulhandbuch mit der angegebenen MongoDB-ID gefunden wurde.
     '''
-    result = mhbs_db.find_one({'_id': ObjectId(mongo_id)})
+    aggregation_pipeline = [
+        {'$match': {'_id': ObjectId(mongo_id)}},
+        *mhb_lookup_pipeline
+    ]
+    result = mhbs_db.aggregate(aggregation_pipeline).to_list(length=1)[0]
     if result:
         return ModuleHandbook(result).infocard # _compressed_modules
     return None
@@ -645,7 +670,7 @@ def replacer(match):
 
 
 # TODO: use search engine to search for query then only allow uni augsburg links in the found urls or specify site: but that changes results to the worse
-"""@DeprecationWarning
+r"""@DeprecationWarning
 @tool
 async def suche_uni_augsburg_website(url: str = 'https://www.uni-augsburg.de') -> str:
     '''
@@ -775,3 +800,14 @@ async def dirty_search(query: str, k: int = 3) -> str:
     if not results:
         return 'Keine passenden Informationen gefunden.'
     return '\n\n---\n\n'.join(results)
+
+
+@tool
+def get_datum() -> str:
+    '''
+    Gibt das aktuelle Datum zurück.
+
+    Returns:
+        str: Das aktuelle Datum im Format "DD-MM-YYYY".
+    '''
+    return datetime.now(ZoneInfo("Europe/Berlin")).strftime("%d-%m-%Y")
