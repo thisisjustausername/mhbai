@@ -2,11 +2,15 @@
 Create tools for searching and retrieving information about study programs, modules, and exams from the internal information cards of the University of Augsburg.
 '''
 
+# TODO: don't make get studiengang etc output the full information but rather only like a short infocard to keep context small. then for more infos either activate full info or fetch by id one by one or concurrently
+
 import os
 import re
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Literal
 from urllib.parse import urljoin
+from zoneinfo import ZoneInfo
 
 import html_to_markdown as htm
 import httpx
@@ -16,8 +20,6 @@ from langchain.tools import tool
 from langchain_chroma import Chroma
 from langchain_ollama import OllamaEmbeddings
 from pymongo import MongoClient
-from datetime import datetime
-from zoneinfo import ZoneInfo
 
 from mhbai.mongo_db.init_vector_search import (
     bm25_keys,
@@ -111,7 +113,7 @@ Create tools
 async def search_studiengang(query: str, k: int = 5) -> str:
     '''
     Durchsucht die internen Informationskarten für Studiengängen nach Studiengangsinformationen, Inhalten, Zulassungsvoraussetzungen (NC) und weiteren studiengangsspezifischen Fragen.
-    Du kannst immer nur nach EINEM Studiengang pro Anfrage suchen. Für mehrere Studiengänge stelle mehrere Anfragen. Stelle die Anfragen NACHEINANDER, sonst treten Fehler auf. Sende immer nur eine Suchanfrage und warte auf die Antwort bevor du die nächste Anfrage sendest.
+    Du kannst immer nur nach EINEM Studiengang pro Anfrage suchen. Für mehrere Studiengänge stelle mehrere Anfragen. Stelle die Anfragen NACHEINANDER, sonst treten Fehler auf. Nur unterschiedliche Studiengänge dürfen parallel gesucht werden. Sende sonst immer nur eine Suchanfrage und warte auf die Antwort bevor du die nächste Anfrage sendest.
     Du kannst mit und nach Infos in folgenden Bereichen suchen:
         * Studiengangsname
         * Inhalt
@@ -124,6 +126,35 @@ async def search_studiengang(query: str, k: int = 5) -> str:
         * Unterrichtssprache
         * gefordertes Deutschniveau
     Es wird empfohlen, den Studiengangsnamen zu suchen, je nach Anfrage können auch die anderen Bereiche abgefragt werden.
+    STRATEGIE:
+    - Bei groben Fragen zu Themenbereichen und Berufsperspektiven
+    - Schnell und günstig für Übersicht
+    EINSATZGEBIET:
+    - Studiengang-Namen
+    - Inhalte
+    - Berufsperspektiven
+    - Ziele
+    - Regelstudienzeit
+    - Teil-/Vollzeitstudium
+    - Zulassungsmodus
+    - Studienbeginn
+    - Unterrichtssprache
+    - Gefordertes Deutschniveau
+    IMMER enthaltene Felder:
+      - Studiengangsname
+      - Inhalt
+      - Berufsperspektiven
+      - Ziele
+      - Regelstudienzeit
+      - Teil-/Vollzeitstudium
+      - Zulassungsmodus
+      - Studienbeginn
+      - Unterrichtssprache
+      - Gefordertes Deutschniveau
+    HINWEISE:
+    - IMMER nur EINEN Studiengang pro Anfrage suchen
+    - Nur Anfragen zu verschiedenen Studiengängen dürfen parallel gestellt werden
+    - Bei groben Fragen zuerst verwenden (günstig)
 
     Args:
         query (str): Die Suchanfrage, die Informationen zu einem Studiengang oder studiengangsbezogenen Fragen enthält.
@@ -295,6 +326,7 @@ Turnus: {self.data.get('frequency', default)}''')
 class Module:
     data: dict
     infocard: str = field(init=False)
+    compact: bool = field(default=True)
 
     def __post_init__(self):
         default = 'Unbekannt'
@@ -315,7 +347,7 @@ class Module:
         if not isinstance(exams, str):
             exams = '\n' + '\n'.join(['\t--- Klausurblock ---\n\t' + ',\n\t'.join(Exam(i).infocard.split(';\n')) for i in exams])
 
-        object.__setattr__(self, 'infocard', f'''Name: {self.data.get('name')}
+        info = f'''Name: {self.data.get('name')}
 Modulcode: {self.data.get('module_code')}
 MongoDB-ID: {self.data.get('_id')}
 ECTS: {self.data.get('ects')}
@@ -332,13 +364,24 @@ Dozent: {self.data.get('lecturer', default) or default}
 Sprachen: {', '.join(self.data.get('languages', [])) if self.data.get('languages') else default}
 International: {self.data.get('international')}
 Angeboten in den Semestern: {available_semesters}
-Wochenstunden: {self.data.get('weekly_hours', default) or default}
 Workload-Stunden: {self.data.get('workload_hours', default) or default}
 Workloads: {workloads}
-Lehrstuhl: {self.data.get('faculty_chair', default) or default}
 Klausurbeschreibung: {self.data.get('exam_outline', default) or default}
-Prüfungen: {exams}''')
-        # Prüfungen (MongoDB-IDs): {', '.join(map(str, self.data.get('exams', []))) if self.data.get('exams') else default}''')
+Prüfungen: {exams}'''
+
+        if self.compact is True:
+            excluded_fields = ['<Inhalt>', '<Ziele>', 'Workloads', 'Klausurbeschreibung', 'Voraussetzungen', 'Bestehensvoraussetzungen', 'Dozent', 'International', 'Prüfungen']
+            fields = [i for i in info.split('\n') if not i in excluded_fields]
+            unknowns = []
+            knowns = []
+            for f in fields:
+                if f.endswith(default):
+                    unknowns.append(f.split(':')[0])
+                else: knowns.append(f)
+            info = '\n'.join(knowns)
+            if unknowns: info = info + f'\nUnbekannt: {", ".join(unknowns)}'
+
+        object.__setattr__(self, 'infocard', info)
 
     def __str__(self) -> str:
         return self.infocard
@@ -351,6 +394,7 @@ class ModuleHandbook:
     infocard: str = field(init=False)
     infocard_compressed_modules: str = field(init=False)
     infocard_module_ids_only: str = field(init=False)
+    compact: bool = field(default=True)
 
     def __post_init__(self):
         default = 'Unbekannt'
@@ -366,14 +410,20 @@ class ModuleHandbook:
             Returns:
                 str: A string representation of the infocard for the module handbook.
             '''
-            return f'''Name: {self.data.get('name')}
-            MongoDB-ID: {self.data.get('_id')}
-            Beginn: {start_semester}
-            Fakultäten: {', '.join(self.data.get('faculties'))}
-            Modulhandbuchgruppe: {self.data.get('module_handbook_group', default)}
-            Dateipfad: {self.data.get('path').split('uni-a_mhbs_json', 1)[1][1:]}
-            Gründung des Studiengangs: {self.data.get('description', default)}
-            Modulgruppen: {mdl_grp}''' # type: ignore
+            excluded_fields = ['Modulgruppen', 'Gründung des Studiengangs']
+            output = f'''Name: {self.data.get('name')}
+MongoDB-ID: {self.data.get('_id')}
+Beginn: {start_semester}
+Fakultäten: {', '.join(self.data.get('faculties'))}
+Modulhandbuchgruppe: {self.data.get('module_handbook_group', default)}
+Dateipfad: {self.data.get('path').split('uni-a_mhbs_json', 1)[1][1:]}
+Gründung des Studiengangs: {self.data.get('description', default)}
+Modulgruppen: {mdl_grp}''' # type: ignore
+            if self.compact is False:
+                return output
+            if 'Modulgruppen' in excluded_fields:
+                output = output.split('\nModulgruppen: ', 1)[0]
+            return '\n'.join([i for i in output.split('\n') if not i.split(':', 1)[0] in excluded_fields])
 
         def _create_module_group(module_group: dict, information: Literal['all', 'compressed', 'ids']) -> str:
             '''
@@ -430,8 +480,42 @@ async def get_studiengang_modulhandbuch(
     start_semester: int | tuple[int | None, int | None] | None = None, # (datetime.now(ZoneInfo('Europe/Berlin')).year - (1 if (curr_time := datetime.now(ZoneInfo('Europe/Berlin')).month) < 3 else 0)) * 10 + (0 if curr_time < 7 else 1),
     k: int = 3) -> str | ValueError:
     '''
-    Gibt passende Modulhandbücher von Studiengängen zurück.
+    Findet passende Modulhandbücher für einen bestimmten Studiengang - ÜBERSICHTSVERSION.
+    Um die Details der gefundenen besten Modulhandbücher einzusehen, verwende anschließend get_modulhandbuch_by_mongodb_id
     Verwende mindestens einen semantischen Parameter (module_handbook, name, description, faculties, path).
+    STRATEGIE:
+    - Finde die besten Modulhandbücher (MHB) für den Studiengang
+    - Kann mit start_semester gefiltert werden für aktuelles Handbuch
+    EINSATZGEBIET:
+    - Name des Studiengangs
+    - Modulhandbuchgruppe
+    - Fakultäten des Studiengangs
+    - Dateipfad des Modulhandbuchs
+    INPUTS (SEMANTISCH ERFORDERLICH):
+    Mindestens EINER von:
+      - name (str): Name des Modulhandbuchs
+      - description (str): Ab wann man den Studiengang studieren kann; description ist NICHT der Inhalt des Studiengangs, sondern wann er gegründet wurde
+      - faculties (str): Die Fakultäten des Studiengangs
+      - path (str): Der Pfad des Modulhandbuchs
+    INPUTS (OPTIONAL ALS FILTER):
+    - start_semester (int oder tuple): Startsemester des Modulhandbuchs
+      Format: YYYY1 für Wintersemester, YYYY0 für Sommersemester
+      Beispiel: 20261 = WS 2026/27, 20260 = SS 2026
+      Tuple: (min, max)  für Bereich, oder exakter Wert mit int oder nicht spezifiziert mit None
+    - k (int, default=3): Anzahl der Ergebnisse (MAXIMAL 3 empfohlen, da Dokumente sehr lang)
+    OUTPUTS:
+      Name
+      MongoDB-ID
+      Beginn
+      Fakultäten
+      Modulhandbuchgruppe
+      Dateipfad
+    HINWEISE:
+    - start_semester ist SEHR WICHTIG für korrekte Semesterzuordnung
+    - NIE mehrmals in einem ähnlichen Thema aufrufen (Ergebnisse sehr ähnlich)
+    - MongoDB-IDs NICHT in Antworten an Nutzer geben
+    - Um Modulgruppen und Gründung des Studiengangs zu finden, muss get_modulhandbuch_by_mongodb_id aufgerufen werden
+    - Alle Felder, die fehlen, haben keine Informationen inne
 
     Args:
         name (str | None): Der Name des Modulhandbuchs, nach dem gesucht werden soll (SEMANTISCHE SUCHE).
@@ -499,6 +583,62 @@ async def get_modul(
             raise ValueError('At least one of name, content, goals, lecturer, prerequisites, faculty_chair, workloads, success_requirements or exam_outline must be provided for semantic or lexicographic search.')
     Verwende mindestens einen semantischen Parameter (module, name, content, goals, lecturer, prerequisites, faculty_chair, workloads, success_requirements, exam_outline).
 exam, name, description, preparation, type, duration, or frequency
+Gibt Informationen zu passenden Modulen zurück - ÜBERSICHTSVERSION.
+Um zu den besten gefundenen Modulen detaillierte Informationen zu erlangen, verwende das Tool get_modul_by_mongodb_id.
+Mittels get_modul_by_mongodb_id erhältst du zusätzliche Informationen zu <Inhalt>, <Ziele>, Workloads, Klausurbeschreibung, Voraussetzungen, Bestehensvoraussetzungen, Dozent, International, Prüfungen.
+STRATEGIE:
+- Wird aufgerufen, wenn nach Modulen gesucht wird
+- Bietet eine Übersicht, die mittels get_modul_by_mongodb_id spezifiziert werden kann
+EINSATZGEBIET:
+- Modulcode
+- Dozenten und Lehrstühle
+- Voraussetzungen und Erfolgsvoraussetzungen
+- ECTS-Punkte und Semesterverfügbarkeit
+- Sprachen und Internationalität
+INPUTS (SEMANTISCH ERFORDERLICH):
+Mindestens EINER von:
+  - name (str): Name des Moduls
+  - content (str): Inhalt des Moduls
+  - goals (str): Ziele des Moduls
+  - lecturer (str): Dozent des Moduls
+  - prerequisites (str): Voraussetzungen des Moduls
+  - faculty_chair (str): Lehrstuhl des Moduls
+  - workloads (str): Arbeitsbelastung des Moduls
+  - success_requirements (str): Erfolgsvoraussetzungen
+  - exam_outline (str): Prüfungsordnung
+INPUTS (OPTIONAL ALS FILTER):
+- mandatory (bool): Ob das Modul verpflichtend ist
+- module_code (str): Der Modulcode (auch Teil-codes möglich)
+- ects (int oder tuple): ECTS-Punkte
+- available_semesters (int oder tuple): Verfügbare Semester
+- recommended_semester_span (int oder tuple): Empfohlene Semesteranzahl
+- languages (list): Sprachen des Moduls
+- international (bool): Ob das Modul international ist
+- weekly_hours (int oder tuple): Wöchentliche Stunden
+- workload_hours (int oder tuple): Arbeitsstunden
+- exams (list[int]): Prüfungs-IDs
+- k (int, default=5): Anzahl der Ergebnisse
+OUTPUTS:
+Format Infocard (ÜBERSICHT - excluded Felder):
+  Name
+  Modulcode
+  MongoDB-ID
+  ECTS
+  Lehrstuhl
+  Verpflichtend
+  Wochenarbeitsstunden
+  Empfohlener Absolvierungszeitraum von bis Semester
+  Dauer in Semestern
+  Sprachen
+  Angeboten in Semestern
+  Workload-Stunden
+HINWEISE:
+- Mindestens einen semantischen Parameter angeben
+- MongoDB-IDs NICHT in Antworten an Nutzer geben
+- Für Übersicht verwenden
+- Für detaillierte Informationen passender hier gefundener Module: get_modul_by_mongodb_id verwenden
+- Alle Felder, die fehlen, haben keine Informationen inne
+
     Args:
         name (str | None): Der Name des Moduls, nach dem gesucht werden soll (SEMANTISCHE SUCHE).
         content (str | None): Der Inhalt des Moduls, nach dem gesucht werden soll (SEMANTISCHE SUCHE).
@@ -567,6 +707,40 @@ async def get_klausur(
     '''
     Gibt Informationen zu passenden Klausuren zurück.
     Verwende mindestens einen semantischen Parameter (exam, name, description, preparation, type, duration, frequency).
+    EINSATZGEBIET:
+    - Klausurvorbereitung
+    - Prüfungsordnungen
+    - Termine und Deadlines
+    INPUTS (SEMANTISCH ERFORDERLICH):
+    Mindestens EINER von:
+      - name (str): Name der Klausur
+      - description (str): Beschreibung der Klausur
+      - preparation (str): Vorbereitung auf die Klausur
+      - type (str): Typ der Klausur (mündlich, schriftlich, Hausarbeit, Seminararbeit, ...)
+      - duration (str): Dauer der Klausur
+      - frequency (str): Häufigkeit der Klausur
+    INPUTS (OPTIONAL ALS FILTER):
+    - deadline (int oder tuple): Deadline der Klausur
+    - graded (bool): Ob die Klausur benotet ist
+    - id (int): ID der Klausur
+    - portion_of_grade (int oder tuple): Anteil an der Note der Klausur
+    - k (int, default=5): Anzahl der Ergebnisse
+    OUTPUTS:
+    Format Infocard:
+      Name
+      Klausur
+      MongoDB
+      Beschreibung
+      Klausurart
+      Dauer
+      Benotet
+      Vorbereitung
+      Notenanteil
+      Turnus
+    HINWEISE:
+    - Mindestens einen semantischen Parameter angeben
+    - MongoDB-IDs NICHT in Antworten an Nutzer geben
+    - Alle Felder, die fehlen, haben keine Informationen inne
 
     Args:
         name (str | None): Der Name der Klausur, nach dem gesucht werden soll (SEMANTISCHE SUCHE).
@@ -613,6 +787,31 @@ async def get_klausur(
 def get_klausur_by_mongodb_id(mongo_id: str) -> str | None:
     '''
     Gibt Informationen zu einer Klausur anhand der MongoDB-ID zurück.
+    Gibt Informationen zu einer Klausur anhand der MongoDB-ID zurück.
+    Die MongoDB-ID sollte von dem Tool get_modul_by_mongodb_id stammen.
+    STRATEGIE:
+    - Wird für einzelne Klausuren aufgerufen, die im Modul gefunden wurden
+    EINSATZGEBIET:
+    - Wenn ID bekannt ist (von anderen Tools erhalten)
+    - Detaillierte Abfrage einer spezifischen Klausur
+    - Nach `get_modul_by_mongodb_id`
+    INPUTS:
+    - mongo_id (str): Die MongoDB-ID der Klausur
+    OUTPUTS:
+        Name
+        Klausur
+        MongoDB
+        Beschreibung
+        Klausurart
+        Dauer
+        Benotet
+        Vorbereitung
+        Notenanteil
+        Turnus
+
+    HINWEISE:
+    - MongoDB-IDs nur intern verwenden
+    - Alle Felder, die fehlen, haben keine Informationen inne
 
     Args:
         mongo_id (str): Die MongoDB-ID der Klausur, nach der gesucht werden soll.
@@ -628,6 +827,50 @@ def get_klausur_by_mongodb_id(mongo_id: str) -> str | None:
 def get_modul_by_mongodb_id(mongo_id: str) -> str | None:
     '''
     Gibt Informationen zu einem Modul anhand der MongoDB-ID zurück.
+    Gibt Informationen zu einem Modul anhand der MongoDB-ID zurück - DETAILVERSION.
+    Die MongoDB-ID sollte aus dem Tool get_modulhandbuch_by_mongodb_id stammen.
+    STRATEGIE:
+    - Wird für einzelne Module aufgerufen, die im Modulhandbuch gefunden wurden
+    EINSATZGEBIET:
+    - Wenn ID bekannt ist (von anderen Tools erhalten)
+    - Detaillierte Abfrage eines spezifischen Moduls
+    - Nach `get_studiengang_modulhandbuch` und ggf. `get_modulhandbuch_by_mongodb_id`
+    - Untersucht die besten gefundenen Ergebnisse aus get_modul
+    INPUTS:
+    - mongo_id (str): Die MongoDB-ID des Moduls
+    OUTPUTS:
+        Name
+        Modulcode
+        MongoDB-ID
+        ECTS
+        Lehrstuhl
+        Verpflichtend
+        Wochenarbeitsstunden
+        Voraussetzungen
+        Bestehensvoraussetzungen
+        Empfohlener
+        Dauer
+        Inhalt
+        Ziele
+        Dozent
+        Sprachen
+        International
+        Angeboten
+        Wochenstunden
+        Workload
+        Workloads
+        Klausurbeschreibung
+        Prüfungen: Liste aller Klausuren in diesem Modul mit Klausur-ID, MongoDB-ID, Beschreibung, Klausurart, Dauer, Benotet, Vorbereitung, Notenanteil an Modul und Turnus (wie häufig die Klausur gehalten wird)
+    WICHTIG:
+    - Für detaillierte Untersuchung verwenden
+    - Workloads werden vollständig ausgeschrieben (nicht zusammengefasst)
+    HINWEISE:
+    - IDs nur intern verwenden
+    - NICHT in Antworten an Nutzer geben
+    - None zurückgegeben, wenn nicht gefunden
+    - Für detaillierte Informationen verwenden
+    - Um mehr Informationen zu den Klausuren zu erhalten, rufe get_klausur_by_mongodb_id auf
+    - Alle Felder, die fehlen, haben keine Informationen inne
 
     Args:
         mongo_id (str): Die MongoDB-ID des Moduls, nach der gesucht werden soll.
@@ -640,13 +883,40 @@ def get_modul_by_mongodb_id(mongo_id: str) -> str | None:
     ]
     result = modules_db.aggregate(aggregation_pipeline).to_list(length=1)[0]
     if result:
-        return Module(result).infocard
+        return Module(result, compact=False).infocard
     return None
 
 @tool
 def get_modulhandbuch_by_mongodb_id(mongo_id: str) -> str | None:
     '''
     Gibt Informationen zu einem Modulhandbuch anhand der MongoDB-ID zurück.
+    Gibt ausführliche Informationen zu einem Modulhandbuch anhand der MongoDB-ID zurück - DETAILVERSION.
+    Die ModulDB-ID für den Aufruf sollte von dem Tool get_studiengang_modulhandbuch stammen
+    STRATEGIE:
+    - VIERTE STUFE nach get_studiengang_modulhandbuch
+    - Wird mit dem besten gefundenen MHB aufgerufen
+    - Gibt vollständige Details ohne Kompaktierung (compact=False)
+    EINSATZGEBIET:
+    - Wenn ID bekannt ist (von anderen Tools erhalten)
+    - Detaillierte Abfrage eines spezifischen Modulhandbuchs
+    - Nach `get_studiengang_modulhandbuch` mit dem besten Ergebnis
+    INPUTS:
+    - mongo_id (str): Die MongoDB-ID des Modulhandbuchs
+    OUTPUTS:
+    Format Infocard (vollständig, compact=False):
+      Name
+      MongoDB
+      Beginn
+      Fakultäten
+      Modulhandbuchgruppe
+      Dateipfad
+      Gründung
+      Modulgruppen: beinhaltet Liste aller Modulgruppen mit Name (Buchstabe), Bereich der zu absolvierenden ECTS, alle enthaltenen Module mit <Name, Modulcode, MongoDB-ID>
+    HINWEISE:
+    - IDs nur intern verwenden
+    - None zurückgegeben, wenn nicht gefunden
+    - Nach `get_studiengang_modulhandbuch` mit dem besten Ergebnis aufrufen
+    - Alle Felder, die fehlen, haben keine Informationen inne
 
     Args:
         mongo_id (str): Die MongoDB-ID des Modulhandbuchs, nach der gesucht werden soll.
@@ -659,7 +929,7 @@ def get_modulhandbuch_by_mongodb_id(mongo_id: str) -> str | None:
     ]
     result = mhbs_db.aggregate(aggregation_pipeline).to_list(length=1)[0]
     if result:
-        return ModuleHandbook(result).infocard # _compressed_modules
+        return ModuleHandbook(result, compact=False).infocard # _compressed_modules
     return None
 
 
