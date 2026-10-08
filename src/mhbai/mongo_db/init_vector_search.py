@@ -23,7 +23,7 @@ embedded_keys = {'mhbs': ['description', 'faculties', 'name', 'path'],
 
 embedded_keys_paths = {key: ['embedding_' + e for e in value] + ['embedding'] for key, value in embedded_keys.items()}
 
-bm25_keys = {'mhbs': ['name', 'description', 'faculties', 'path'],
+bm25_keys = {'mhbs': ['description', 'faculties', 'path'], # 'name',
               'modules': ['name', 'lecturer', 'prerequisites', 'faculty_chair', 'success_requirements'],
               'exams': ['name', 'type', 'duration', 'frequency']}
 

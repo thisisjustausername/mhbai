@@ -4,6 +4,7 @@ Create tools for searching and retrieving information about study programs, modu
 
 # TODO: don't make get studiengang etc output the full information but rather only like a short infocard to keep context small. then for more infos either activate full info or fetch by id one by one or concurrently
 
+import json
 import os
 import re
 from dataclasses import dataclass, field
@@ -167,12 +168,13 @@ async def search_studiengang(query: str, k: int = 5) -> str:
 
     if not matches:
         return 'Keine passenden Informationen gefunden.'
-    return '\n\n'.join(
-        [
-            f'Treffer {index + 1}:\n'
-            f'Studiengang: {match.metadata.get('Studiengang', 'unbekannt')}\n'
-            f'Inhalt: {match.page_content}\n'
-            f'Metadaten: {match.metadata}'
+    return json.dumps(
+        [{
+            'ranking': index + 1,
+            'studiengang': match.metadata.get('Studiengang', 'unbekannt'),
+            'inhalt': match.page_content,
+            'metadaten': match.metadata
+        }
             for index, match in enumerate(matches)
         ]
     )
@@ -183,7 +185,7 @@ def _build_vector_search(index: str, embedding: list[float], k: int, filters: li
         '$vectorSearch': {
             'queryVector': embedding,
             'path': index,
-            'limit': k,
+            'limit': k*15,
             **({'filters': filters} if filters else {})
         }
     }
@@ -240,7 +242,7 @@ def _create_vector_search(attribs: dict, rename_keys: dict, bm25_keys: list[str]
         filters[key] = _create_filter(val)
         lexico_filters.append(_create_filter(val, lexico_search_field=key))
     emb_attrs = {key: v for key, v in link_to_keys.items() if key.startswith('embedding') and v is not None}
-    bm25_attribs = {k: v for k, v in attribs.items() if k in bm25_keys and v is not None}
+    bm25_attribs = {key: v for key, v in attribs.items() if key in bm25_keys and v is not None}
 
     pipelines = {}
     flat_weights = {}
@@ -271,7 +273,13 @@ def _create_vector_search(attribs: dict, rename_keys: dict, bm25_keys: list[str]
         else:
             search_stage = {
                     'index': 'bm25_index',
-                    'text': {'query': [val], 'path': key}
+                    # 'text': {'query': [val], 'path': key}
+                    'text': {
+                        'query': val,
+                        'path': key,
+                        'matchCriteria': 'all',
+                        'fuzzy': {'maxEdits': 2, 'prefixLength': 1}
+                    }
             }
 
         pipelines[key] = [{'$search': search_stage}]
@@ -303,11 +311,14 @@ def _create_vector_search(attribs: dict, rename_keys: dict, bm25_keys: list[str]
 @dataclass(frozen=True)
 class Exam:
     data: dict
-    infocard: str = field(init=False)
+    # infocard_text: str = field(init=False)
+    infocard: dict = field(init=False)
+    compact: bool = field(default=True)
+
 
     def __post_init__(self):
         default = 'Unbekannt'
-        object.__setattr__(self, 'infocard', f'''Name: {self.data.get('name')};
+        """info = f'''Name: {self.data.get('name')};
 Klausur-ID: {self.data.get('id')};
 MongoDB-ID: {self.data.get('_id')};
 Beschreibung: {self.data.get('description', default)};
@@ -316,16 +327,53 @@ Dauer: {self.data.get('duration', default)};
 Benotet: {self.data.get('graded')};
 Vorbereitung: {self.data.get('preparation', default)};
 Notenanteil an Modul: {self.data.get('portion_of_grade', default)};
-Turnus: {self.data.get('frequency', default)}''')
+Turnus: {self.data.get('frequency', default)}'''"""
+        info_dict = {
+            'name': self.data.get('name'),
+            'id': self.data.get('id'),
+            'mongo_id': str(self.data.get('_id')),
+            'beschreibung': self.data.get('description', default),
+            'klausurart': self.data.get('type'),
+            'dauer': self.data.get('duration', default),
+            'benotet': self.data.get('graded'),
+            'vorbereitung': self.data.get('preparation', default),
+            'notenanteil_an_modul': self.data.get('portion_of_grade', default),
+            'turnus': self.data.get('frequency', default)
+        }
 
-    def __str__(self) -> str:
-        return self.infocard
+        if self.compact is True:
+            unknowns_json = []
+            keys_to_pop = []
+            for k, v in info_dict.items():
+                if v == default:
+                    keys_to_pop.append(k)
+                    unknowns_json.append(k)
+            for k in keys_to_pop:
+                info_dict.pop(k)
+            if unknowns_json:
+                info_dict['unbekannt'] = unknowns_json
+            # fields = [i for i in info.split('\n')]
+            """unknowns = []
+            knowns = []
+            for f in fields:
+                if f.endswith(default):
+                    unknowns.append(f.split(':')[0])
+                else: knowns.append(f)
+            info = '\n'.join(knowns)
+            if unknowns: info = info + f'\nUnbekannt: {", ".join(unknowns)}'"""
+
+        # object.__setattr__(self, 'infocard_text', info)
+        object.__setattr__(self, 'infocard', info_dict)
+
+    """def __str__(self) -> str:
+        return self.infocard_text"""
 
 
 @dataclass(frozen=True)
 class Module:
     data: dict
-    infocard: str = field(init=False)
+    # infocard_text: str = field(init=False)
+    infocard: dict = field(init=False)
     compact: bool = field(default=True)
 
     def __post_init__(self):
@@ -344,10 +392,12 @@ class Module:
         if not isinstance(workloads, str):
             workloads = ',\n'.join([f'    name: {wl["name"]}\n    in presence: {wl["in_presence"]}\n    time expenditure in hours: {wl["time_expenditure"]}' for wl in workloads])
         exams = self.data.get('exams', default)
+        exams_json = exams
         if not isinstance(exams, str):
-            exams = '\n' + '\n'.join(['\t--- Klausurblock ---\n\t' + ',\n\t'.join(Exam(i).infocard.split(';\n')) for i in exams])
+            exams_json = [Exam(i).infocard for i in exams]
+            # exams = '\n' + '\n'.join(['\t--- Klausurblock ---\n\t' + ',\n\t'.join(Exam(i).infocard_text.split(';\n')) for i in exams])
 
-        info = f'''Name: {self.data.get('name')}
+        """info = f'''Name: {self.data.get('name')}
 Modulcode: {self.data.get('module_code')}
 MongoDB-ID: {self.data.get('_id')}
 ECTS: {self.data.get('ects')}
@@ -367,11 +417,48 @@ Angeboten in den Semestern: {available_semesters}
 Workload-Stunden: {self.data.get('workload_hours', default) or default}
 Workloads: {workloads}
 Klausurbeschreibung: {self.data.get('exam_outline', default) or default}
-Prüfungen: {exams}'''
+Prüfungen: {exams}'''"""
+        info_dict = {
+            'name': self.data.get('name'),
+            'modulcode': self.data.get('module_code'),
+            'mongoDB-ID': str(self.data.get('_id')),
+            'ects': self.data.get('ects'),
+            'lehrstuhl': self.data.get('faculty_chair'),
+            'verpflichtend': self.data.get('mandatory'),
+            'wochenarbeitsstunden': self.data.get('weekly_hours', default) or default,
+            'voraussetzungen': self.data.get('prerequisites', default) or default,
+            'bestehensvoraussetzungen': self.data.get('success_requirements', default) or default,
+            'empfohlener Absolvierungszeitraum von bis Semester': semester_span,
+            'dauer in Semestern': self.data.get('semester_span', default) or default,
+            'inhalt': self.data.get('content', default) or default,
+            'ziele': self.data.get('goals', default) or default,
+            'dozent': self.data.get('lecturer', default) or default,
+            'sprachen': ', '.join(self.data.get('languages', [])) if self.data.get('languages') else default,
+            'international': self.data.get('international'),
+            'angeboten_in_den_semestern': available_semesters,
+            'workload_stunden': self.data.get('workload_hours', default) or default,
+            'workloads': workloads,
+            'klausurbeschreibung': self.data.get('exam_outline', default) or default,
+            'prüfungen': exams_json,
+        }
 
         if self.compact is True:
-            excluded_fields = ['<Inhalt>', '<Ziele>', 'Workloads', 'Klausurbeschreibung', 'Voraussetzungen', 'Bestehensvoraussetzungen', 'Dozent', 'International', 'Prüfungen']
-            fields = [i for i in info.split('\n') if not i in excluded_fields]
+            # excluded_fields = ['<Inhalt>', '<Ziele>', 'Workloads', 'Klausurbeschreibung', 'Voraussetzungen', 'Bestehensvoraussetzungen', 'Dozent', 'International', 'Prüfungen']
+            excluded_fields_json = ['inhalt', 'ziele', 'workloads', 'klausurbeschreibung', 'voraussetzungen', 'bestehensvoraussetzungen', 'dozent', 'international', 'prüfungen']
+            unknowns_json = []
+            keys_to_pop = []
+            for k, v in info_dict.items():
+                if k in excluded_fields_json:
+                    keys_to_pop.append(k)
+                    continue
+                if v == default:
+                    keys_to_pop.append(k)
+                    unknowns_json.append(k)
+            for k in keys_to_pop:
+                info_dict.pop(k)
+            if unknowns_json:
+                info_dict['unbekannt'] = unknowns_json
+            """fields = [i for i in info.split('\n') if not i in excluded_fields]
             unknowns = []
             knowns = []
             for f in fields:
@@ -379,21 +466,25 @@ Prüfungen: {exams}'''
                     unknowns.append(f.split(':')[0])
                 else: knowns.append(f)
             info = '\n'.join(knowns)
-            if unknowns: info = info + f'\nUnbekannt: {", ".join(unknowns)}'
+            if unknowns: info = info + f'\nUnbekannt: {", ".join(unknowns)}'"""
 
-        object.__setattr__(self, 'infocard', info)
+        # object.__setattr__(self, 'infocard_text', info)
+        object.__setattr__(self, 'infocard', info_dict)
 
-    def __str__(self) -> str:
-        return self.infocard
+    """def __str__(self) -> str:
+        return self.infocard_text"""
 
 
 @dataclass(frozen=True)
 class ModuleHandbook:
     data: dict
     granularities: list[Literal['all', 'compressed', 'ids']] = field(default_factory=lambda: ['all', 'compressed', 'ids'])
-    infocard: str = field(init=False)
-    infocard_compressed_modules: str = field(init=False)
-    infocard_module_ids_only: str = field(init=False)
+    infocard: dict = field(init=False)
+    infocard_compressed_modules: tuple = field(init=False)
+    infocard_module_ids_only: tuple = field(init=False)
+    """infocard_text: str = field(init=False)
+    infocard_compressed_modules_text: str = field(init=False)
+    infocard_module_ids_only_text: str = field(init=False)"""
     compact: bool = field(default=True)
 
     def __post_init__(self):
@@ -401,72 +492,124 @@ class ModuleHandbook:
         start_semester = self.data.get('start_semester')
         module_groups = module_groups_compressed = module_groups_ids = self.data.get('module_groups', default) or default
 
-        def _create_infocard(mdl_grp: str) -> str:
+        def _create_infocard(mdl_grp: str | tuple) -> dict:
             '''
-            Creates an infocard string for the module handbook with the specified module group information.
+            Creates an infocard dictionary for the module handbook with the specified module group information.
 
             Args:
-                mdl_grp (str): The module group information to include in the infocard.
+                mdl_grp (str | tuple): The module group information to include in the infocard.
             Returns:
-                str: A string representation of the infocard for the module handbook.
+                dict: A dictionary representation of the infocard for the module handbook.
             '''
-            excluded_fields = ['Modulgruppen', 'Gründung des Studiengangs']
-            output = f'''Name: {self.data.get('name')}
+            # excluded_fields = ['Modulgruppen', 'Gründung des Studiengangs']
+            excluded_fields_json = ['modulgruppen', 'gründung_des_studiengangs']
+            """info = f'''Name: {self.data.get('name')}
 MongoDB-ID: {self.data.get('_id')}
 Beginn: {start_semester}
 Fakultäten: {', '.join(self.data.get('faculties'))}
 Modulhandbuchgruppe: {self.data.get('module_handbook_group', default)}
 Dateipfad: {self.data.get('path').split('uni-a_mhbs_json', 1)[1][1:]}
 Gründung des Studiengangs: {self.data.get('description', default)}
-Modulgruppen: {mdl_grp}''' # type: ignore
-            if self.compact is False:
-                return output
-            if 'Modulgruppen' in excluded_fields:
-                output = output.split('\nModulgruppen: ', 1)[0]
-            return '\n'.join([i for i in output.split('\n') if not i.split(':', 1)[0] in excluded_fields])
+Modulgruppen: {mdl_grp if isinstance(mdl_grp, str) else ""}''' # temporary else empty fix"""
+# TODO: above remove empty
+            info_dict = {
+                'name': self.data.get('name'),
+                'mongoDB-ID': str(self.data.get('_id')),
+                'beginn': start_semester,
+                'fakultäten': self.data.get('faculties'),
+                'modulhandbuchgruppe': self.data.get('module_handbook_group', default),
+                'dateipfad': self.data.get('path').split('uni-a_mhbs_json', 1)[1][1:], # TODO: remove hardcoded path
+                'gründung_des_studiengangs': self.data.get('description', default),
+                'modulgruppen': mdl_grp
+            }
 
-        def _create_module_group(module_group: dict, information: Literal['all', 'compressed', 'ids']) -> str:
+            if self.compact is False:
+                return info_dict
+            unknowns_json = []
+            keys_to_pop = []
+            for k, v in info_dict.items():
+                if k in excluded_fields_json:
+                    keys_to_pop.append(k)
+                    continue
+                if v == default:
+                    keys_to_pop.append(k)
+                    unknowns_json.append(k)
+            for k in keys_to_pop:
+                info_dict.pop(k)
+            if unknowns_json:
+                info_dict['unbekannt'] = unknowns_json
+            """if 'Modulgruppen' in excluded_fields:
+                info = info.split('\nModulgruppen: ', 1)[0]"""
+            # return '\n'.join([i for i in info.split('\n') if not i.split(':', 1)[0] in excluded_fields])
+            return info_dict
+
+        """@overload
+        def _create_module_group(module_group: dict, information: Literal['all', 'compressed', 'ids'], output_format=Literal['dict']) -> dict: ...
+
+        @overload
+        def _create_module_group(module_group: dict, information: Literal['all', 'compressed', 'ids'], output_format=Literal['str']) -> str: ..."""
+
+        def _create_module_group(module_group: dict, information: Literal['all', 'compressed', 'ids']) -> dict:
             '''
-            Creates a string representation of a module group with the specified information granularity.
+            Creates a string or dictionary representation of a module group with the specified information granularity.
 
             Args:
                 module_group (dict): The module group data.
                 information (Literal['all', 'compressed', 'ids']): The level of detail to include in the output. 'all' includes full module details, 'compressed' includes name and module code, and 'ids' includes only MongoDB IDs.
             Returns:
-                str: A string representation of the module group with the specified information granularity.
+                dict: A dictionary representation of the module group with the specified information granularity.
             '''
             modules = module_group.get('modules', default)
+            modules_json = modules
             if modules is None:
                 modules = default
+                modules_json = default
             if not isinstance(modules, str):
                 if information == 'ids':
-                    modules = ', '.join([str(i.get('_id', default) if isinstance(i, dict) else i) for i in modules]) # TODO: test isinstance
+                    # modules = ', '.join([str(i.get('_id', default) if isinstance(i, dict) else i) for i in modules]) # TODO: test isinstance
+                    # either dictionary or when no match found the object id
+                    modules_json = [str(i.get('_id', default) if isinstance(i, dict) else i) for i in modules]
                 elif information == 'compressed':
-                    modules = ', '.join([f'<{i.get("name")}, {i.get("module_code")}, {i.get("_id")}>' if isinstance(i, dict) else f'<{default}, {default}, {i}' for i in modules])
+                    # modules = ', '.join([f'<{i.get("name")}, {i.get("module_code")}, {i.get("_id")}>' if isinstance(i, dict) else f'<{default}, {default}, {i}' for i in modules])
+                    modules_json = [{'name': i.get('name'), 'modulcode': i.get('module_code'), 'mongoDB-ID': i.get('_id')} if isinstance(i, dict) else {'name': default, 'modulcode': default, 'mongoDB-ID': i} for i in modules]
                 else:
-                    modules = '\n'.join(['        --- Modul ---\n' + '\n        '.join(Module(i).infocard.split(';\n')) for i in modules])
-            return f'''\tName: {module_group.get('name_letter')},
+                    # modules = '\n'.join(['        --- Modul ---\n' + '\n        '.join(Module(i).infocard.split(';\n')) for i in modules]) # FIX: outdated as ; was removed. Marked for removal as well
+                    modules_json = [Module(i).infocard for i in modules_json] # type: ignore
+            """info = f'''\tName: {module_group.get('name_letter')},
 \tZu absolvierende ECTS: {module_group.get('min_ects', default) or default} - {module_group.get('max_ects', default) or default},
-\tModule {" (MongoDB-IDs)" if information == 'ids' else "<Name, Modulcode, MongoDB-ID>" if information == 'compressed' else ""}: {modules}'''
+\tModule {" (MongoDB-IDs)" if information == 'ids' else "<Name, Modulcode, MongoDB-ID>" if information == 'compressed' else ""}: {modules}'''"""
+            info_dict = {
+                'name': module_group.get('name_letter'),
+                'zu_absolvierende_ects': f"{module_group.get('min_ects', default) or default} - {module_group.get('max_ects', default) or default}",
+                'module': modules_json
+            }
+            return info_dict #  if output_format == 'dict' else info
 
         if not isinstance(module_groups, str):
             if 'compressed' in self.granularities:
-                module_groups_compressed = '\n' + '\n'.join(['    --- Modulgruppe ---\n' + _create_module_group(i, information='compressed') for i in module_groups])
-                object.__setattr__(self, 'infocard_compressed_modules', _create_infocard(mdl_grp=module_groups_compressed))
+                # module_groups_compressed = '\n' + '\n'.join(['    --- Modulgruppe ---\n' + _create_module_group(i, information='compressed') for i in module_groups])
+                module_groups_compressed_json = tuple(_create_module_group(i, information='compressed') for i in module_groups) # tuple
+                object.__setattr__(self, 'infocard_compressed_modules_text', _create_infocard(mdl_grp=module_groups_compressed))
+                object.__setattr__(self, 'infocard_compressed_modules', _create_infocard(mdl_grp=module_groups_compressed_json))
             if 'ids' in self.granularities:
-                module_groups_ids = '\n' + '\n'.join(['    --- Modulgruppe ---\n' + _create_module_group(i, information='ids') for i in module_groups])
-                object.__setattr__(self, 'infocard_module_ids_only', _create_infocard(mdl_grp=module_groups_ids))
+                # module_groups_ids = '\n' + '\n'.join(['    --- Modulgruppe ---\n' + _create_module_group(i, information='ids') for i in module_groups])
+                object.__setattr__(self, 'infocard_module_ids_only_text', _create_infocard(mdl_grp=module_groups_ids))
+                module_groups_ids_json = tuple(_create_module_group(i, information='ids') for i in module_groups)
+                object.__setattr__(self, 'infocard_module_ids_only', _create_infocard(mdl_grp=module_groups_ids_json))
             if 'all' in self.granularities:
-                module_groups = '\n' + '\n'.join(['    --- Modulgruppe ---\n' + _create_module_group(i, information='all') for i in module_groups])
-                object.__setattr__(self, 'infocard', _create_infocard(mdl_grp=module_groups))
+                module_groups_json = tuple(_create_module_group(i, information='all') for i in module_groups)
+                # module_groups = '\n' + '\n'.join(['    --- Modulgruppe ---\n' + _create_module_group(i, information='all') for i in module_groups])
+                object.__setattr__(self, 'infocard_text', _create_infocard(mdl_grp=module_groups))
+                object.__setattr__(self, 'infocard', _create_infocard(mdl_grp=module_groups_json))
         if start_semester is not None:
             start_semester = str(start_semester)
             is_winter_start = bool(start_semester[-1])
             year = start_semester[:4]
             start_semester = ('Wintersemester ' if is_winter_start else 'Sommersemester ') + str(year) + (f'/{int(year) + 1}' if is_winter_start else '')
 
-    def __str__(self) -> str:
-        return self.infocard
+
+    """def __str__(self) -> str:
+        return self.infocard_text"""
 
 
 # NOTE: search_field Literal options originate from embedding_ fields in mongo_db/create_collection.py
@@ -533,10 +676,11 @@ async def get_studiengang_modulhandbuch(
     attribs = locals()
     attribs.pop('k')
     # rename_keys = {'module_handbook': 'embedding'}
-    rename_keys = {k: v for k, v in zip(embedded_keys['mhbs'], embedded_keys_paths['mhbs'])} | {'module_handbook': 'embedding'}
+    rename_keys = {key: v for key, v in zip(embedded_keys['mhbs'], embedded_keys_paths['mhbs'])} | {'module_handbook': 'embedding'}
     # bm25 = ['name', 'description', 'faculties', 'path']
     bm25 = bm25_keys['mhbs']
     for i in bm25:
+        # if i == 'name': continue # TODO: make nicer, don't manually exclude fields, that need both or only vector search
         rename_keys.pop(i, None)
     if not any(attribs.get(key) is not None for key in (rename_keys.keys() | bm25)):
         raise ValueError('At least one of name, description or faculties must be provided for semantic or lexicographic search.')
@@ -551,7 +695,7 @@ async def get_studiengang_modulhandbuch(
     cursor = mhbs_db.aggregate(agg_pipeline)
     results = cursor.to_list(length=k)
     outputs = [ModuleHandbook(i, granularities=['compressed']).infocard_compressed_modules for i in results]
-    return '\n\n--- Neues Suchresultat ---\n\n'.join(outputs)
+    return json.dumps(outputs)
 
 
 # TODO: add filters either in new function or in get_studiengang_modulhandbuch
@@ -686,7 +830,7 @@ HINWEISE:
     cursor = modules_db.aggregate(agg_pipeline)
     results = cursor.to_list(length=k)
     outputs = [Module(i).infocard for i in results]
-    return '\n\n--- Neues Suchresultat ---\n\n'.join(outputs)
+    return json.dumps(outputs)
 
 
 # NOTE: use at least one semantic parameter so ranking is possible when limiting the output to k results
@@ -780,7 +924,7 @@ async def get_klausur(
     cursor = exams_db.aggregate(agg_pipeline)
     results = cursor.to_list(length=k)
     outputs = [Exam(i).infocard for i in results]
-    return '\n\n--- Neues Suchresultat ---\n\n'.join(outputs)
+    return json.dumps(outputs)
 
 
 @tool
@@ -820,8 +964,8 @@ def get_klausur_by_mongodb_id(mongo_id: str) -> str | None:
     '''
     result = exams_db.find_one({'_id': ObjectId(mongo_id)})
     if result:
-        return Exam(result).infocard
-    return None
+        return json.dumps(Exam(result).infocard)
+    return 'Keine Informationen zu der Klausur gefunden.'
 
 @tool
 def get_modul_by_mongodb_id(mongo_id: str) -> str | None:
@@ -883,8 +1027,8 @@ def get_modul_by_mongodb_id(mongo_id: str) -> str | None:
     ]
     result = modules_db.aggregate(aggregation_pipeline).to_list(length=1)[0]
     if result:
-        return Module(result, compact=False).infocard
-    return None
+        return json.dumps(Module(result, compact=False).infocard)
+    return 'Keine Informationen zu dem Modul gefunden.'
 
 @tool
 def get_modulhandbuch_by_mongodb_id(mongo_id: str) -> str | None:
@@ -929,8 +1073,8 @@ def get_modulhandbuch_by_mongodb_id(mongo_id: str) -> str | None:
     ]
     result = mhbs_db.aggregate(aggregation_pipeline).to_list(length=1)[0]
     if result:
-        return ModuleHandbook(result, compact=False).infocard # _compressed_modules
-    return None
+        return json.dumps(ModuleHandbook(result, compact=False).infocard) # _compressed_modules
+    return 'Keine Informationen zu dem Modulhandbuch gefunden.'
 
 
 def replacer(match):
@@ -1069,7 +1213,7 @@ async def dirty_search(query: str, k: int = 3) -> str:
         results.append(f'Quelle: {url}\n{text}')
     if not results:
         return 'Keine passenden Informationen gefunden.'
-    return '\n\n---\n\n'.join(results)
+    return json.dumps(results)
 
 
 @tool
