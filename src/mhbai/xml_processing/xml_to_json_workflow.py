@@ -7,8 +7,8 @@ from multiprocessing import Pool, cpu_count
 from tqdm import tqdm
 
 
-base_read_path = Path(os.path.expanduser("~/mhbai/mount/StudisDaten/Modulhandbuecher/"))
-base_save_path = Path(os.path.expanduser("~/mhbai/uni-a_mhbs_json/"))
+base_read_path = Path(os.path.expanduser("~/mhbai/src/mhbai/mount/StudisDaten/Modulhandbuecher/"))
+base_save_path = Path(os.path.expanduser("~/mhbai/src/mhbai/uni-a_mhbs_json/"))
 
 def process_file(xml_file: str):
     with open(xml_file, "r") as f:
@@ -26,7 +26,7 @@ def main():
         for xml_file, result in tqdm(
             pool.imap_unordered(process_file, files), total=len(files)
         ):
-            
+
             save_path = base_save_path / Path(xml_file).relative_to(base_read_path).with_suffix(".json")
             save_path.parent.mkdir(parents=True, exist_ok=True)
 

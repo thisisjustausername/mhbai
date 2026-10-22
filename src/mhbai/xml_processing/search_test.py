@@ -16,7 +16,7 @@ def get_json_files(path_to_json: Path) -> list[Path]:
 
 if __name__ == "__main__":
     # Initialize base data
-    path_to_json = Path(os.path.expanduser("~/mhbai/uni-a_mhbs_json/"))
+    path_to_json = Path(os.path.expanduser("~/mhbai/src/mhbai/uni-a_mhbs_json/"))
 
     print("Collecting all JSON files...")
     res = get_json_files(path_to_json)

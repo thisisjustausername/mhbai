@@ -57,7 +57,7 @@ exams_db = mongo_db['exams']
 
 options = htm.ConversionOptions(exclude_selectors=['script', 'style', 'noscript', 'footer', 'nav'])
 
-mhb_lookup_modules = [ '_id', 'module_code', 'name']
+mhb_lookup_modules = ['_id', 'module_code', 'name']
 mhb_lookup_pipeline = [
     {'$lookup': {
             'from': 'modules',
@@ -480,8 +480,8 @@ class ModuleHandbook:
     data: dict
     granularities: list[Literal['all', 'compressed', 'ids']] = field(default_factory=lambda: ['all', 'compressed', 'ids'])
     infocard: dict = field(init=False)
-    infocard_compressed_modules: tuple = field(init=False)
-    infocard_module_ids_only: tuple = field(init=False)
+    infocard_compressed_modules: tuple | str = field(init=False)
+    infocard_module_ids_only: tuple | str = field(init=False)
     """infocard_text: str = field(init=False)
     infocard_compressed_modules_text: str = field(init=False)
     infocard_module_ids_only_text: str = field(init=False)"""
@@ -585,22 +585,21 @@ Modulgruppen: {mdl_grp if isinstance(mdl_grp, str) else ""}''' # temporary else 
             }
             return info_dict #  if output_format == 'dict' else info
 
-        if not isinstance(module_groups, str):
-            if 'compressed' in self.granularities:
-                # module_groups_compressed = '\n' + '\n'.join(['    --- Modulgruppe ---\n' + _create_module_group(i, information='compressed') for i in module_groups])
-                module_groups_compressed_json = tuple(_create_module_group(i, information='compressed') for i in module_groups) # tuple
-                object.__setattr__(self, 'infocard_compressed_modules_text', _create_infocard(mdl_grp=module_groups_compressed))
-                object.__setattr__(self, 'infocard_compressed_modules', _create_infocard(mdl_grp=module_groups_compressed_json))
-            if 'ids' in self.granularities:
-                # module_groups_ids = '\n' + '\n'.join(['    --- Modulgruppe ---\n' + _create_module_group(i, information='ids') for i in module_groups])
-                object.__setattr__(self, 'infocard_module_ids_only_text', _create_infocard(mdl_grp=module_groups_ids))
-                module_groups_ids_json = tuple(_create_module_group(i, information='ids') for i in module_groups)
-                object.__setattr__(self, 'infocard_module_ids_only', _create_infocard(mdl_grp=module_groups_ids_json))
-            if 'all' in self.granularities:
-                module_groups_json = tuple(_create_module_group(i, information='all') for i in module_groups)
-                # module_groups = '\n' + '\n'.join(['    --- Modulgruppe ---\n' + _create_module_group(i, information='all') for i in module_groups])
-                object.__setattr__(self, 'infocard_text', _create_infocard(mdl_grp=module_groups))
-                object.__setattr__(self, 'infocard', _create_infocard(mdl_grp=module_groups_json))
+        if 'compressed' in self.granularities:
+            # module_groups_compressed = '\n' + '\n'.join(['    --- Modulgruppe ---\n' + _create_module_group(i, information='compressed') for i in module_groups])
+            module_groups_compressed_json = tuple(_create_module_group(i, information='compressed') for i in module_groups) if not isinstance(module_groups, str) else module_groups # tuple
+            # object.__setattr__(self, 'infocard_compressed_modules_text', _create_infocard(mdl_grp=module_groups_compressed))
+            object.__setattr__(self, 'infocard_compressed_modules', _create_infocard(mdl_grp=module_groups_compressed_json))
+        if 'ids' in self.granularities:
+            # module_groups_ids = '\n' + '\n'.join(['    --- Modulgruppe ---\n' + _create_module_group(i, information='ids') for i in module_groups])
+            # object.__setattr__(self, 'infocard_module_ids_only_text', _create_infocard(mdl_grp=module_groups_ids))
+            module_groups_ids_json = tuple(_create_module_group(i, information='ids') for i in module_groups) if not isinstance(module_groups, str) else module_groups
+            object.__setattr__(self, 'infocard_module_ids_only', _create_infocard(mdl_grp=module_groups_ids_json))
+        if 'all' in self.granularities:
+            module_groups_json = tuple(_create_module_group(i, information='all') for i in module_groups) if not isinstance(module_groups, str) else module_groups
+            # module_groups = '\n' + '\n'.join(['    --- Modulgruppe ---\n' + _create_module_group(i, information='all') for i in module_groups])
+            # object.__setattr__(self, 'infocard_text', _create_infocard(mdl_grp=module_groups))
+            object.__setattr__(self, 'infocard', _create_infocard(mdl_grp=module_groups_json))
         if start_semester is not None:
             start_semester = str(start_semester)
             is_winter_start = bool(start_semester[-1])

@@ -353,9 +353,9 @@ def extract_module_data(
 
 
 if __name__ == "__main__":
-    modules = load_pdf_modules(pdf_folder="~/mhbai/pdfs/", from_db=True)
+    modules = load_pdf_modules(pdf_folder="~/mhbai/src/mhbai/pdfs/", from_db=True)
     print()
     print("Extracting data from modules using AI...")
     results = extract_module_data(
-        modules, save_path="~/mhbai/_temp_extracted_modules.json"
+        modules, save_path="~/mhbai/src/mhbai/_temp_extracted_modules.json"
     )

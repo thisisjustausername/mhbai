@@ -54,13 +54,13 @@ def save(res: tuple[dict, Path]) -> None:
         res (tuple[dict, Path]): The data to save.
         file_path (Path): The path where the JSON file will be saved.
     """
-    with open(Path(os.path.expanduser(f"~/mhbai/xml_processing/_temp/{res[1].stem}.json")), "w") as f:
+    with open(Path(os.path.expanduser(f"~/mhbai/src/mhbai/xml_processing/_temp/{res[1].stem}.json")), "w") as f:
         json.dump(res[0], f, indent=4)
 
 
 if __name__ == "__main__":
     # Initialize base data
-    path_to_xml = Path(os.path.expanduser("~/mhbai/mount/StudisDaten/Modulhandbuecher/"))
+    path_to_xml = Path(os.path.expanduser("~/mhbai/src/mhbai/mount/StudisDaten/Modulhandbuecher/"))
 
     print("Collecting all XML files...")
     res = get_files(path_to_xml)

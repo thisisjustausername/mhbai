@@ -9,7 +9,7 @@ from pathlib import Path
 
 from mhbai.xml_processing.pipeline import get_files
 
-base_path = Path(os.path.expanduser('~/mhbai/ai/compressed_mhbs'))
+base_path = Path(os.path.expanduser('~/mhbai/src/mhbai/ai/compressed_mhbs'))
 files = get_files(path_to_file=base_path, file_type='json')
 files = [i for i in files if i.stem != 'metadata']
 

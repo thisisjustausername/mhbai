@@ -112,7 +112,7 @@ def fetch_pdf(web_url: str, adapt_file_names: bool = False) -> None:
         pass
 
     # insert data into database
-    result = db.insert(table="unia.mhbs", values={"web_url": web_url, "pdf_name": file_name, "folder": "~/mhbai/pdfs/", "version": time_code}, returning_column="id")
+    result = db.insert(table="unia.mhbs", values={"web_url": web_url, "pdf_name": file_name, "folder": "~/mhbai/src/mhbai/pdfs/", "version": time_code}, returning_column="id")
     if result.is_error:
         raise Exception(f"Error inserting mhb {web_url} into database: {result.error}")
     if result.data is None:

@@ -12,11 +12,12 @@ from typing import Literal, overload
 
 from bson import ObjectId
 from langchain_ollama import OllamaEmbeddings
-from mhbai.mongo_db.init_vector_search import collections, embedded_keys
-from mhbai.xml_processing.pipeline import get_files
 from pymongo import MongoClient, ReturnDocument, UpdateOne
 from pymongo.collection import Collection
 from tqdm import tqdm
+
+from mhbai.mongo_db.init_vector_search import collections, embedded_keys
+from mhbai.xml_processing.pipeline import get_files
 
 embeddings = OllamaEmbeddings(model="qwen3-embedding")
 
@@ -170,7 +171,7 @@ def batch_embedding_to_mongo(collection: Literal['mhbs', 'modules', 'exams'], ba
         db[collection].bulk_write(ops)
 
 
-base_path = Path(os.path.expanduser('~/mhbai/ai/compressed_mhbs'))
+base_path = Path(os.path.expanduser('~/mhbai/src/mhbai/ai/compressed_mhbs'))
 files = get_files(path_to_file=base_path, file_type='json')
 files = [i for i in files if i.stem != 'metadata']
 

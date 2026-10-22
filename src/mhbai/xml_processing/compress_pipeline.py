@@ -43,7 +43,7 @@ def save(res) -> None:
         file_path (Path): The path where the JSON file will be saved.
     """
     name = res[1][0].stem + '__' + str(res[1][1]) + '.json'
-    with open(Path(os.path.expanduser(f"~/mhbai/ai/compressed_mhbs/{name}")), "w") as f:
+    with open(Path(os.path.expanduser(f"~/mhbai/src/mhbai/ai/compressed_mhbs/{name}")), "w") as f:
         json.dump(res[0], f, indent=4)
 
 
@@ -61,13 +61,13 @@ def save_concurrently(results):
 
 if __name__ == "__main__":
     # Initialize base data
-    str_path = "~/mhbai/uni-a_mhbs_json/"
+    str_path = "~/mhbai/src/mhbai/uni-a_mhbs_json/"
     path_to_json = Path(os.path.expanduser(str_path))
 
     print("Collecting all JSON files...")
     res = get_files(path_to_json, file_type="json")
     res: list[tuple[Path, int]] = [(r, index) for index, r in enumerate(res)]
-    with open(Path(os.path.expanduser("~/mhbai/ai/compressed_mhbs/metadata.json")), "w") as f:
+    with open(Path(os.path.expanduser("~/mhbai/src/mhbai/ai/compressed_mhbs/metadata.json")), "w") as f:
         json.dump([(str(r[0]), r[1]) for r in res], f, indent=4)
     print(f"Found {len(res)} JSON files.")
     print()

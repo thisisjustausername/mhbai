@@ -5,7 +5,7 @@ from IPython.display import display
 
 
 # setting variables
-path = os.path.expanduser("~/mhbai/ai/information_extraction/mrc_test/markdown/")
+path = os.path.expanduser("~/mhbai/src/mhbai/ai/information_extraction/mrc_test/markdown/")
 min_lines = 100
 
 # fetching files
@@ -18,7 +18,7 @@ for i in files:
         data = f.read()
     if len(data.split("\n")) < min_lines:
         continue
-    
+
     heading_contents = []
     heading = i.split("/markdown/", 1)[1][:-3]
     content = []
@@ -45,13 +45,13 @@ df["heading_short"] = df["heading"].apply(lambda x: x.split("(", 1)[0].split("{"
 df["content"] = df["content"].apply(lambda x: x.split("(", 1)[0].split("{", 1)[0].split("![", 1)[0].split("`", 1)[0].strip())
 df = df[(df["heading_short"] != "") & (df["content"] != "")]
 
- 
+
 print(f"Overall results:   {len(df)}")
 
 pd.set_option('display.max_columns', None)
 display(df.head(10))
 
-df.to_pickle(path=os.path.expanduser("~/mhbai/ai/information_extraction/mrc_test/headings.pkl"))
+df.to_pickle(path=os.path.expanduser("~/mhbai/src/mhbai/ai/information_extraction/mrc_test/headings.pkl"))
 
 # Process files
 # for each file add a clean text version that is used for llm query generation

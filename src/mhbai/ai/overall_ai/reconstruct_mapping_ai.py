@@ -41,7 +41,7 @@ def read_data() -> dict:
 
     computed_data = result.data
 
-    result = load_pdf_modules(pdf_folder="~/mhbai/pdfs/")
+    result = load_pdf_modules(pdf_folder="~/mhbai/src/mhbai/pdfs/")
 
     raw_data = result
 
