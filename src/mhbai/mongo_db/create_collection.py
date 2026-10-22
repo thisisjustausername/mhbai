@@ -30,6 +30,15 @@ db.create_collection(
                     'bsonType': 'string',
                     'description': 'name of the mhb'
                 },
+                'embedding_name': {
+                    'bsonType': 'array',
+                    'description': 'name as vector embedding',
+                    'items': {
+                        'bsonType': 'double'
+                    },
+                    'minItems': 4096,
+                    'maxItems': 4096
+                },
                 'start_semester': {
                     'bsonType': ['int', 'null'],
                     'description': 'the first semester the mhb starts with the first 4 digits being the smaller year and the fifth a boolean for is wintersemester (1) or summersemester (0)',
