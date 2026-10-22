@@ -297,6 +297,8 @@ E.g. for data fetching: Execute file x (FileID) after file y (FileID)
 - bug-fixes in pdf_reader_toc.py making reading mhbs more resilient to "irregular" pdfs
 
 ### TODOs
+1. Check compressed path or truncated path in mongodb as it seems to contain a bug!!!
+2. Fix repo, add setup instructions!!!
 1. Update file structure in README.md
 2. adding options for saving data in csv/xlsx/json etc.
 3. finish commenting pdf_reader_toc.py
