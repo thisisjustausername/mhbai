@@ -1,3 +1,4 @@
+import json
 import os
 
 from dotenv import load_dotenv
@@ -32,9 +33,10 @@ filter_keys = {'mhbs': ['start_semester'],
               'exams': ['deadline', 'graded', 'id', 'portion_of_grade']}
 
 if __name__ == '__main__':
+    collection_indices = {}
     for collection in collections:
         coll = client['unia'][collection]
-        res = coll.create_search_index({
+        vector_search = {
             'name': 'vector_index',
             'type': 'vectorSearch',
             'definition': {
@@ -52,8 +54,9 @@ if __name__ == '__main__':
                     } for key in filter_keys[collection] + ['_hash']]
                 ]
             }
-        })
-        bm25_res = coll.create_search_index({
+        }
+        res = coll.create_search_index(vector_search)
+        bm25_search = {
             'name': 'bm25_index',
             'type': 'search',
             'definition': {
@@ -64,5 +67,9 @@ if __name__ == '__main__':
                     }
                 }
             }
-        })
+        }
+        bm25_res = coll.create_search_index(bm25_search)
+        collection_indices[collection] = {'vectorSearch': vector_search, 'search': bm25_search}
+        with open('src/mhbai/mongo_db/collection_indices.json', 'w') as f:
+            json.dump(collection_indices, f, indent=4)
         print(f"Created search index for collection '{collection}': {res} & {bm25_res}")
