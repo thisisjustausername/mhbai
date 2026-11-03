@@ -1,0 +1,308 @@
+{
+    "mhbs": {
+        "vectorSearch": {
+            "name": "vector_index",
+            "type": "vectorSearch",
+            "definition": {
+                "fields": [
+                    {
+                        "type": "vector",
+                        "path": "embedding_description",
+                        "numDimensions": 4096,
+                        "similarity": "cosine"
+                    },
+                    {
+                        "type": "vector",
+                        "path": "embedding_faculties",
+                        "numDimensions": 4096,
+                        "similarity": "cosine"
+                    },
+                    {
+                        "type": "vector",
+                        "path": "embedding_name",
+                        "numDimensions": 4096,
+                        "similarity": "cosine"
+                    },
+                    {
+                        "type": "vector",
+                        "path": "embedding_path",
+                        "numDimensions": 4096,
+                        "similarity": "cosine"
+                    },
+                    {
+                        "type": "vector",
+                        "path": "embedding",
+                        "numDimensions": 4096,
+                        "similarity": "cosine"
+                    },
+                    {
+                        "type": "filter",
+                        "path": "start_semester"
+                    },
+                    {
+                        "type": "filter",
+                        "path": "_hash"
+                    }
+                ]
+            }
+        },
+        "search": {
+            "name": "bm25_index",
+            "type": "search",
+            "definition": {
+                "mappings": {
+                    "dynamic": true,
+                    "fields": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "faculties": {
+                            "type": "string"
+                        },
+                        "path": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "modules": {
+        "vectorSearch": {
+            "name": "vector_index",
+            "type": "vectorSearch",
+            "definition": {
+                "fields": [
+                    {
+                        "type": "vector",
+                        "path": "embedding_content",
+                        "numDimensions": 4096,
+                        "similarity": "cosine"
+                    },
+                    {
+                        "type": "vector",
+                        "path": "embedding_goals",
+                        "numDimensions": 4096,
+                        "similarity": "cosine"
+                    },
+                    {
+                        "type": "vector",
+                        "path": "embedding_exam_outline",
+                        "numDimensions": 4096,
+                        "similarity": "cosine"
+                    },
+                    {
+                        "type": "vector",
+                        "path": "embedding_faculty_chair",
+                        "numDimensions": 4096,
+                        "similarity": "cosine"
+                    },
+                    {
+                        "type": "vector",
+                        "path": "embedding_lecturer",
+                        "numDimensions": 4096,
+                        "similarity": "cosine"
+                    },
+                    {
+                        "type": "vector",
+                        "path": "embedding_name",
+                        "numDimensions": 4096,
+                        "similarity": "cosine"
+                    },
+                    {
+                        "type": "vector",
+                        "path": "embedding_prerequisites",
+                        "numDimensions": 4096,
+                        "similarity": "cosine"
+                    },
+                    {
+                        "type": "vector",
+                        "path": "embedding_success_requirements",
+                        "numDimensions": 4096,
+                        "similarity": "cosine"
+                    },
+                    {
+                        "type": "vector",
+                        "path": "embedding_workloads",
+                        "numDimensions": 4096,
+                        "similarity": "cosine"
+                    },
+                    {
+                        "type": "vector",
+                        "path": "embedding",
+                        "numDimensions": 4096,
+                        "similarity": "cosine"
+                    },
+                    {
+                        "type": "filter",
+                        "path": "available_semesters"
+                    },
+                    {
+                        "type": "filter",
+                        "path": "ects"
+                    },
+                    {
+                        "type": "filter",
+                        "path": "exams"
+                    },
+                    {
+                        "type": "filter",
+                        "path": "international"
+                    },
+                    {
+                        "type": "filter",
+                        "path": "languages"
+                    },
+                    {
+                        "type": "filter",
+                        "path": "mandatory"
+                    },
+                    {
+                        "type": "filter",
+                        "path": "module_code"
+                    },
+                    {
+                        "type": "filter",
+                        "path": "recommended_semester_span"
+                    },
+                    {
+                        "type": "filter",
+                        "path": "weekly_hours"
+                    },
+                    {
+                        "type": "filter",
+                        "path": "workload_hours"
+                    },
+                    {
+                        "type": "filter",
+                        "path": "_hash"
+                    }
+                ]
+            }
+        },
+        "search": {
+            "name": "bm25_index",
+            "type": "search",
+            "definition": {
+                "mappings": {
+                    "dynamic": true,
+                    "fields": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "lecturer": {
+                            "type": "string"
+                        },
+                        "prerequisites": {
+                            "type": "string"
+                        },
+                        "faculty_chair": {
+                            "type": "string"
+                        },
+                        "success_requirements": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "exams": {
+        "vectorSearch": {
+            "name": "vector_index",
+            "type": "vectorSearch",
+            "definition": {
+                "fields": [
+                    {
+                        "type": "vector",
+                        "path": "embedding_description",
+                        "numDimensions": 4096,
+                        "similarity": "cosine"
+                    },
+                    {
+                        "type": "vector",
+                        "path": "embedding_duration",
+                        "numDimensions": 4096,
+                        "similarity": "cosine"
+                    },
+                    {
+                        "type": "vector",
+                        "path": "embedding_frequency",
+                        "numDimensions": 4096,
+                        "similarity": "cosine"
+                    },
+                    {
+                        "type": "vector",
+                        "path": "embedding_name",
+                        "numDimensions": 4096,
+                        "similarity": "cosine"
+                    },
+                    {
+                        "type": "vector",
+                        "path": "embedding_preparation",
+                        "numDimensions": 4096,
+                        "similarity": "cosine"
+                    },
+                    {
+                        "type": "vector",
+                        "path": "embedding_type",
+                        "numDimensions": 4096,
+                        "similarity": "cosine"
+                    },
+                    {
+                        "type": "vector",
+                        "path": "embedding",
+                        "numDimensions": 4096,
+                        "similarity": "cosine"
+                    },
+                    {
+                        "type": "filter",
+                        "path": "deadline"
+                    },
+                    {
+                        "type": "filter",
+                        "path": "graded"
+                    },
+                    {
+                        "type": "filter",
+                        "path": "id"
+                    },
+                    {
+                        "type": "filter",
+                        "path": "portion_of_grade"
+                    },
+                    {
+                        "type": "filter",
+                        "path": "_hash"
+                    }
+                ]
+            }
+        },
+        "search": {
+            "name": "bm25_index",
+            "type": "search",
+            "definition": {
+                "mappings": {
+                    "dynamic": true,
+                    "fields": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        },
+                        "duration": {
+                            "type": "string"
+                        },
+                        "frequency": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

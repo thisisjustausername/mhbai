@@ -39,3 +39,4 @@ ai/information_extraction/mrc_test/
 mongot-community
 student_counselor/chroma_db/
 .chainlit/
+!src/mhbai/mongo_db/collection_indices.json
