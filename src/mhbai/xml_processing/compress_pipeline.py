@@ -61,7 +61,7 @@ def save_concurrently(results):
 
 if __name__ == "__main__":
     # Initialize base data
-    str_path = "~/mhbai/src/mhbai/uni-a_mhbs_json/"
+    str_path = "~/mhbai/uni-a_mhbs_json/"
     path_to_json = Path(os.path.expanduser(str_path))
 
     print("Collecting all JSON files...")

@@ -1,14 +1,15 @@
 import json
 import os
-from pathlib import Path
-import xmltodict
-from mhbai.xml_processing import xml_to_json, find_information
 from multiprocessing import Pool, cpu_count
+from pathlib import Path
+
+import xmltodict
 from tqdm import tqdm
 
+from mhbai.xml_processing import find_information, xml_to_json
 
-base_read_path = Path(os.path.expanduser("~/mhbai/src/mhbai/mount/StudisDaten/Modulhandbuecher/"))
-base_save_path = Path(os.path.expanduser("~/mhbai/src/mhbai/uni-a_mhbs_json/"))
+base_read_path = Path(os.path.expanduser("~/mhbai/mount/StudisDaten/Modulhandbuecher/"))
+base_save_path = Path(os.path.expanduser("~/mhbai/uni-a_mhbs_json/"))
 
 def process_file(xml_file: str):
     with open(xml_file, "r") as f:
