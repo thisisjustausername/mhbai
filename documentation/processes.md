@@ -30,7 +30,7 @@ Specify `1` for only downloading new pdfs and `0` for downloading all available 
 
 ```bash
 source venv/bin/activate
-python3 -m university_of_augsburg.web_scraping.download_files 1
+python3 -m src.mhbai.university_of_augsburg.web_scraping.download_files 1
 ```
 
 ### Raw pages
@@ -40,7 +40,7 @@ Only run this program after downloading all needed MHB-PDFs using [Fetch MHBs](#
 
 ```bash
 source venv/bin/activate
-python3 -m database.add_to_db.add_modules_raw
+python3 -m src.mhbai.database.add_to_db.add_modules_raw
 ```
 
 ### Regex Extraction
@@ -50,7 +50,7 @@ Only run this program after downloading all needed MHB-PDFs using [Fetch MHBs](#
 
 ```bash
 source venv/bin/activate
-python3 -m database.add_to_db.add_modules_regex
+python3 -m src.mhbai.database.add_to_db.add_modules_regex
 ```
 
 ### AI Extraction
@@ -60,7 +60,7 @@ Only run this program after downloading all needed MHB-PDFs using [Fetch MHBs](#
 
 ```bash
 source venv/bin/activate
-python3 -m ai.overall_ai.full_extraction
+python3 -m src.mhbai.ai.overall_ai.full_extraction
 ```
 
 ### Uni-A Website Extraction
@@ -70,9 +70,9 @@ This information is embedded and stored in a chromadb database.</br>
 
 ```bash
 source venv/bin/activate
-python3 -m student_counselor.grab_course_info
-python3 -m student_counselor.json_to_text
-python3 -m student_counselor.embed
+python3 -m src.mhbai.student_counselor.grab_course_info
+python3 -m src.mhbai.student_counselor.json_to_text
+python3 -m src.mhbai.student_counselor.embed
 ```
 
 ### MHB and Module Extraction from Studis
@@ -83,18 +83,18 @@ An alternative approach generating a more detailed schema is also available unde
 
 ```bash
 source venv/bin/activate
-python3 -m xml_processing.xml_to_json_workflow
-python3 -m xml_processing.compress_pipeline
-python3 -m mongo_db.fill_db
+python3 -m src.mhbai.xml_processing.xml_to_json_workflow
+python3 -m src.mhbai.xml_processing.compress_pipeline
+python3 -m src.mhbai.mongo_db.fill_db
 ```
 
 When first using mongoDB, initialize it first as follows:
 
 ```bash
 source venv/bin/activate
-python3 -m mongo_db.create_user
-python3 -m mongo_db.create_collection
-python3 -m mongo_db.init_vector_search
+python3 -m src.mhbai.mongo_db.create_user
+python3 -m src.mhbai.mongo_db.create_collection
+python3 -m src.mhbai.mongo_db.init_vector_search
 ```
 
 ## Website and API
