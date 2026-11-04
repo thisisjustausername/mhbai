@@ -123,7 +123,7 @@ def compress_json(local_path: Path) -> dict[str, Any] | None:
                 part["exams"] = None if len(exam_ids) == 0 else [a for a in exams if a["id"] in exam_ids]
                 if part["exams"] == []:
                     part["exams"] = None
-                taken_exams.extend(list({[l["id"] for l in part["exams"] or []]}.intersection(set(temp_exams_mod_ids))))
+                taken_exams.extend(list({l["id"] for l in part["exams"] or []}.intersection(set(temp_exams_mod_ids))))
                 t_exams = []
                 for l in [m for m in (k.get("exams", []) or []) if m.get("id", None) in free_exam_ids]:
                     exam = {}
