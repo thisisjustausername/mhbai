@@ -14,6 +14,7 @@ from bson import ObjectId
 from langchain_ollama import OllamaEmbeddings
 from pymongo import MongoClient, ReturnDocument, UpdateOne
 from pymongo.collection import Collection
+from pymongo.errors import DuplicateKeyError
 from tqdm import tqdm
 
 from mhbai.mongo_db.init_vector_search import collections, embedded_keys
@@ -128,13 +129,23 @@ def insert_non_dupl(collection: Collection, doc: dict, check_attr: str = '_hash'
     Returns:
         ObjectId: The ID of the inserted or existing document.
     '''
-    return collection.find_one_and_update(
-        {'_hash': doc[check_attr]},
-        {'$setOnInsert': doc},
-        upsert=True,
-        projection={"_id": 1},
-        return_document=ReturnDocument.AFTER
-    )['_id'] # type: ignore
+    try:
+        return collection.find_one_and_update(
+            {'_hash': doc[check_attr]},
+            {'$setOnInsert': doc},
+            upsert=True,
+            projection={"_id": 1},
+            return_document=ReturnDocument.AFTER
+        )['_id'] # type: ignore
+    except DuplicateKeyError as e:
+        # FIXME: DuplicateKeyError are being raised e.g. for duplicate paths but not matching hashes, so a document might've been updated.
+        # FIXME: No default behaviour (ignore, override, ...) specified for that yet
+        print(f"Duplicate key error: {e}. Document with hash {doc[check_attr]} already exists.")
+        existing_doc = collection.find_one({'_hash': doc[check_attr]}, projection={"_id": 1})
+        if existing_doc:
+            return existing_doc['_id']
+        else:
+            raise
 
 
 client = MongoClient('mongodb://localhost:27017/')
