@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 import re
+import unicodedata
 from copy import deepcopy
 from pathlib import Path
 from typing import Literal, overload
@@ -33,6 +34,12 @@ def retype_objectid_to_str(data: dict | list):
     elif isinstance(data, list):
         data = [retype_objectid_to_str(item) if isinstance(item, (list, dict)) else item if not isinstance(item, ObjectId) else str(item) for item in data]
     return data
+
+
+def normalize_path(p: str) -> str:
+    p = os.path.expanduser(p)
+    p = Path(p).resolve().as_posix()
+    return unicodedata.normalize('NFC', p)
 
 
 # NOTE: DO NOT HASH THE EMBEDDING VECTOR FIELDS!!!
@@ -73,7 +80,7 @@ def infocard(data: dict, collection: Literal['mhbs', 'modules', 'exams'] | None)
         data['module_groups'] = [f'    name: {mg["name"]}\n    needed / allowed ects: {mg["min_ects"]} - {mg["max_ects"]}\n    modules: {", ".join(mg["modules"])}' for mg in data['module_groups']]
     # clean path (for security reasons too)
     if 'path' in data:
-        data['path'] = data['path'].split('uni-a_mhbs_json/', 1)[1]
+        data['path'] = normalize_path(data['path']).split('uni-a_mhbs_json/', 1)[1] # TODO: make it work for compressed path too or scrap calling it for compressed path
 
     # unnest nested values for modules collection
     if 'languages' in data and data['languages'] != 'Unknown':
@@ -131,7 +138,7 @@ def insert_non_dupl(collection: Collection, doc: dict, check_attr: str = '_hash'
     '''
     try:
         return collection.find_one_and_update(
-            {'_hash': doc[check_attr]},
+            {check_attr: doc[check_attr]},
             {'$setOnInsert': doc},
             upsert=True,
             projection={"_id": 1},
@@ -262,6 +269,7 @@ for file in tqdm(files):
         data['module_groups'] = None
     start_sem = data['start_semester']
     data['start_semester'] = None if start_sem is None else int((splitted := start_sem.split(' ', 1))[1].split('/', 1)[0] + str(int(splitted[0] == 'Wintersemester')))
+    data['path'] = normalize_path(data['path']).split('uni-a_mhbs_json/', 1)[1]
 
     data['_hash'] = create_unique_hash(data)
 
