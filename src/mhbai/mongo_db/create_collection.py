@@ -2,12 +2,11 @@
 Create mongodb for compressed STUDIS mhb json files and extracted json files.
 '''
 
-import json
-
+import json5
 from pymongo import ASCENDING, IndexModel, MongoClient
 
-with open('src/mongo_db/collection_schemata.json', 'r') as f:
-    schemata = json.load(f)
+with open('src/mhbai/mongo_db/collection_schemata.jsonc', 'r') as f:
+    schemata = json5.load(f)
 
 client = MongoClient('mongodb://localhost:27017/')
 
