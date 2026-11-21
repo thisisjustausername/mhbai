@@ -49,7 +49,8 @@ def compress_json(local_path: Path) -> dict[str, Any] | None:
     mhb["module_groups"] = []
     for i in data.get("module_groups", []):
         module_group = {}
-        module_group["name_letter"] = i.get("name", None)
+        module_group["name"] = i.get("name", None)
+        module_group["name_letter"] = i.get("name_letter", None)
         module_group["min_ects"] = i.get("min_ects", None)
         module_group["max_ects"] = i.get("max_ects", None)
         module_group["modules"] = []
