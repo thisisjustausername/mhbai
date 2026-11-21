@@ -31,6 +31,7 @@ from mhbai.mongo_db.init_vector_search import (
 embedded_keys_paths = embedded_keys_paths.copy()
 
 mdl = 'qwen3.8:27b'
+mdl = 'Qwen3.8-Flash-Next'
 
 ################################################################
 '''
@@ -191,7 +192,7 @@ def _build_vector_search(index: str, embedding: list[float], k: int, filters: li
     }
 
 
-def _create_filter(attribute: int | bool | tuple[int | None, int | None], lexico_search_field: None | str = None) -> int | bool | dict[str, int] | dict[str, dict[str, str | int]]:
+def _create_filter(attribute: int | bool | tuple[int | None, int | None] | str, lexico_search_field: None | str = None) -> int | bool | str | dict[str, int] | dict[str, dict[str, str | int]]:
     '''
     Creates a filter for the given attribute for mongodb search.
 
@@ -214,6 +215,11 @@ def _create_filter(attribute: int | bool | tuple[int | None, int | None], lexico
                 **{f: v for f, v in zip(['gte', 'lte'], attribute) if v is not None}
                     }
         }
+    if isinstance(attribute, str):
+        if not lexico_search_field:
+            return attribute
+        return {'equals': {'path': lexico_search_field, 'value': attribute}}
+
     # TODO: finish implementation for lists
     if isinstance(attribute, list):
         raise NotImplementedError('Currently only int, bool, and tuple[int, int] are implemented for filters. Lists are not yet supported.')
@@ -262,7 +268,6 @@ def _create_vector_search(attribs: dict, rename_keys: dict, bm25_keys: list[str]
                             'text': {
                                 'query': val,
                                 'path': key,
-                                'matchCriteria': 'all',
                                 'fuzzy': {'maxEdits': 2, 'prefixLength': 1}
                             }
                         }
@@ -277,7 +282,6 @@ def _create_vector_search(attribs: dict, rename_keys: dict, bm25_keys: list[str]
                     'text': {
                         'query': val,
                         'path': key,
-                        'matchCriteria': 'all',
                         'fuzzy': {'maxEdits': 2, 'prefixLength': 1}
                     }
             }
@@ -518,7 +522,7 @@ Modulgruppen: {mdl_grp if isinstance(mdl_grp, str) else ""}''' # temporary else 
                 'beginn': start_semester,
                 'fakultäten': self.data.get('faculties'),
                 'modulhandbuchgruppe': self.data.get('module_handbook_group', default),
-                'dateipfad': self.data.get('path').split('uni-a_mhbs_json', 1)[1][1:], # TODO: remove hardcoded path
+                'dateipfad': (self.data.get('path') or default).split('uni-a_mhbs_json', 1)[-1].removeprefix('/'), # TODO: remove hardcoded path
                 'gründung_des_studiengangs': self.data.get('description', default),
                 'modulgruppen': mdl_grp
             }
@@ -571,7 +575,7 @@ Modulgruppen: {mdl_grp if isinstance(mdl_grp, str) else ""}''' # temporary else 
                     modules_json = [str(i.get('_id', default) if isinstance(i, dict) else i) for i in modules]
                 elif information == 'compressed':
                     # modules = ', '.join([f'<{i.get("name")}, {i.get("module_code")}, {i.get("_id")}>' if isinstance(i, dict) else f'<{default}, {default}, {i}' for i in modules])
-                    modules_json = [{'name': i.get('name'), 'modulcode': i.get('module_code'), 'mongoDB-ID': i.get('_id')} if isinstance(i, dict) else {'name': default, 'modulcode': default, 'mongoDB-ID': i} for i in modules]
+                    modules_json = [{'name': i.get('name'), 'modulcode': i.get('module_code'), 'mongoDB-ID': str(i.get('_id'))} if isinstance(i, dict) else {'name': default, 'modulcode': default, 'mongoDB-ID': i} for i in modules]
                 else:
                     # modules = '\n'.join(['        --- Modul ---\n' + '\n        '.join(Module(i).infocard.split(';\n')) for i in modules]) # FIX: outdated as ; was removed. Marked for removal as well
                     modules_json = [Module(i).infocard for i in modules_json] # type: ignore
@@ -579,7 +583,7 @@ Modulgruppen: {mdl_grp if isinstance(mdl_grp, str) else ""}''' # temporary else 
 \tZu absolvierende ECTS: {module_group.get('min_ects', default) or default} - {module_group.get('max_ects', default) or default},
 \tModule {" (MongoDB-IDs)" if information == 'ids' else "<Name, Modulcode, MongoDB-ID>" if information == 'compressed' else ""}: {modules}'''"""
             info_dict = {
-                'name': module_group.get('name_letter'),
+                'name': module_group.get('name'),
                 'zu_absolvierende_ects': f"{module_group.get('min_ects', default) or default} - {module_group.get('max_ects', default) or default}",
                 'module': modules_json
             }
@@ -1072,6 +1076,7 @@ def get_modulhandbuch_by_mongodb_id(mongo_id: str) -> str | None:
     ]
     result = mhbs_db.aggregate(aggregation_pipeline).to_list(length=1)[0]
     if result:
+        return json.dumps(ModuleHandbook(result, granularities=['compressed'], compact=False).infocard_compressed_modules) # _compressed_modules
         return json.dumps(ModuleHandbook(result, compact=False).infocard) # _compressed_modules
     return 'Keine Informationen zu dem Modulhandbuch gefunden.'
 
@@ -1193,7 +1198,6 @@ async def dirty_search(query: str, k: int = 3) -> str:
         if response.url != url and response.url:
             url = str(response.url)
         text = htm.convert(response.text, options=options).content
-        print(text)
         if not text:
             continue
         text = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', replacer, text)
