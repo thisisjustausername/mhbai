@@ -71,8 +71,12 @@
                   "minItems": 1,
                   "items": {
                       "bsonType": "object",
-                      "required": ["name_letter", "modules"],
+                      "required": ["name", "name_letter", "modules"],
                       "properties": {
+                          "name": {
+                              "bsonType": ["string", "null"],
+                              "description": "name of the module group"
+                          },
                           "name_letter": {
                               "bsonType": "string",
                               "description": "letter for the module group"
