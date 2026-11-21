@@ -31,6 +31,9 @@ bm25_keys = {'mhbs': ['name', 'description', 'faculties', 'path'],
 filter_keys = {'mhbs': ['start_semester'],
               'modules': ['available_semesters', 'ects', 'exams', 'international', 'languages', 'mandatory', 'module_code', 'recommended_semester_span', 'weekly_hours', 'workload_hours'],
               'exams': ['deadline', 'graded', 'id', 'portion_of_grade']}
+bm25_token_keys = {'mhbs': [],
+                   'modules': ['module_code'],
+                   'exams': []}
 
 if __name__ == '__main__':
     collection_indices = {}
@@ -63,7 +66,8 @@ if __name__ == '__main__':
                 'mappings': {
                     'dynamic': True,
                     'fields': {
-                        **{key: {'type': 'string'} for key in bm25_keys[collection]}
+                        **{key: {'type': 'string'} for key in bm25_keys[collection]},
+                        **{key: {'type': 'token'} for key in bm25_token_keys[collection]}
                     }
                 }
             }
