@@ -2,11 +2,12 @@
 convert xml to json and clean the html tags in the process
 """
 
+import json
+import re
 from pathlib import Path
 from typing import Any
-import re
+
 import xmltodict
-import json
 
 
 def clean_dict(diction: dict[str, Any]) -> dict[str, Any]:
@@ -19,13 +20,13 @@ def clean_dict(diction: dict[str, Any]) -> dict[str, Any]:
         dict[str, Any]: the cleaned dict
     """
     # initialize new dict
-    new_dict = dict()
+    new_dict = {}
 
     # clean the dict recursively
     for key, value in diction.items():
         # remove @ from the key if it exists
         if key.startswith("@"):
-            key = key[1:] if key.startswith("@") else key
+            key = key.removeprefix("@")
         # convert camelCase to snake_case
         key = camel_to_snake(key)
         # clean the value recursively if it is a dict, list or tuple, that contain dicts
@@ -84,7 +85,7 @@ def clean_html_only(data: dict[str, str | list | dict | None], none_separator: s
         if isinstance(value, str):
             output += value
             continue
-        
+
         # add <None> separator
         if value is None:
             output += none_separator
@@ -116,17 +117,16 @@ def clean_html_dict(data: dict[str, str | list | dict | None] | list[Any]) -> di
     """
 
     if isinstance(data, dict):
-        new = dict()
+        new = {}
         for key, value in data.items():
-            if isinstance(value, dict) and len(value) == 1 and "html" in value:
-                if "body" in value["html"]:
-                    html = value["html"]["body"]
-                    if isinstance(html, str):
-                        new[key] = html
-                        continue
-                    if isinstance(html, dict):
-                        new[key] = clean_html_only(html)
-                        continue
+            if isinstance(value, dict) and len(value) == 1 and "html" in value and "body" in value["html"]:
+                html = value["html"]["body"]
+                if isinstance(html, str):
+                    new[key] = html
+                    continue
+                if isinstance(html, dict):
+                    new[key] = clean_html_only(html)
+                    continue
             if not isinstance(value, (list, dict)):
                 new[key] = value
             new[key] = clean_html_dict(value) # type: ignore
@@ -159,7 +159,7 @@ if __name__ == "__main__":
     # 1. read xml
     with open("test.xml", "r") as f:
         xml = f.read()
-    
+
     # 2. parse xml to json
     diction = xmltodict.parse(xml)
 
