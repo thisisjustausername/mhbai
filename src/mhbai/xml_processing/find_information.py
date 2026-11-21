@@ -3,7 +3,7 @@ Convert raw Studis XML-files for study programs (courses) to a new JSON schema
 """
 
 import json
-from typing import Callable
+from collections.abc import Callable
 
 
 def recursive_walk(
@@ -132,9 +132,9 @@ def clean_mhb(data: dict) -> dict | None:
         "version"
     ]
 
-    retype_values = {str(str): lambda x: int(x)}
+    retype_values: dict[str, Callable[[str], int]] = {str(str): lambda x: int(x)}
 
-    replace_values = {-1: None}
+    replace_values: dict[int | str | None, int | str | None] = {-1: None}
 
     d = mhb["mhb_pos"]
     if mhb["handbuch_gruppen"] is None:
@@ -171,7 +171,7 @@ def clean_mhb(data: dict) -> dict | None:
         new_module_group["po_version_unclear-"]= i.get("modulgruppe", {}).get("bezeichnung", None)
         new_module_group["name_letter"] = i.get("modulgruppe", {}).get("name", [None])[0]
         new_module_group["type"] = i.get("modulgruppe", {}).get("name", [None])[0][2:].split(" (")[0]
-        new_module_group["name"] = i.get("modulgruppe", {}).get("name", [None])[0].split("): ")[-1]
+        new_module_group["name"] = (i.get("modulgruppe", {}).get("sprache_bez", None) or i.get("modulgruppe", {}).get("name", [None])[0].split("): ")[-1])
 
         if isinstance((i.get("modulgruppe", {}).get("gruppe_module", {}) or {}).get("gruppe_modul", None), dict):
             i["modulgruppe"]["gruppe_module"]["gruppe_modul"] = [i.get("modulgruppe", {}).get("gruppe_module", {}).get("gruppe_modul", None)]
@@ -241,8 +241,9 @@ def clean_mhb(data: dict) -> dict | None:
             module["organization_owner"] = [ {"organization_id": c.get("orgeinheit", None), "role": c.get("role", None), "name": c.get("name", None)} for c in mod.get("orgeinheit", [])]
 
             # print(list(mod.keys()))
-            # TODO: check, whether it contains useful information
-            mod_parts = (mod.get("modul_lvs", {}) or {}).get("modul_lv", [])
+            # NOTE: already implemented, as it holds useful information; module lehrveranstaltungen under crss
+            # mod_parts = (mod.get("modul_lvs", {}) or {}).get("modul_lv", [])
+
             # print(json.dumps(mod_parts, indent=4))
 
             # TODO: maybe add to lv if more exist, but probably not
